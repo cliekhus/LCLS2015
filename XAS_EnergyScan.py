@@ -19,7 +19,7 @@ ReEnterData = False
 
 #Set up the scans and the number of time steps
 
-NumTTSteps = 6
+NumTTSteps = 4
 NumTTStepsPlots = NumTTSteps
 
 if ReEnterData:
@@ -29,7 +29,7 @@ if ReEnterData:
     #Initialize the necessary lists
     XOn = []
     LOn = []
-    XEnergy = []
+    XEnergyRaw = []
     Diode2 = []
     
     Ipm2Sum = []
@@ -67,7 +67,7 @@ if ReEnterData:
         xOn = list(map(bool, ScanName['/lightStatus/xray']))
         XOn = XOn + xOn
         LOn = LOn + list(map(bool, ScanName['/lightStatus/laser']))
-        XEnergy = XEnergy + [round(4*x,3)/4 for x in list(ScanName['/scan/var0'])]
+        XEnergyRaw = XEnergyRaw + list(ScanName['/scan/var0'])
 
         diode = [x[2] for x in list(ScanName['/diodeU/channels'])]                  #Quad cell 2 from diode - this one has an output
         Diode2 = Diode2 + diode
@@ -131,16 +131,16 @@ if ReEnterData:
 
 
 #Set up the intensity filter - the diode and cspad sum should respond linearly with the x-ray intensity
-IpmNumSTDs = 3
+IpmNumSTDs = 6
 IpmFilter = list(a < b+IpmNumSTDs*c and a > b-IpmNumSTDs*c for a,b,c in zip(Ipm2Sum, Ipm2Median, Ipm2STD))
 
-DISSTDs = 1.5
+DISSTDs = 3
 DISFilter = list(a < b*c+DISSTDs*d and a > b*c-DISSTDs*d for a,b,c,d in zip(Ipm2Sum, Diode2, DISMedian, DISSTD))
 
-CspadSTDs = 3
+CspadSTDs = 6
 CspadFilter = list(a < b+CspadSTDs*c and a > b-CspadSTDs*c for a,b,c in zip(CspadSum, CspadMedian, CspadSTD))
 
-DCSSTDs = 1.5
+DCSSTDs = 3
 DCSFilter = list(a < b*c+DCSSTDs*d and a > b*c-DCSSTDs*d for a,b,c,d in zip(CspadSum, Diode2, DCSMedian, DCSSTD))
 
 #IntensityFilter = list(a for a in zip(IpmFilter))
@@ -155,19 +155,19 @@ plt.ylabel('intensity signal')
 
 
 #Convert the timetool signal into femtosecond delays and create the time tool filters
-TTSTDs = 2
+TTSTDs = 3
 TTValueFilter = list(a < b+TTSTDs*c and a > b-TTSTDs*c for a,b,c in zip(TimeTool, TTMedian, TTSTD))
 
-TTAmpSTDs = 2
+TTAmpSTDs = 3
 TTAmpFilter = list(a < b+TTAmpSTDs*c and a > b-TTAmpSTDs*c for a,b,c in zip(TTAmp, TTAmpMedian, TTAmpSTD))
 
-TTFWHMSTDs = 2
+TTFWHMSTDs = 3
 TTFWHMFilter = list(a < b+TTFWHMSTDs*c and a > b-TTFWHMSTDs*c for a,b,c in zip(TTFWHM, TTFWHMMedian, TTFWHMSTD))
 
 TTFilter = list((a and b and c) or not d or not e for a,b,c,d,e in zip(TTValueFilter, TTAmpFilter, TTFWHMFilter, XOn, LOn))
 
 TTDelay = [x*1000 for x in TimeTool]
-TTSteps = np.array([float(min(TTDelay)), float(-100), float(-50), float(0), float(50), float(100), float(max(TTDelay))])
+TTSteps = np.array([float(min(TTDelay)), float(-100), float(0), float(100), float(max(TTDelay))])
 #TTSteps = np.linspace(min(TTDelay),max(TTDelay),NumTTSteps+1)
 
 fig=plt.figure()
@@ -179,6 +179,7 @@ plt.hist(list(compress(TTDelay, [a and b and c for a,b,c in zip(TTFilter, XOn, L
 plt.title('time tool after filters')
 
 #Make XAS spectra
+XEnergy = [round(x,4)*1000+.75 for x in XEnergyRaw]
 UniXEnergy = np.unique(XEnergy)
 
 XASOn = [[0 for x in range(len(UniXEnergy))] for y in range(len(TTSteps)-1)]
