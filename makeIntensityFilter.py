@@ -17,7 +17,7 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd):
     plt.figure()
     plt.scatter(list(compress(diode, xonfilter)),list(compress(slope, xonfilter)),s=2)
     
-    numstds = .5
+    numstds = 2
     
     slopefilter = [abs(a-c) < numstds*d and b for a,b,c,d in zip(slope,xonfilter,slopemedian, slopestd)]
     
@@ -34,7 +34,7 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd):
     slopefiltered = list(compress(slope,slopefilter))
     
     plt.figure()
-    slopehist = plt.hist(slopefiltered,1000)
+    slopehist = plt.hist(slopefiltered,2000)
     plt.xlabel('slope')
     plt.ylabel('counts')
     slopes = slopehist[1]
@@ -46,7 +46,7 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd):
     def gausfit(x,a0,x00,sig0,a1,x01,sig1,a2,x02,sig2):
         return gauss(x,a0,x00,sig0) + gauss(x,a1,x01,sig1) + gauss(x,a2,x02,sig2)
     
-    params,cov = curve_fit(gausfit,slopes,slopehist[0])
+    params,cov = curve_fit(gausfit,slopes,slopehist[0],p0 = [100*max(slopehist[0])/116,.04,.01,60*max(slopehist[0])/116,.06,.01,30*max(slopehist[0])/116,.12,.01])
     
     plt.plot(slopes,gausfit(slopes,*params))
     
@@ -56,10 +56,22 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd):
     
     paramssorted = sorted(zip(x0fit,a0fit,sigfit))
     
-    desiredgauss = gauss(slope,paramssorted[2][1],paramssorted[2][0],paramssorted[2][2])
-    closegauss = gauss(slope,paramssorted[1][1],paramssorted[1][0],paramssorted[1][2])
+    gauss0 = gauss(slope,paramssorted[0][1],paramssorted[0][0],paramssorted[0][2])
+    gauss1 = gauss(slope,paramssorted[1][1],paramssorted[1][0],paramssorted[1][2])
+    gauss2 = gauss(slope,paramssorted[2][1],paramssorted[2][0],paramssorted[2][2])
     
-    gaussfilter = [x>y and z for x,y,z in zip(desiredgauss,closegauss,slopefilter)]
+    plt.figure()
+    plt.scatter(slope, gauss0)
+    plt.scatter(slope, gauss1)
+    plt.scatter(slope, gauss2)
+    
+    gaussamp = 3
+    
+    gaussfilter = [x > paramssorted[0][1]/gaussamp or y > paramssorted[1][1]/gaussamp or z > paramssorted[2][1]/gaussamp and a for x,y,z,a in zip(gauss0, gauss1, gauss2, slopefilter)]
+    
+    #gaussfilter = [x>y and x>z and a for x,y,z,a in zip(desiredgauss,closegauss1,closegauss2,slopefilter)]
+    
+    #gaussfilter = slopefilter
     
     plt.figure()
     plt.scatter(ipm2,diode,s=2)

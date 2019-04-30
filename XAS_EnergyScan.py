@@ -16,7 +16,7 @@ import math
 import statistics as stat
 from makeIntensityFilter import makeDiodeFilter
 
-ReEnterData = True
+ReEnterData = False
 
 #Set up the scans and the number of time steps
 
@@ -115,13 +115,6 @@ DiodeFilter = makeDiodeFilter(Ipm2Sum, Diode2, XOn, LOn, DiodeIpmSlope, DISMedia
 
 IntensityFilter = [a and b for a,b in zip(IpmFilter, DiodeFilter)]
 
-plt.figure()
-plt.scatter(Ipm2Sum, Diode2, s=1)
-plt.scatter(list(compress(Ipm2Sum, IntensityFilter)), list(compress(Diode2, IntensityFilter)), s=1, alpha = .25)
-plt.title('intensity filter effect')
-plt.ylabel('diode signal')
-plt.xlabel('intensity signal')
-
 
 #Convert the timetool signal into femtosecond delays and create the time tool filters
 TTSTDs = 3
@@ -146,6 +139,7 @@ plt.title('time tool before filters')
 fig.add_subplot(122)
 plt.hist(list(compress(TTDelay, [a and b and c for a,b,c in zip(TTFilter, XOn, LOn)])), 1000)
 plt.title('time tool after filters')
+
 
 #Make XAS spectra
 XEnergy = [round(x,4)*1000+.75 for x in XEnergyRaw]
@@ -192,14 +186,14 @@ LegendLabel = []
 for ii in range(NumTTStepsPlots):
 
     XASOn_Norm[ii] = [a/b for a,b,c in zip(XASOn[ii], NormFactor_On[ii], AtleastOne) if c]
-    LegendLabel = LegendLabel + plt.plot(list(compress(UniXEnergy, [x > 0 for x in On_NumScan[ii]])), XASOn_Norm[ii])
+    LegendLabel = LegendLabel + plt.plot(list(compress(UniXEnergy, AtleastOne)), XASOn_Norm[ii])
     
 plt.xlabel('x-ray energy (keV)')
 plt.ylabel('x-ray absorption')
 
 XASOff_Norm = [a/b for a,b,c in zip(XASOff, NormFactor_Off, AtleastOne) if c]
 
-LegendLabel = LegendLabel + plt.plot(list(compress(UniXEnergy, [x > 0 for x in Off_NumScan])), XASOff_Norm)
+LegendLabel = LegendLabel + plt.plot(list(compress(UniXEnergy, AtleastOne)), XASOff_Norm)
 plt.xlabel('x-ray energy (keV)')
 plt.ylabel('x-ray absorption')
 
