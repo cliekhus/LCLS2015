@@ -24,7 +24,7 @@ NumTTStepsPlots = NumTTSteps
 
 if ReEnterData:
 
-    FileNums = list(range(371,395+1))
+    FileNums = list(range(371,371+1))
     
     #Initialize the necessary lists
     XOn = []
@@ -79,29 +79,29 @@ if ReEnterData:
         statstdev = stat.stdev(compress(ipm2, xOn))
         Ipm2STD = Ipm2STD + [float(statstdev) for x in range(len(ipm2))]
         
-        slope = [y/x for x,y in zip(diode, ipm2)]
+        slope = [y/x for y,x in zip(diode, ipm2)]
         DiodeIpmSlope = DiodeIpmSlope + slope
         statmedian = stat.median([x for x in slope if not math.isnan(x)])
         DISMedian = [float(statmedian) for x in range(len(ipm2))]
         statstdev = stat.stdev([i-statmedian*d for d,i in zip(diode, ipm2)])
         DISSTD = DISSTD + [float(statstdev) for x in range(len(ipm2))]
         
-        Cspad = []
-        for cspad in list(ScanName['/cspad/azav']):
-            Cspad.append(float(sum([x for x in cspad if not math.isnan(x)])))
+        #Cspad = []
+        #for cspad in list(ScanName['/cspad/azav']):
+        #    Cspad.append(float(sum([x for x in cspad if not math.isnan(x)])))
             
-        CspadSum = CspadSum + Cspad
-        statmediun = stat.median(Cspad)
-        CspadMedian = CspadMedian + [float(statmedian) for x in range(len(Cspad))]
-        statstdev = stat.stdev(Cspad)
-        CspadSTD = CspadSTD + [float(statstdev) for x in range(len(Cspad))]
+        #CspadSum = CspadSum + Cspad
+        #statmediun = stat.median(Cspad)
+        #CspadMedian = CspadMedian + [float(statmedian) for x in range(len(Cspad))]
+        #statstdev = stat.stdev(Cspad)
+        #CspadSTD = CspadSTD + [float(statstdev) for x in range(len(Cspad))]
         
-        slope = [y/x for x,y in zip(diode, Cspad)]
-        DiodeCspadSlope = DiodeCspadSlope + slope
-        statmedian = stat.median(slope)
-        DCSMedian = [float(statmedian) for x in range(len(diode))]
-        statstdev = stat.stdev([c-statmedian*d for d,c in zip(diode, Cspad)])
-        DCSSTD = DCSSTD + [float(statstdev) for x in range(len(diode))]
+        #slope = [y/x for x,y in zip(diode, Cspad)]
+        #DiodeCspadSlope = DiodeCspadSlope + slope
+        #statmedian = stat.median(slope)
+        #DCSMedian = [float(statmedian) for x in range(len(diode))]
+        #statstdev = stat.stdev([c-statmedian*d for d,c in zip(diode, Cspad)])
+        #DCSSTD = DCSSTD + [float(statstdev) for x in range(len(diode))]
         
         timetool = [float(x) for x in list(ScanName['/ttCorr/tt'])]
         TimeTool = TimeTool + timetool
@@ -135,23 +135,33 @@ IpmNumSTDs = 6
 IpmFilter = list(a < b+IpmNumSTDs*c and a > b-IpmNumSTDs*c for a,b,c in zip(Ipm2Sum, Ipm2Median, Ipm2STD))
 
 DISSTDs = 3
-DISFilter = list(a < b*c+DISSTDs*d and a > b*c-DISSTDs*d for a,b,c,d in zip(Ipm2Sum, Diode2, DISMedian, DISSTD))
+DISFilter = list(a < DISSTDs*d and a > b*c-DISSTDs*d for a,b,c,d in zip(DiodeIpmSlope, DISMedian, DISSTD))
 
-CspadSTDs = 6
-CspadFilter = list(a < b+CspadSTDs*c and a > b-CspadSTDs*c for a,b,c in zip(CspadSum, CspadMedian, CspadSTD))
+#DISSTDs = 3
+#DISFilter = list(a < b*c+DISSTDs*d and a > b*c-DISSTDs*d for a,b,c,d in zip(Ipm2Sum, Diode2, DISMedian, DISSTD))
 
-DCSSTDs = 3
-DCSFilter = list(a < b*c+DCSSTDs*d and a > b*c-DCSSTDs*d for a,b,c,d in zip(CspadSum, Diode2, DCSMedian, DCSSTD))
+#CspadSTDs = 6
+#CspadFilter = list(a < b+CspadSTDs*c and a > b-CspadSTDs*c for a,b,c in zip(CspadSum, CspadMedian, CspadSTD))
+
+#DCSSTDs = 3
+#DCSFilter = list(a < b*c+DCSSTDs*d and a > b*c-DCSSTDs*d for a,b,c,d in zip(CspadSum, Diode2, DCSMedian, DCSSTD))
 
 #IntensityFilter = list(a for a in zip(IpmFilter))
-IntensityFilter = list((a and b and c and d) or not e for a,b,c,d,e in zip(IpmFilter, DISFilter, CspadFilter, DCSFilter, XOn))
+#IntensityFilter = list((a and b and c and d) or not e for a,b,c,d,e in zip(IpmFilter, DISFilter, CspadFilter, DCSFilter, XOn))
 
 plt.figure()
-plt.scatter(Diode2, Ipm2Sum, s=1)
-plt.scatter(list(compress(Diode2, IntensityFilter)), list(compress(Ipm2Sum, IntensityFilter)), s=1, alpha = .25)
+plt.scatter(Ipm2Sum, Diode2, s=1)
+plt.scatter(list(compress(Ipm2Sum, IntensityFilter)), list(compress(Diode2, IntensityFilter)), s=1, alpha = .25)
 plt.title('intensity filter effect')
-plt.xlabel('diode signal')
-plt.ylabel('intensity signal')
+plt.ylabel('diode signal')
+plt.xlabel('intensity signal')
+
+plt.figure()
+plt.scatter(CspadSum, Diode2, s=1)
+plt.scatter(list(compress(CspadSum, IntensityFilter)), list(compress(Diode2, IntensityFilter)), s=1, alpha = .25)
+plt.title('intensity filter effect')
+plt.ylabel('diode signal')
+plt.xlabel('cspad signal')
 
 
 #Convert the timetool signal into femtosecond delays and create the time tool filters
@@ -251,7 +261,6 @@ for ii in range(NumTTStepsPlots):
     
 plt.xlabel('x-ray energy (keV)')
 plt.ylabel('difference in x-ray absorption (on-off)')
-plt.title('raw data')
 
 LegendWords.pop()
 
