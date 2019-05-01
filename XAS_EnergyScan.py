@@ -16,7 +16,7 @@ import math
 import statistics as stat
 from makeIntensityFilter import makeDiodeFilter
 
-ReEnterData = False
+ReEnterData = True
 
 #Set up the scans and the number of time steps
 
@@ -129,7 +129,7 @@ TTFWHMFilter = list(a < b+TTFWHMSTDs*c and a > b-TTFWHMSTDs*c for a,b,c in zip(T
 TTFilter = list((a and b and c) or not d or not e for a,b,c,d,e in zip(TTValueFilter, TTAmpFilter, TTFWHMFilter, XOn, LOn))
 
 TTDelay = [x*1000 for x in TimeTool]
-TTSteps = np.array([float(min(TTDelay)), float(-100), float(0), float(100), float(max(TTDelay))])
+TTSteps = np.array([float(-220), float(-160), float(-100), float(-40), float(20)])
 #TTSteps = np.linspace(min(TTDelay),max(TTDelay),NumTTSteps+1)
 
 fig=plt.figure()
