@@ -154,9 +154,11 @@ Off_NumScan = [0 for x in range(len(UniXEnergy))]
 NormFactor_On = [[0 for x in range(len(UniXEnergy))] for y in range(len(TTSteps)-1)]
 NormFactor_Off = [0 for x in range(len(UniXEnergy))]
 
+NanCheck = [not a and not b for a,b in zip([math.isnan(x) for x in Diode2], [math.isnan(x) for x in Ipm2Sum])]
+
 for jj in range(len(UniXEnergy)):
     
-    SelectedRuns = list(a and b and not c and d and e for a,b,c,d,e in zip(XOn, (XEnergy == UniXEnergy[jj]), [math.isnan(x) for x in Diode2], IntensityFilter, TTFilter))
+    SelectedRuns = list(a and b and c and d and e for a,b,c,d,e in zip(XOn, (XEnergy == UniXEnergy[jj]), NanCheck, IntensityFilter, TTFilter))
     
     off = list(not a and b for a,b in zip(LOn, SelectedRuns))
     XASOff[jj] = sum(list(compress(Diode2, off)))
