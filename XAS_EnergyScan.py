@@ -23,7 +23,7 @@ ReEnterData = False
 
 #Set up the scans and the number of time steps
 
-NumTTSteps = 2
+NumTTSteps = 3
 NumTTStepsPlots = NumTTSteps
 
 if ReEnterData:
@@ -36,12 +36,13 @@ Filter = makeFilter(Ipm2Sum, Ipm2Median, Ipm2STD, Diode2, XOn, LOn, DiodeIpmSlop
 t0 = find_t0_XAS(XOn, LOn, XEnergyRaw, TimeTool, Ipm2Sum, RowlandY, Filter)
 
 TTDelay = [x*1000 for x in TimeTool]- round(t0, 0)
-TTSteps = np.array([float(-100), float(0), float(100)])
+TTSteps = np.array([float(-225), float(-75), float(75), float(225)])
 #TTSteps = np.linspace(min(TTDelay),max(TTDelay),NumTTSteps+1)
 
 #Make XAS spectra
-XEnergy = [round(x,4)*1000+.75 for x in XEnergyRaw]
+XEnergy = [round(x*1.5,3)/1.5*1000+.75 for x in XEnergyRaw]
 UniXEnergy = np.unique(XEnergy)
+#UniXEnergy = np.linspace(min(XEnergy), max(XEnergy), )
 
 XASOn = [[0 for x in range(len(UniXEnergy))] for y in range(len(TTSteps)-1)]
 XASOff = [0 for x in range(len(UniXEnergy))]

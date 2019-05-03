@@ -13,7 +13,7 @@ def makeFilter(Ipm2Sum, Ipm2Median, Ipm2STD, Diode2, XOn, LOn, DiodeIpmSlope, DI
     import matplotlib.pyplot as plt
         
     #Set up the intensity filter - the diode and cspad sum should respond linearly with the x-ray intensity
-    IpmNumSTDs = 6
+    IpmNumSTDs = 5
     IpmFilter = list(a < b+IpmNumSTDs*c and a > b-IpmNumSTDs*c for a,b,c in zip(Ipm2Sum, Ipm2Median, Ipm2STD))
     
     DiodeFilter = makeDiodeFilter(Ipm2Sum, Diode2, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD)

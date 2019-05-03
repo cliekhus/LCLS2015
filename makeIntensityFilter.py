@@ -17,17 +17,19 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd):
     plt.figure()
     plt.scatter(list(compress(diode, xonfilter)),list(compress(slope, xonfilter)),s=2)
     
-    numstds = 2
+    numstds = 5
     
     slopefilter = [abs(a-c) < numstds*d and b for a,b,c,d in zip(slope,xonfilter,slopemedian, slopestd)]
     
-    plt.scatter(list(compress(diode, slopefilter)),list(compress(slope,slopefilter)),s=2,alpha=.2)
+    #slopefilter = xonfilter
+    
+    plt.scatter(list(compress(diode, slopefilter)),list(compress(slope,slopefilter)),s=2)
     plt.xlabel('diode')
     plt.ylabel('slope')
     
     plt.figure()
     plt.scatter(ipm2,diode,s=2)
-    plt.scatter(list(compress(ipm2, slopefilter)), list(compress(diode, slopefilter)),s=2,alpha=.2)
+    plt.scatter(list(compress(ipm2, slopefilter)), list(compress(diode, slopefilter)),s=2)
     plt.xlabel('ipm2')
     plt.ylabel('diode')
     
@@ -65,9 +67,11 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd):
     plt.scatter(slope, gauss1)
     plt.scatter(slope, gauss2)
     
-    gaussamp = 5
+    gaussamp = 20
     
     gaussfilter = [x > paramssorted[0][1]/gaussamp or y > paramssorted[1][1]/gaussamp or z > paramssorted[2][1]/gaussamp and a for x,y,z,a in zip(gauss0, gauss1, gauss2, slopefilter)]
+    
+    #gaussfilter = [True for x in diode]
     
     #gaussfilter = [x>y and x>z and a for x,y,z,a in zip(desiredgauss,closegauss1,closegauss2,slopefilter)]
     
@@ -75,7 +79,7 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd):
     
     plt.figure()
     plt.scatter(ipm2,diode,s=2)
-    plt.scatter(list(compress(ipm2, gaussfilter)), list(compress(diode, gaussfilter)), s=2, alpha=.2)
+    plt.scatter(list(compress(ipm2, gaussfilter)), list(compress(diode, gaussfilter)), s=2)
     plt.xlabel('ipm2')
     plt.ylabel('diode')
     
