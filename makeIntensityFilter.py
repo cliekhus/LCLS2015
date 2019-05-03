@@ -65,7 +65,7 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd):
     plt.scatter(slope, gauss1)
     plt.scatter(slope, gauss2)
     
-    gaussamp = 3
+    gaussamp = 5
     
     gaussfilter = [x > paramssorted[0][1]/gaussamp or y > paramssorted[1][1]/gaussamp or z > paramssorted[2][1]/gaussamp and a for x,y,z,a in zip(gauss0, gauss1, gauss2, slopefilter)]
     
