@@ -4,7 +4,7 @@ Created on Fri May  3 11:07:12 2019
 
 @author: chelsea
 """
-def makeFilter(Ipm2Sum, Ipm2Median, Ipm2STD, Diode2, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD):
+def makeFilter(Ipm2Sum, Ipm2Median, Ipm2STD, Diode2, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, ploton):
     
     import numpy as np
     import statistics as stat
@@ -16,7 +16,7 @@ def makeFilter(Ipm2Sum, Ipm2Median, Ipm2STD, Diode2, XOn, LOn, DiodeIpmSlope, DI
     IpmNumSTDs = 5
     IpmFilter = list(a < b+IpmNumSTDs*c and a > b-IpmNumSTDs*c for a,b,c in zip(Ipm2Sum, Ipm2Median, Ipm2STD))
     
-    DiodeFilter = makeDiodeFilter(Ipm2Sum, Diode2, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD)
+    DiodeFilter = makeDiodeFilter(Ipm2Sum, Diode2, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, ploton)
     
     IntensityFilter = [a and b for a,b in zip(IpmFilter, DiodeFilter)]
     
@@ -33,13 +33,15 @@ def makeFilter(Ipm2Sum, Ipm2Median, Ipm2STD, Diode2, XOn, LOn, DiodeIpmSlope, DI
     
     TTFilter = list((a and b and c) or not d or not e for a,b,c,d,e in zip(TTValueFilter, TTAmpFilter, TTFWHMFilter, XOn, LOn))
     
-    fig=plt.figure()
-    fig.add_subplot(121)
-    plt.hist(list(compress(TimeTool, [a and b for a,b in zip(XOn, LOn)])), 1000)
-    plt.title('time tool before filters')
-    fig.add_subplot(122)
-    plt.hist(list(compress(TimeTool, [a and b and c for a,b,c in zip(TTFilter, XOn, LOn)])), 1000)
-    plt.title('time tool after filters')
+    if ploton:
+            
+        fig=plt.figure()
+        fig.add_subplot(121)
+        plt.hist(list(compress(TimeTool, [a and b for a,b in zip(XOn, LOn)])), 1000)
+        plt.title('time tool before filters')
+        fig.add_subplot(122)
+        plt.hist(list(compress(TimeTool, [a and b and c for a,b,c in zip(TTFilter, XOn, LOn)])), 1000)
+        plt.title('time tool after filters')
     
     Filter = list(a and b for a,b in zip(TTFilter, IntensityFilter))
     

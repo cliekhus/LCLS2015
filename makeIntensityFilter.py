@@ -5,17 +5,20 @@ Created on Mon Apr 29 11:29:47 2019
 @author: chelsea
 """
 
-def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd):
+def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd, ploton):
     
     from pylab import exp
     from scipy.optimize import curve_fit
     import matplotlib.pyplot as plt
     from itertools import compress
+    import numpy as np
     
     xonfilter = [a>0 and b for a,b in zip(slope,xOn)]
     
-    plt.figure()
-    plt.scatter(list(compress(diode, xonfilter)),list(compress(slope, xonfilter)),s=2)
+    if ploton:
+            
+        plt.figure()
+        plt.scatter(list(compress(diode, xonfilter)),list(compress(slope, xonfilter)),s=2)
     
     numstds = 5
     
@@ -23,22 +26,30 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd):
     
     #slopefilter = xonfilter
     
-    plt.scatter(list(compress(diode, slopefilter)),list(compress(slope,slopefilter)),s=2)
-    plt.xlabel('diode')
-    plt.ylabel('slope')
-    
-    plt.figure()
-    plt.scatter(ipm2,diode,s=2)
-    plt.scatter(list(compress(ipm2, slopefilter)), list(compress(diode, slopefilter)),s=2)
-    plt.xlabel('ipm2')
-    plt.ylabel('diode')
+    if ploton:
+            
+        plt.scatter(list(compress(diode, slopefilter)),list(compress(slope,slopefilter)),s=2)
+        plt.xlabel('diode')
+        plt.ylabel('slope')
+        
+        plt.figure()
+        plt.scatter(ipm2,diode,s=2)
+        plt.scatter(list(compress(ipm2, slopefilter)), list(compress(diode, slopefilter)),s=2)
+        plt.xlabel('ipm2')
+        plt.ylabel('diode')
     
     slopefiltered = list(compress(slope,slopefilter))
     
-    plt.figure()
-    slopehist = plt.hist(slopefiltered,2000)
-    plt.xlabel('slope')
-    plt.ylabel('counts')
+    if ploton:
+            
+        plt.figure()
+        plt.hist(slopefilter, 2000)
+    slopehist = np.histogram(slopefiltered,2000)
+    
+    if ploton:
+        plt.xlabel('slope')
+        plt.ylabel('counts')
+    
     slopes = slopehist[1]
     slopes = slopes[1:]
     
@@ -48,9 +59,11 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd):
     def gausfit(x,a0,x00,sig0,a1,x01,sig1,a2,x02,sig2):
         return gauss(x,a0,x00,sig0) + gauss(x,a1,x01,sig1) + gauss(x,a2,x02,sig2)
     
-    params,cov = curve_fit(gausfit,slopes,slopehist[0],p0 = [100*max(slopehist[0])/116,.04,.01,60*max(slopehist[0])/116,.06,.01,30*max(slopehist[0])/116,.12,.01])
-    
-    plt.plot(slopes,gausfit(slopes,*params))
+    #params,cov = curve_fit(gausfit,slopes,slopehist[0],p0 = [100*max(slopehist[0])/116,.04,.01,60*max(slopehist[0])/116,.06,.01,30*max(slopehist[0])/116,.12,.01])
+    print('this is fake data mode')
+    params = np.array([1,1,1,2,2,2,3,3,3])
+    if ploton:
+        plt.plot(slopes,gausfit(slopes,*params))
     
     a0fit = [params[0],params[3],params[6]]
     x0fit = [params[1],params[4],params[7]]
@@ -62,14 +75,17 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd):
     gauss1 = gauss(slope,paramssorted[1][1],paramssorted[1][0],paramssorted[1][2])
     gauss2 = gauss(slope,paramssorted[2][1],paramssorted[2][0],paramssorted[2][2])
     
-    plt.figure()
-    plt.scatter(slope, gauss0)
-    plt.scatter(slope, gauss1)
-    plt.scatter(slope, gauss2)
+    if ploton:
+            
+        plt.figure()
+        plt.scatter(slope, gauss0)
+        plt.scatter(slope, gauss1)
+        plt.scatter(slope, gauss2)
+        plt.title('fits to slope peaks')
     
     gaussamp = 20
     
-    gaussfilter = [x > paramssorted[0][1]/gaussamp or y > paramssorted[1][1]/gaussamp or z > paramssorted[2][1]/gaussamp and a for x,y,z,a in zip(gauss0, gauss1, gauss2, slopefilter)]
+    gaussfilter = [bool(x > paramssorted[0][1]/gaussamp or y > paramssorted[1][1]/gaussamp or z > paramssorted[2][1]/gaussamp and a) for x,y,z,a in zip(gauss0, gauss1, gauss2, slopefilter)]
     
     #gaussfilter = [True for x in diode]
     
@@ -77,10 +93,12 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd):
     
     #gaussfilter = slopefilter
     
-    plt.figure()
-    plt.scatter(ipm2,diode,s=2)
-    plt.scatter(list(compress(ipm2, gaussfilter)), list(compress(diode, gaussfilter)), s=2)
-    plt.xlabel('ipm2')
-    plt.ylabel('diode')
+    if ploton:
+            
+        plt.figure()
+        plt.scatter(ipm2,diode,s=2)
+        plt.scatter(list(compress(ipm2, gaussfilter)), list(compress(diode, gaussfilter)), s=2)
+        plt.xlabel('ipm2')
+        plt.ylabel('diode')
     
     return gaussfilter

@@ -13,34 +13,34 @@ import numpy as np
 import matplotlib.pyplot as plt
 from itertools import compress
 import math
-import statistics as stat
-from makeIntensityFilter import makeDiodeFilter
 from makeFilter import makeFilter
 from find_t0_XAS import find_t0_XAS
 from loadData import loadData
 
 ReEnterData = False
+FPlots = False
 
 #Set up the scans and the number of time steps
 
-NumTTSteps = 3
+NumTTSteps = 2
 NumTTStepsPlots = NumTTSteps
 
 if ReEnterData:
 
-    FileNums = list(range(373,395+1))
+    FileNums = list(range(394,394+1))
     XOn, LOn, XEnergyRaw, Diode2, Ipm2Sum, Ipm2Median, Ipm2STD, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, ScanNum, RowlandY = loadData(FileNums)
 
-Filter = makeFilter(Ipm2Sum, Ipm2Median, Ipm2STD, Diode2, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD)
+Filter = makeFilter(Ipm2Sum, Ipm2Median, Ipm2STD, Diode2, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, FPlots)
 
-t0 = find_t0_XAS(XOn, LOn, XEnergyRaw, TimeTool, Ipm2Sum, RowlandY, Filter)
+t0 = find_t0_XAS(XOn, LOn, XEnergyRaw, TimeTool, Ipm2Sum, RowlandY, Filter, FPlots)
 
 TTDelay = [x*1000 for x in TimeTool]- round(t0, 0)
-TTSteps = np.array([float(-225), float(-75), float(75), float(225)])
+TTSteps = np.array([float(-500), float(0), float(500)])
 #TTSteps = np.linspace(min(TTDelay),max(TTDelay),NumTTSteps+1)
 
 #Make XAS spectra
-XEnergy = [round(x*1.5,3)/1.5*1000+.75 for x in XEnergyRaw]
+#XEnergy = [round(x*1.5,3)/1.5*1000+.75 for x in XEnergyRaw]
+XEnergy = XEnergyRaw
 UniXEnergy = np.unique(XEnergy)
 #UniXEnergy = np.linspace(min(XEnergy), max(XEnergy), )
 
@@ -67,7 +67,7 @@ for jj in range(len(UniXEnergy)):
     
     for ii in range(len(TTSteps)-1):
         
-        on = list(a and b and c and d for a,b,c,d in zip(LOn, SelectedRuns, (TTDelay >= TTSteps[ii]), (TTDelay < TTSteps[ii+1])))
+        on = list(bool(a and b and c and d) for a,b,c,d in zip(LOn, SelectedRuns, (TTDelay > TTSteps[ii]), (TTDelay <= TTSteps[ii+1])))
         XASOn[ii][jj] = sum(list(compress(Diode2, on)))
         
         On_NumScan[ii][jj] = sum([int(x) for x in on])
@@ -87,6 +87,7 @@ LegendLabel = []
 for ii in range(NumTTStepsPlots):
 
     XASOn_Norm[ii] = [a/b for a,b,c in zip(XASOn[ii], NormFactor_On[ii], AtleastOne) if c]
+    #XASOn_Norm[ii] = [a/b for a,b,c in zip(XASOn[ii], On_NumScan[ii], AtleastOne) if c]
     LegendLabel = LegendLabel + plt.plot(list(compress(UniXEnergy, AtleastOne)), XASOn_Norm[ii])
     
 plt.xlabel('x-ray energy (keV)')
