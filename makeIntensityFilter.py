@@ -59,9 +59,9 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd, ploton)
     def gausfit(x,a0,x00,sig0,a1,x01,sig1,a2,x02,sig2):
         return gauss(x,a0,x00,sig0) + gauss(x,a1,x01,sig1) + gauss(x,a2,x02,sig2)
     
-    #params,cov = curve_fit(gausfit,slopes,slopehist[0],p0 = [100*max(slopehist[0])/116,.04,.01,60*max(slopehist[0])/116,.06,.01,30*max(slopehist[0])/116,.12,.01])
-    print('this is fake data mode')
-    params = np.array([1,1,1,2,2,2,3,3,3])
+    params,cov = curve_fit(gausfit,slopes,slopehist[0],p0 = [100*max(slopehist[0])/116,.04,.01,60*max(slopehist[0])/116,.06,.01,30*max(slopehist[0])/116,.12,.01])
+    #print('this is fake data mode')
+    #params = np.array([1,1,1,2,2,2,3,3,3])
     if ploton:
         plt.plot(slopes,gausfit(slopes,*params))
     

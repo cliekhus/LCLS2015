@@ -22,25 +22,27 @@ FPlots = False
 
 #Set up the scans and the number of time steps
 
-NumTTSteps = 2
-NumTTStepsPlots = NumTTSteps
+NumTTSteps = 20
+NumTTStepsPlots = 2
 
 if ReEnterData:
 
-    FileNums = list(range(394,394+1))
+    FileNums = list(range(373,373+1))
     XOn, LOn, XEnergyRaw, Diode2, Ipm2Sum, Ipm2Median, Ipm2STD, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, ScanNum, RowlandY = loadData(FileNums)
 
 Filter = makeFilter(Ipm2Sum, Ipm2Median, Ipm2STD, Diode2, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, FPlots)
 
-t0 = find_t0_XAS(XOn, LOn, XEnergyRaw, TimeTool, Ipm2Sum, RowlandY, Filter, FPlots)
+#t0 = find_t0_XAS(XOn, LOn, XEnergyRaw, TimeTool, Ipm2Sum, RowlandY, Filter, True)
 
-TTDelay = [x*1000 for x in TimeTool]- round(t0, 0)
-TTSteps = np.array([float(-500), float(0), float(500)])
-#TTSteps = np.linspace(min(TTDelay),max(TTDelay),NumTTSteps+1)
+t0 = -50
+
+TTDelay = [x*1000 - t0 for x in TimeTool]
+#TTSteps = np.array([float(-500), float(0), float(500)])
+TTSteps = np.linspace(-1000,1000,NumTTSteps+1)
 
 #Make XAS spectra
-#XEnergy = [round(x*1.5,3)/1.5*1000+.75 for x in XEnergyRaw]
-XEnergy = XEnergyRaw
+XEnergy = [round(x,5)*1000+.75 for x in XEnergyRaw]
+#XEnergy = XEnergyRaw
 UniXEnergy = np.unique(XEnergy)
 #UniXEnergy = np.linspace(min(XEnergy), max(XEnergy), )
 
@@ -73,28 +75,35 @@ for jj in range(len(UniXEnergy)):
         On_NumScan[ii][jj] = sum([int(x) for x in on])
         NormFactor_On[ii][jj] = sum(list(compress(Ipm2Sum, on)))
 
-fig = plt.figure()
+#fig = plt.figure()
 
 XASOn_Norm = [[0 for x in range(len(UniXEnergy))] for y in range(len(TTSteps)-1)]
 
 AtleastOne = [x > 0 for x in Off_NumScan]
 
-for ii in range(NumTTStepsPlots):
-    AtleastOne = [a and b > 0 for a,b in zip(AtleastOne, On_NumScan[ii])]
+for ii in range(NumTTSteps):
+    AtleastOne = [a and sum(b) > 0 for a,b in zip(AtleastOne, On_NumScan[ii])]
 
 LegendLabel = []
 
-for ii in range(NumTTStepsPlots):
+for ii in range(NumTTSteps):
 
     XASOn_Norm[ii] = [a/b for a,b,c in zip(XASOn[ii], NormFactor_On[ii], AtleastOne) if c]
     #XASOn_Norm[ii] = [a/b for a,b,c in zip(XASOn[ii], On_NumScan[ii], AtleastOne) if c]
     LegendLabel = LegendLabel + plt.plot(list(compress(UniXEnergy, AtleastOne)), XASOn_Norm[ii])
     
-plt.xlabel('x-ray energy (keV)')
-plt.ylabel('x-ray absorption')
+#plt.xlabel('x-ray energy (keV)')
+#plt.ylabel('x-ray absorption')
 
 XASOff_Norm = [a/b for a,b,c in zip(XASOff, NormFactor_Off, AtleastOne) if c]
 
+OutEnergy = list(compress(UniXEnergy, [x > 0 for x in AtleastOne]))
+
+XASDiff = [[0 for x in range(len(UniXEnergy))] for y in range(len(TTSteps)-1)]
+for ii in range(len(TTSteps)-1):
+    XASDiff[ii] = [a - b for a,b in zip(XASOn_Norm[ii], XASOff_Norm)]
+
+"""
 LegendLabel = LegendLabel + plt.plot(list(compress(UniXEnergy, AtleastOne)), XASOff_Norm)
 plt.xlabel('x-ray energy (keV)')
 plt.ylabel('x-ray absorption')
@@ -120,3 +129,5 @@ plt.ylabel('difference in x-ray absorption (on-off)')
 LegendWords.pop()
 
 plt.legend(LegendLabel, LegendWords)
+
+"""

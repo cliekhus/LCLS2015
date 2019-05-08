@@ -45,7 +45,7 @@ def loadData(FileNums):
     #Fill the lists with data from the h5 file
     for filenum in FileNums:
         
-        ScanName = h5py.File('Data\ldat_xppj6715_Run' + str(filenum) + '.h5')
+        ScanName = h5py.File('D:\LCLS_Data\ldat_xppj6715_Run' + str(filenum) + '.h5')
         
         xOn = list(map(bool, ScanName['/lightStatus/xray']))
         XOn = XOn + xOn
