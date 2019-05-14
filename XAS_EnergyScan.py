@@ -17,14 +17,15 @@ from find_t0_XAS import find_t0_XAS
 from loadData import loadData
 from scipy.signal import savgol_filter
 from makeXAS import makeXAS
+from APSCalibration import findEnergyShift
 
 ReEnterData = True
 FPlots = False
 
 #Set up the scans and the number of time steps
 
-NumTTSteps = 1
-NumTTStepsPlots = int(NumTTSteps/1)
+NumTTSteps = 10
+NumTTStepsPlots = int(NumTTSteps/2)
 #NumEnergySteps = 35
 
 if ReEnterData:
@@ -35,19 +36,23 @@ if ReEnterData:
 Filter = makeFilter(Ipm2Sum, Ipm2Median, Ipm2STD, Diode2, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, FPlots)
 
 TTDelay = [x*1000 for x in TimeTool]
-TTSteps = np.linspace(-200,100,NumTTSteps+1)
+TTSteps = np.linspace(-200,75,NumTTSteps+1)
 
 #Make XAS spectra
 XEnergy = [round(x*1000,1) for x in XEnergyRaw]
 #XEnergy = [round(x,5)*1000+.75 for x in XEnergyRaw]
 #XEnergy = XEnergyRaw
-UniXEnergy = np.unique(compress(XEnergy, [x >= 7108 and x <= 7120 for x in XEnergy]))
+UniXEnergy = np.unique(list(compress(XEnergy, [x >= 7108 and x <= 7120 for x in XEnergy])))
 #UniXEnergy = np.linspace(7108, 7120, NumEnergySteps+1)
 #UniXEnergy = np.linspace(min(XEnergy), max(XEnergy), )
 
 NumEnergySteps = len(UniXEnergy)
+XASOn_Norm, XASOff_Norm, EnergyPlot = makeXAS(NumEnergySteps, NumTTSteps, Ipm2Sum, Diode2, UniXEnergy, XEnergy, Filter, LOn, XOn, TTDelay, TTSteps, FPlots)
 
-XASOn_Norm, XASOff_Norm, EnergyPlot = makeXAS(NumEnergySteps, NumTTSteps, Ipm2Sum, Diode2, UniXEnergy, XEnergy, Filter, LOn, XOn, TTDelay, TTSteps, False)
+EnergyShift = findEnergyShift(XASOff_Norm, UniXEnergy, True)
+XEnergy = [round(x*1000,1)+EnergyShift for x in XEnergyRaw]
+UniXEnergy = np.unique(list(compress(XEnergy, [x >= 7109 and x <= 7121 for x in XEnergy])))
+NumEnergySteps = len(UniXEnergy)
 
 XASDiff = [[0 for x in range(NumEnergySteps)] for y in range(NumTTSteps)]
 
@@ -58,11 +63,12 @@ for ii in range(NumTTSteps):
     XASDiff[ii] = xasdiff
     Peak = Peak + [sum(compress(xasdiff, [a and b for a,b in zip((EnergyPlot >= np.float64(7114)), (EnergyPlot <= np.float64(7117)))]))]
 
-t0 = find_t0_XAS(TTSteps, Peak, False)
+t0 = find_t0_XAS(TTSteps, Peak, True)
+#t0 = np.float64(-125)
 
-TTSteps = np.linspace(round(-200-t0,0),round(100-t0,0),NumTTSteps+1)
+TTSteps = np.linspace(-50,100,NumTTStepsPlots+1)
 
-XASOn_Norm_t0, XASOff_Norm_t0, EnergyPlot = makeXAS(NumEnergySteps, NumTTStepsPlots, Ipm2Sum, Diode2, UniXEnergy, XEnergy, Filter, LOn, XOn, TTDelay-t0, TTSteps, False)
+XASOn_Norm_t0, XASOff_Norm_t0, EnergyPlot = makeXAS(NumEnergySteps, NumTTStepsPlots, Ipm2Sum, Diode2, UniXEnergy, XEnergy, Filter, LOn, XOn, TTDelay-t0, TTSteps, FPlots)
 
 TTDelayPlot = []
 
@@ -70,7 +76,7 @@ XASDiffPlot = [[0 for x in range(NumEnergySteps)] for y in range(NumTTStepsPlots
 
 for ii in range(NumTTStepsPlots):
     for jj in range(NumEnergySteps):
-        XASDiffPlot[ii][jj] = XASOff_Norm_t0[jj] - XASOn_Norm_t0[ii][jj]
+        XASDiffPlot[ii][jj] = XASOn_Norm_t0[ii][jj] - XASOff_Norm_t0[jj]
 
 
 LegendLabel = []
@@ -78,10 +84,10 @@ fig = plt.figure()
 
 for ii in range(NumTTStepsPlots):
     
-    LegendLabel = LegendLabel + plt.plot(EnergyPlot, savgol_filter(XASDiffPlot[ii],5,4))
-    #LegendLabel = LegendLabel + plt.plot(EnergyPlot, XASDiffPlot[ii])
+    LegendLabel = LegendLabel + plt.plot(EnergyPlot, savgol_filter(XASDiffPlot[ii],7,2), marker='.')
+    #LegendLabel = LegendLabel + plt.plot(EnergyPlot, XASDiffPlot[ii], marker='o')
 plt.xlabel('x-ray energy (keV)')
-plt.ylabel('x-ray absorption')
+plt.ylabel('change in x-ray absorption')
 
 LegendWords = []
 for ii in range(NumTTStepsPlots):

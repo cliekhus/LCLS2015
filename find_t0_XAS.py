@@ -9,8 +9,8 @@ def find_t0_XAS(TTSteps, Peak, ploton):
     import matplotlib.pyplot as plt
     from scipy.signal import savgol_filter
     
-    #Filtered = savgol_filter(Peak, 5, 3)
-    Filtered = Peak
+    Filtered = savgol_filter(Peak, 5, 2)
+    #Filtered = Peak
     MinIndex = np.argmin(Filtered)
     
     Times = []

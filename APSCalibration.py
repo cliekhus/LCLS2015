@@ -4,107 +4,68 @@ Created on Thu May  2 15:24:58 2019
 
 @author: chelsea
 """
-
-import h5py
-import numpy as np
-import matplotlib.pyplot as plt
-import math
-from itertools import compress
-from makeIntensityFilter import makeDiodeFilter
-import statistics as stat
-
-fileNums = list(range(373,395+1))
-
-XOn = []
-LOn = []
-XEnergyRaw = []
-Diode2 = []
-
-Ipm2Sum = []
-Ipm2Median = []
-Ipm2STD = []
-DiodeIpmSlope = []
-DISMedian = []
-DISSTD = []
-
-for fileNum in fileNums:
+def findEnergyShift(XASOff, UniXEnergy, ploton):
+        
+    import h5py
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import scipy.signal as scisig
     
-    ScanName = h5py.File('Data\ldat_xppj6715_Run' + str(fileNum) + '.h5')
+    APSName = h5py.File('D:\LCLS_Data\APS\APS_Aug_2015_Fesamples.mat')
     
-    xOn = list(map(bool, ScanName['/lightStatus/xray']))
-    XOn = XOn + xOn
-    LOn = LOn + list(map(bool, ScanName['/lightStatus/laser']))
-    XEnergyRaw = XEnergyRaw + [round(x,4) for x in list(ScanName['/scan/var0'])]
-    diode = [x[2] for x in list(ScanName['/diodeU/channels'])]                  #Quad cell 2 from diode - this one has an output
-    Diode2 = Diode2 + diode
-    ipm2 = [float(x[1])+float(x[3]) for x in list(ScanName['/ipm2/channels'])]  #Intensity (and position) monitor #2.  Quad cells 1 and 3 had signal - use these
-    Ipm2Sum = Ipm2Sum + ipm2
+    FeRuRIXS = np.array(APSName['/FeRu_RIXS'])
     
-    ipm2 = [float(x[1])+float(x[3]) for x in list(ScanName['/ipm2/channels'])]  #Intensity (and position) monitor #2.  Quad cells 1 and 3 had signal - use these
-    Ipm2Sum = Ipm2Sum + ipm2
-    statmedian = stat.median(compress(ipm2, xOn))
-    Ipm2Median = Ipm2Median + [float(statmedian) for x in range(len(ipm2))]
-    statstdev = stat.stdev(compress(ipm2, xOn))
-    Ipm2STD = Ipm2STD + [float(statstdev) for x in range(len(ipm2))]
+    incident_axis = 1000*np.array(APSName['/Fe_RIXS_incident_axis'])
+    emitted_axis = 1000*np.array(APSName['/Fe_RIXS_emitted_axis'])
+    xp,yp = np.meshgrid(emitted_axis,incident_axis)
     
-    slope = [y/x for y,x in zip(diode, ipm2)]
-    DiodeIpmSlope = DiodeIpmSlope + slope
-    statmedian = stat.median([x for x in slope if not math.isnan(x)])
-    DISMedian = [float(statmedian) for x in range(len(ipm2))]
-    statstdev = stat.stdev([i-statmedian*d for d,i in zip(diode, ipm2)])
-    DISSTD = DISSTD + [float(statstdev) for x in range(len(ipm2))]
-
-APSName = h5py.File('Data/APS/APS_Aug_2015_Fesamples.mat')
-
-FeRuRIXS = np.array(APSName['/FeRu_RIXS'])
-
-incident_axis = np.array(APSName['/Fe_RIXS_incident_axis'])
-emitted_axis = np.array(APSName['/Fe_RIXS_emitted_axis'])
-xp,yp = np.meshgrid(emitted_axis,incident_axis)
-
-UniXEnergy = np.unique(XEnergyRaw)
-
-XASOff = [0 for x in range(len(UniXEnergy))]
-
-Off_NumScan = [0 for x in range(len(UniXEnergy))]
-
-NormFactor_Off = [0 for x in range(len(UniXEnergy))]
-
-NanCheck = [not a and not b for a,b in zip([math.isnan(x) for x in Diode2], [math.isnan(x) for x in Ipm2Sum])]
-IpmNumSTDs = 6
-IpmFilter = list(a < b+IpmNumSTDs*c and a > b-IpmNumSTDs*c for a,b,c in zip(Ipm2Sum, Ipm2Median, Ipm2STD))
-
-DiodeFilter = makeDiodeFilter(Ipm2Sum, Diode2, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD)
-
-IntensityFilter = [a and b for a,b in zip(IpmFilter, DiodeFilter)]
-
-for jj in range(len(UniXEnergy)):
+    incident_axis = incident_axis[:,0]
     
-    SelectedRuns = list(a and b and c and d and e for a,b,c,d,e in zip(XOn, (XEnergyRaw == UniXEnergy[jj]), NanCheck, IntensityFilter))
+    if ploton:
+        plt.figure()
+        plt.pcolor(xp, yp, FeRuRIXS)
+        
+        plt.figure()
+        plt.plot(emitted_axis[0], np.sum(FeRuRIXS, axis=0), marker='.')
+        
+        plt.xlabel('emitted energy (keV)')
+        plt.ylabel('emittance')
     
-    off = list(not a and b for a,b in zip(LOn, SelectedRuns))
-    XASOff[jj] = sum(list(compress(Diode2, off)))
+    APSXASNorm = np.sum(FeRuRIXS, axis = 1)
+    APSXASNorm = (APSXASNorm-min(APSXASNorm))/np.sum(APSXASNorm)*100
+    fit = np.polyfit(incident_axis, APSXASNorm, 3)
+    poly = np.poly1d(fit)
     
-    Off_NumScan[jj] = sum([int(x) for x in off])
-    NormFactor_Off[jj] = sum(list(compress(Ipm2Sum, off)))
-
-plt.figure()
-plt.pcolor(xp, yp, FeRuRIXS)
-
-
-plt.figure()
-plt.plot(emitted_axis[0], np.sum(FeRuRIXS, axis=0), marker='.')
-
-plt.xlabel('emitted energy (keV)')
-plt.ylabel('emittance')
-
-APSXASNorm = np.sum(FeRuRIXS, axis = 1)
-
-plt.figure()
-plt.plot(incident_axis, np.sum(FeRuRIXS, axis=1), marker='.')
-plt.plot(UniXEnergy, [x/y for x,y in zip(XASOff, NormFactor_Off)])
-
-plt.xlabel('x-ray energy (keV)')
-plt.ylabel('x-ray absorption')
-
-def 
+    XASOff_Norm = (XASOff-min(XASOff))/sum(XASOff)*100
+    fitData = np.polyfit(UniXEnergy, XASOff_Norm,3)
+    polyData = np.poly1d(fitData)
+    
+    if ploton:
+        plt.figure()
+        plt.plot(incident_axis, APSXASNorm, marker='.')
+        plt.plot(incident_axis, poly(incident_axis))
+        plt.plot(UniXEnergy, XASOff_Norm, marker = '.')
+        plt.plot(UniXEnergy, polyData(UniXEnergy))
+        
+        plt.xlabel('x-ray energy (keV)')
+        plt.ylabel('x-ray absorption')
+    
+    Fitted = APSXASNorm - poly(incident_axis)
+    pos, pro = scisig.find_peaks(Fitted, threshold = 0.0043)
+    
+    FittedData = XASOff_Norm - polyData(UniXEnergy)
+    posData, pro = scisig.find_peaks(FittedData, threshold = 0.03)
+    
+    if ploton:
+        plt.figure()
+        plt.plot(incident_axis, Fitted)
+        plt.plot(incident_axis[pos], Fitted[pos], 'o')
+        plt.plot(UniXEnergy, FittedData)
+        plt.plot(UniXEnergy[posData], FittedData[posData], 'o')
+    
+    APSEnergies = list(incident_axis[pos])
+    LCLSEnergies = list(UniXEnergy[posData])
+    
+    EnergyShift = (APSEnergies[0]-LCLSEnergies[0]+APSEnergies[1]-LCLSEnergies[1])/2
+    
+    return EnergyShift

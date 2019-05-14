@@ -6,7 +6,7 @@ Created on Mon May 13 17:34:21 2019
 """
 
 def makeXAS(NumEnergySteps, NumTTSteps, Ipm2Sum, Diode2, UniXEnergy, XEnergy, Filter, LOn, XOn, TTDelay, TTSteps, ploton):
-
+    
     import math
     from itertools import compress
     import matplotlib.pyplot as plt
