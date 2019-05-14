@@ -3,59 +3,27 @@ Find t0
 
 """
 
-def find_t0_XAS(XASDiff, TTSteps, OutEnergy):
+def find_t0_XAS(TTSteps, Peak, ploton):
     
     import numpy as np
     import matplotlib.pyplot as plt
-    from itertools import compress
-    import math
-    from pylab import exp
-    from scipy.optimize import curve_fit
+    from scipy.signal import savgol_filter
     
-    pickenergy = [x > 7116 and x < 7119 for x in XEnergy]
+    #Filtered = savgol_filter(Peak, 5, 3)
+    Filtered = Peak
+    MinIndex = np.argmin(Filtered)
     
+    Times = []
     
-    
-    
+    for ii in range(len(TTSteps)-1):
+        Times = Times + [(TTSteps[ii]+TTSteps[ii+1])/2]
+        
     if ploton:
             
         plt.figure()
-        plt.plot(XESOffNorm)
-        plt.xlabel('rowland pixel')
-        plt.ylabel('signal')
-    
-    def gauss(x,a,x0,sig):
-        return a*exp(-(x-x0)**2/2/sig**2)
-    
-    if ploton:
-            
-        plt.figure()
-        plt.plot(Intensity)
-        plt.title('Intensity over time')
-        
-        plt.figure()
-        plt.plot(DelayTime, Peak1, marker='.')
-    params,cov = curve_fit(gauss,DelayTime, Peak1, p0 = [max(Peak1), -70, 100])
-    if ploton:
-        plt.plot(DelayTime,gauss(DelayTime,*params))
-        plt.xlabel('Delay Time')
-        plt.ylabel('fit peak 1')
-    
-    
-    meanx0 = params[1]
-    
-    if ploton:
-        plt.figure()
-        plt.plot(DelayTime, Peak2, marker='.')
-    params,cov = curve_fit(gauss,DelayTime, Peak2, p0 = [max(Peak2), -70, 100])
-    if ploton:    
-        plt.plot(DelayTime, gauss(DelayTime,*params))
-        plt.xlabel('Delay Time')
-        plt.ylabel('fit peak 2')
-        
-        plt.figure()
-        plt.pcolor(XES)
-    
-    meanx0 = (meanx0+params[1])/2
-    
-    return meanx0
+        plt.plot(Times, Peak, 'x')
+        plt.plot(Times, Filtered, marker = 'x')
+        plt.plot(Times[MinIndex], Filtered[MinIndex], marker = 'o')
+        plt.title('peak is at ' + str(Times[MinIndex]) + ' fs')
+
+    return Times[MinIndex]
