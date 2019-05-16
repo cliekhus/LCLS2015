@@ -6,8 +6,6 @@ Created on Fri May  3 11:07:12 2019
 """
 def makeFilter(Ipm2Sum, Ipm2Median, Ipm2STD, Diode2, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, ploton):
     
-    import numpy as np
-    import statistics as stat
     from makeIntensityFilter import makeDiodeFilter
     from itertools import compress
     import matplotlib.pyplot as plt

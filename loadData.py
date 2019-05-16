@@ -8,7 +8,6 @@ Created on Fri May  3 10:37:18 2019
 def loadData(FileNums):
     
     import h5py
-    import numpy as np
     from itertools import compress
     import math
     import statistics as stat
@@ -57,16 +56,16 @@ def loadData(FileNums):
         
         ipm2 = [float(x[1])+float(x[3]) for x in list(ScanName['/ipm2/channels'])]  #Intensity (and position) monitor #2.  Quad cells 1 and 3 had signal - use these
         Ipm2Sum = Ipm2Sum + ipm2
-        statmedian = stat.median(compress(ipm2, xOn))
+        statmedian = stat.median([x for x,y in zip(ipm2, xOn) if not math.isnan(x) and y])
         Ipm2Median = Ipm2Median + [float(statmedian) for x in range(len(ipm2))]
-        statstdev = stat.stdev(compress(ipm2, xOn))
+        statstdev = stat.stdev([x for x,y in zip(ipm2, xOn) if not math.isnan(x) and y])
         Ipm2STD = Ipm2STD + [float(statstdev) for x in range(len(ipm2))]
         
         slope = [y/x for y,x in zip(diode, ipm2)]
         DiodeIpmSlope = DiodeIpmSlope + slope
-        statmedian = stat.median([x for x in slope if not math.isnan(x)])
+        statmedian = stat.median([x for x,y in zip(slope, xOn) if not math.isnan(x) and y])
         DISMedian = [float(statmedian) for x in range(len(ipm2))]
-        statstdev = stat.stdev([i-statmedian*d for d,i in zip(diode, ipm2)])
+        statstdev = stat.stdev([i-statmedian*d for d,i in zip(diode, ipm2) if not math.isnan(d) and not math.isnan(i)])
         DISSTD = DISSTD + [float(statstdev) for x in range(len(ipm2))]
         
         timetool = [float(x) for x in list(ScanName['/ttCorr/tt'])]

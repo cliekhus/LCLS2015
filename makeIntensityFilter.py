@@ -20,11 +20,9 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd, ploton)
         plt.figure()
         plt.scatter(list(compress(diode, xonfilter)),list(compress(slope, xonfilter)),s=2)
     
-    numstds = 5
+    numstds = 10
     
     slopefilter = [abs(a-c) < numstds*d and b for a,b,c,d in zip(slope,xonfilter,slopemedian, slopestd)]
-    
-    #slopefilter = xonfilter
     
     if ploton:
             
