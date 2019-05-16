@@ -20,7 +20,7 @@ from makeXAS import makeXAS
 from APSCalibration import findEnergyShift
 import math
 
-ReEnterData = True
+ReEnterData = False
 FPlots = False
 
 #Set up the scans and the number of time steps
