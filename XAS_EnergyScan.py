@@ -44,7 +44,7 @@ UniXEnergy = np.unique(list(compress(XEnergy, [x >= 7108 and x <= 7120 for x in 
 NumEnergySteps = len(UniXEnergy)
 XASOn_Norm, XASOff_Norm, EnergyPlot, Num_On, Num_Off = makeXAS(NumEnergySteps, NumTTSteps, Ipm2Sum, Diode2, UniXEnergy, XEnergy, Filter, LOn, XOn, TTDelay, TTSteps, FPlots)
 
-EnergyShift = findEnergyShift(XASOff_Norm, UniXEnergy, True)
+EnergyShift = findEnergyShift(XASOff_Norm, UniXEnergy, False)
 XEnergy = [round(x*1000,1)+EnergyShift for x in XEnergyRaw]
 UniXEnergy = np.unique(list(compress(XEnergy, [x >= 7109 and x <= 7121 for x in XEnergy])))
 NumEnergySteps = len(UniXEnergy)
@@ -67,7 +67,7 @@ t0 = find_t0_XAS(TTSteps, Peak, True)
 
 
 
-TTSteps = np.linspace(-75,175,NumTTStepsPlots+1)
+TTSteps = np.linspace(-40,160,NumTTStepsPlots+1)
 
 XASOn_Norm_t0, XASOff_Norm_t0, EnergyPlot, Num_On, Num_Off = makeXAS(NumEnergySteps, NumTTStepsPlots, Ipm2Sum, Diode2, UniXEnergy, XEnergy, Filter, LOn, XOn, TTDelay-t0, TTSteps, FPlots)
 
