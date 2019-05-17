@@ -37,8 +37,9 @@ def findEnergyShift(XASOff, UniXEnergy, ploton):
     fit = np.polyfit(incident_axis, APSXASNorm, 3)
     poly = np.poly1d(fit)
     
-    UniXEnergy = compress(UniXEnergy, [x>0 for x in XASOff_Norm])
-    XASOff_Norm = compress(XASOff_Norm, [x>0 for x in XASOff_Norm])
+    UniXEnergy = list(compress(UniXEnergy, [x>0 for x in XASOff]))
+    UniXEnergy = np.array(UniXEnergy)
+    XASOff = list(compress(XASOff, [x>0 for x in XASOff]))
 
     XASOff_Norm = [(x-min(XASOff))/sum(XASOff)*100 for x in XASOff]
     fitData = np.polyfit(UniXEnergy, XASOff_Norm,3)

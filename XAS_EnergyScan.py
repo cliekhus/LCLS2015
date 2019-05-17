@@ -25,8 +25,8 @@ FPlots = False
 
 #Set up the scans and the number of time steps
 
-NumTTSteps = 20
-NumTTStepsPlots = int(NumTTSteps/5)
+NumTTSteps = 40
+NumTTStepsPlots = 5
 
 if ReEnterData:
 
@@ -67,7 +67,7 @@ t0 = find_t0_XAS(TTSteps, Peak, True)
 
 
 
-TTSteps = np.linspace(-40,120,NumTTStepsPlots+1)
+TTSteps = np.linspace(-75,175,NumTTStepsPlots+1)
 
 XASOn_Norm_t0, XASOff_Norm_t0, EnergyPlot, Num_On, Num_Off = makeXAS(NumEnergySteps, NumTTStepsPlots, Ipm2Sum, Diode2, UniXEnergy, XEnergy, Filter, LOn, XOn, TTDelay-t0, TTSteps, FPlots)
 

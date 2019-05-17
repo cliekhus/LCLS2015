@@ -10,8 +10,8 @@ def find_t0_XAS(TTSteps, Peak, ploton):
     from scipy.signal import savgol_filter
     from itertools import compress
     
-    minrange = -175
-    maxrange = -100
+    minrange = -155
+    maxrange = -90
     
     Filtered = savgol_filter(Peak, 5, 2)
     
