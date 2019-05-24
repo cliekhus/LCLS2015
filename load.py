@@ -12,8 +12,17 @@ with open("D://LCLS_Data/LCLS_python_data/XOn.pkl", "rb") as f:
 with open("D://LCLS_Data/LCLS_python_data/LOn.pkl", "rb") as f:
     LOn = pickle.load(f)
     
-with open("D://LCLS_Data/LCLS_python_data/XEnergyRaw.pkl", "rb") as f:
-    XEnergyRaw = pickle.load(f)
+try:
+    with open("D://LCLS_Data/LCLS_python_data/XEnergyRaw.pkl", "rb") as f:
+        pickle.load(f)
+except:
+    print('no XEnergyRaw variable')
+    
+try:
+    with open("D://LCLS_Data/LCLS_python_data/StageDelay.pkl", "wb") as f:
+        pickle.load(f)
+except:
+    print('no StageDelay variable')
     
 with open("D://LCLS_Data/LCLS_python_data/Diode2.pkl", "rb") as f:
     Diode2 = pickle.load(f)

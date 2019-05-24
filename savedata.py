@@ -11,9 +11,18 @@ with open("D://LCLS_Data/LCLS_python_data/XOn.pkl", "wb") as f:
     
 with open("D://LCLS_Data/LCLS_python_data/LOn.pkl", "wb") as f:
     pickle.dump(LOn, f)
+
+try:
+    with open("D://LCLS_Data/LCLS_python_data/XEnergyRaw.pkl", "wb") as f:
+        pickle.dump(XEnergyRaw, f)
+except:
+    print('no XEnergyRaw variable')
     
-with open("D://LCLS_Data/LCLS_python_data/XEnergyRaw.pkl", "wb") as f:
-    pickle.dump(XEnergyRaw, f)
+try:
+    with open("D://LCLS_Data/LCLS_python_data/StageDelay.pkl", "wb") as f:
+        pickle.dump(StageDelay, f)
+except:
+    print('no StageDelay variable')
     
 with open("D://LCLS_Data/LCLS_python_data/Diode2.pkl", "wb") as f:
     pickle.dump(Diode2, f)

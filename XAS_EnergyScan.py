@@ -17,7 +17,7 @@ from find_t0_XAS import find_t0_XAS
 from loadData import loadData
 from scipy.signal import savgol_filter
 from makeXAS import makeXAS
-from APSCalibration import findEnergyShift
+from APSXASCalibration import findEnergyShift
 import math
 
 ReEnterData = False
@@ -25,8 +25,8 @@ FPlots = False
 
 #Set up the scans and the number of time steps
 
-NumTTSteps = 40
-NumTTStepsPlots = 5
+NumTTSteps = 30
+NumTTStepsPlots = 3
 
 if ReEnterData:
 
@@ -67,7 +67,7 @@ t0 = find_t0_XAS(TTSteps, Peak, True)
 
 
 
-TTSteps = np.linspace(-40,160,NumTTStepsPlots+1)
+TTSteps = np.linspace(-150,150,NumTTStepsPlots+1)
 
 XASOn_Norm_t0, XASOff_Norm_t0, EnergyPlot, Num_On, Num_Off = makeXAS(NumEnergySteps, NumTTStepsPlots, Ipm2Sum, Diode2, UniXEnergy, XEnergy, Filter, LOn, XOn, TTDelay-t0, TTSteps, FPlots)
 

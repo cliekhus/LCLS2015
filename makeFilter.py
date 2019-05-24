@@ -4,9 +4,10 @@ Created on Fri May  3 11:07:12 2019
 
 @author: chelsea
 """
-def makeFilter(Ipm2Sum, Ipm2Median, Ipm2STD, Diode2, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, ploton):
+def makeFilter(Diode2, Ipm2Sum, Ipm2Median, Ipm2STD, Signal, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, ploton, diode):
     
     from makeIntensityFilter import makeDiodeFilter
+    from makeIntensityFilter import makeRowlandFilter
     from itertools import compress
     import matplotlib.pyplot as plt
         
@@ -14,19 +15,22 @@ def makeFilter(Ipm2Sum, Ipm2Median, Ipm2STD, Diode2, XOn, LOn, DiodeIpmSlope, DI
     IpmNumSTDs = 3
     IpmFilter = list(a < b+IpmNumSTDs*c and a > b-IpmNumSTDs*c for a,b,c in zip(Ipm2Sum, Ipm2Median, Ipm2STD))
     
-    DiodeFilter = makeDiodeFilter(Ipm2Sum, Diode2, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, ploton)
-    
-    IntensityFilter = [a and b for a,b in zip(IpmFilter, DiodeFilter)]
+    if diode:
+        DiodeFilter = makeDiodeFilter(Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, ploton)
+        IntensityFilter = [a and b for a,b in zip(IpmFilter, DiodeFilter)]
+    else:
+        RowlandFilter = makeRowlandFilter(Diode2, Signal, XOn, ploton)
+        IntensityFilter = [a and b for a,b in zip(IpmFilter, RowlandFilter)]
     
     
     #Convert the timetool signal into femtosecond delays and create the time tool filters
     TTSTDs = 3
     TTValueFilter = list(a < b+TTSTDs*c and a > b-TTSTDs*c for a,b,c in zip(TimeTool, TTMedian, TTSTD))
     
-    TTAmpSTDs = 1
+    TTAmpSTDs = 3
     TTAmpFilter = list(a < b+TTAmpSTDs*c and a > b-TTAmpSTDs*c for a,b,c in zip(TTAmp, TTAmpMedian, TTAmpSTD))
     
-    TTFWHMSTDs = 1
+    TTFWHMSTDs = 3
     TTFWHMFilter = list(a < b+TTFWHMSTDs*c and a > b-TTFWHMSTDs*c for a,b,c in zip(TTFWHM, TTFWHMMedian, TTFWHMSTD))
     
     TTFilter = list((a and b and c) or not d or not e for a,b,c,d,e in zip(TTValueFilter, TTAmpFilter, TTFWHMFilter, XOn, LOn))

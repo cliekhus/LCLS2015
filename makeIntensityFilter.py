@@ -12,6 +12,7 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd, ploton)
     import matplotlib.pyplot as plt
     from itertools import compress
     import numpy as np
+
     
     xonfilter = [a>0 and b for a,b in zip(slope,xOn)]
     
@@ -100,3 +101,48 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd, ploton)
         plt.ylabel('diode')
     
     return gaussfilter
+
+
+def makeRowlandFilter(ipm2, rowlandsum, xOn, ploton):
+    
+    import matplotlib.pyplot as plt
+    from itertools import compress
+    import math
+    import numpy as np
+    import statistics as stat
+    
+    xonnan = [not math.isnan(x) and y and not math.isnan(z) for x,y,z in zip(rowlandsum, xOn, ipm2)]
+    
+    if ploton:
+            
+        plt.figure()
+        plt.scatter(list(compress(ipm2, xonnan)), list(compress(rowlandsum, xonnan)),s=2)
+    
+    meanrowlandsum = stat.mean(rowlandsum)
+    stdrowlandsum = stat.stdev(rowlandsum)
+    
+    stdlimit = 2
+    
+    rowlandfilter = [abs(x-meanrowlandsum)<stdlimit*stdrowlandsum and y for x,y in zip(rowlandsum, xonnan)]
+    
+    linfit = np.polyfit(list(compress(ipm2, rowlandfilter)), list(compress(rowlandsum, rowlandfilter)), 1)
+    line = np.poly1d(linfit)
+    rowlandres = [abs(x-y) for x,y in zip(list(line(ipm2)),rowlandsum)]
+    statstdev = stat.stdev(rowlandres)
+    
+    if ploton:
+        
+        plt.plot(ipm2, list(line(ipm2)))
+    
+    numstds = .5
+    
+    slopefilter = [a < numstds*statstdev and b for a,b in zip(rowlandres,rowlandfilter)]
+    
+    if ploton:
+            
+        plt.scatter(list(compress(ipm2, slopefilter)),list(compress(rowlandsum,slopefilter)),s=2)
+        plt.xlabel('rowlandsum')
+        plt.ylabel('slope')
+    
+    
+    return slopefilter

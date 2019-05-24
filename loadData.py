@@ -5,18 +5,19 @@ Created on Fri May  3 10:37:18 2019
 @author: chelsea
 """
 
-def loadData(FileNums):
+def loadData(FileNums, XAS):
     
     import h5py
     from itertools import compress
     import math
     import statistics as stat
+    import numpy as np
     
     
     #Initialize the necessary lists
     XOn = []
     LOn = []
-    XEnergyRaw = []
+    Var0 = []
     Diode2 = []
     
     Ipm2Sum = []
@@ -40,16 +41,18 @@ def loadData(FileNums):
     
     RowlandY = []
     
-    
     #Fill the lists with data from the h5 file
     for filenum in FileNums:
-        
-        ScanName = h5py.File('D:\LCLS_Data\ldat_xppj6715_Run' + str(filenum) + '.h5')
+        print(filenum)
+        if XAS:
+            ScanName = h5py.File('D:\LCLS_Data\XAS\ldat_xppj6715_Run' + str(filenum) + '.h5')
+        else:
+            ScanName = h5py.File('D:\LCLS_Data\XES\ldat_xppj6715_Run' + str(filenum) + '.h5')
         
         xOn = list(map(bool, ScanName['/lightStatus/xray']))
         XOn = XOn + xOn
         LOn = LOn + list(map(bool, ScanName['/lightStatus/laser']))
-        XEnergyRaw = XEnergyRaw + list(ScanName['/scan/var0'])
+        Var0 = Var0 + list(ScanName['/scan/var0'])
     
         diode = [x[2] for x in list(ScanName['/diodeU/channels'])]                  #Quad cell 2 from diode - this one has an output
         Diode2 = Diode2 + diode
@@ -94,6 +97,10 @@ def loadData(FileNums):
         
         ScanNum = ScanNum + [filenum for x in range(len(diode))]
         
-        RowlandY = RowlandY + list(ScanName['/Rowland/ROI_proj_ythres'])
+        rowlandy = list(ScanName['/Rowland/ROI_proj_ythres'])
+        RowlandY = RowlandY + rowlandy
         
-    return XOn, LOn, XEnergyRaw, Diode2, Ipm2Sum, Ipm2Median, Ipm2STD, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, ScanNum, RowlandY
+        
+        
+        
+    return XOn, LOn, Var0, Diode2, Ipm2Sum, Ipm2Median, Ipm2STD, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, ScanNum, RowlandY
