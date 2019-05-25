@@ -121,7 +121,7 @@ def makeRowlandFilter(ipm2, rowlandsum, xOn, ploton):
     meanrowlandsum = stat.mean(rowlandsum)
     stdrowlandsum = stat.stdev(rowlandsum)
     
-    stdlimit = 2
+    stdlimit = 1.5
     
     rowlandfilter = [abs(x-meanrowlandsum)<stdlimit*stdrowlandsum and y for x,y in zip(rowlandsum, xonnan)]
     
@@ -134,7 +134,7 @@ def makeRowlandFilter(ipm2, rowlandsum, xOn, ploton):
         
         plt.plot(ipm2, list(line(ipm2)))
     
-    numstds = .5
+    numstds = 1.5
     
     slopefilter = [a < numstds*statstdev and b for a,b in zip(rowlandres,rowlandfilter)]
     

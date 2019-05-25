@@ -17,7 +17,7 @@ from APSXESCalibration import convertPixel2Energy
 import math
 
 ReEnterData = False
-FPlots = True
+FPlots = False
 
 NumTTSteps = 10
 NumTTStepsPlots = 50
@@ -25,20 +25,22 @@ NumTTStepsPlots = 50
 if ReEnterData:
 
     FileNums = [180, 182,183]
-    #FileNums = list(range(180,180+1))
-    XOn, LOn, StageDelay, Diode2, Ipm2Sum, Ipm2Median, Ipm2STD, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, ScanNum, RowlandY = loadData(FileNums, False)
+    #FileNums = list(range(123,124+1))
+    XOn, LOn, StageDelay, Diode2, Ipm2Sum, Ipm2Median, Ipm2STD, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, ScanNum, RowlandYRaw = loadData(FileNums, False)
 
 
-RowlandSum = [sum(x) for x in RowlandY]
+UniXEnergy, RowlandY = convertPixel2Energy(RowlandYRaw)
+XEnergy = UniXEnergy
+
+#RowlandY = RowlandYRaw
+
+RowlandSum = [sum(x) for x in RowlandYRaw]
 
 Filter = makeFilter(Diode2, Ipm2Sum, Ipm2Median, Ipm2STD, RowlandSum, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, FPlots, False)
 
 TTDelay = [x*1000 + y*1e15 for x,y in zip(TimeTool,StageDelay)]
 
-TTSteps = np.linspace(-100,0,NumTTSteps+1)
-
-XEnergy = convertPixel2Energy(RowlandY)
-UniXEnergy = np.unique(list(compress(XEnergy, [x >= 0 and x <= 184 for x in XEnergy])))
+TTSteps = np.linspace(-160,40,NumTTSteps+1)
 
 NumEnergySteps = len(UniXEnergy)
 XESOn_Norm, XESOff_Norm, EnergyPlot, Num_On, Num_Off, Norm_Off, Norm_On = makeXES(NumEnergySteps, NumTTSteps, Diode2, RowlandY, UniXEnergy, XEnergy, Filter, LOn, XOn, TTDelay, TTSteps, FPlots)
@@ -64,7 +66,8 @@ for ii in range(NumTTSteps):
     xesdiff = [a - b for a,b in zip(XESOn_Norm[ii], XESOff_Norm)]
     XESDiff[ii] = xesdiff
     if Num_On[ii]>0:
-        filteredxes = savgol_filter(xesdiff, 5, 1)
+        filteredxes = savgol_filter(xesdiff, 5, 3)
+        #filteredxes = xesdiff
         plt.plot(EnergyPlot, filteredxes, marker='.', label = str(TTSteps[ii]))
         Peak1 = Peak1 + [sum(compress(filteredxes, [x<=74 and x>=70 for x in EnergyPlot]))]
         Peak2 = Peak2 + [sum(compress(filteredxes, [x<=80 and x>=76 for x in EnergyPlot]))]

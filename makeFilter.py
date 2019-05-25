@@ -12,7 +12,7 @@ def makeFilter(Diode2, Ipm2Sum, Ipm2Median, Ipm2STD, Signal, XOn, LOn, DiodeIpmS
     import matplotlib.pyplot as plt
         
     #Set up the intensity filter - the diode and cspad sum should respond linearly with the x-ray intensity
-    IpmNumSTDs = 3
+    IpmNumSTDs = 2
     IpmFilter = list(a < b+IpmNumSTDs*c and a > b-IpmNumSTDs*c for a,b,c in zip(Ipm2Sum, Ipm2Median, Ipm2STD))
     
     if diode:
@@ -24,13 +24,13 @@ def makeFilter(Diode2, Ipm2Sum, Ipm2Median, Ipm2STD, Signal, XOn, LOn, DiodeIpmS
     
     
     #Convert the timetool signal into femtosecond delays and create the time tool filters
-    TTSTDs = 3
+    TTSTDs = 1.5
     TTValueFilter = list(a < b+TTSTDs*c and a > b-TTSTDs*c for a,b,c in zip(TimeTool, TTMedian, TTSTD))
     
-    TTAmpSTDs = 3
+    TTAmpSTDs = 1.5
     TTAmpFilter = list(a < b+TTAmpSTDs*c and a > b-TTAmpSTDs*c for a,b,c in zip(TTAmp, TTAmpMedian, TTAmpSTD))
     
-    TTFWHMSTDs = 3
+    TTFWHMSTDs = 1.5
     TTFWHMFilter = list(a < b+TTFWHMSTDs*c and a > b-TTFWHMSTDs*c for a,b,c in zip(TTFWHM, TTFWHMMedian, TTFWHMSTD))
     
     TTFilter = list((a and b and c) or not d or not e for a,b,c,d,e in zip(TTValueFilter, TTAmpFilter, TTFWHMFilter, XOn, LOn))
