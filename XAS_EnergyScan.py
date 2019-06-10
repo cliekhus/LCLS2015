@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from itertools import compress
 from makeFilter import makeFilter
-from find_t0_XAS import find_t0_XAS
+from find_t0 import find_t0_XAS
 from loadData import loadData
 from scipy.signal import savgol_filter
 from makeXAS import makeXAS
@@ -33,12 +33,12 @@ if ReEnterData:
     FileNums = list(range(373,395+1))
     XOn, LOn, XEnergyRaw, Diode2, Ipm2Sum, Ipm2Median, Ipm2STD, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, ScanNum, RowlandY = loadData(FileNums)
 
-Filter = makeFilter(Ipm2Sum, Ipm2Median, Ipm2STD, Diode2, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, FPlots)
+Filter = makeFilter(Diode2, Ipm2Sum, Ipm2Median, Ipm2STD, Diode2, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, FPlots, True)
 
 TTDelay = [x*1000 for x in TimeTool]
 TTSteps = np.linspace(-200,50,NumTTSteps+1)
 
-XEnergy = [round(x*1000,1) for x in XEnergyRaw]
+XEnergy = [round(x*500,1)*2 for x in XEnergyRaw]
 UniXEnergy = np.unique(list(compress(XEnergy, [x >= 7108 and x <= 7120 for x in XEnergy])))
 
 NumEnergySteps = len(UniXEnergy)
@@ -67,7 +67,7 @@ t0 = find_t0_XAS(TTSteps, Peak, True)
 
 
 
-TTSteps = np.linspace(-150,150,NumTTStepsPlots+1)
+TTSteps = np.linspace(-50,50,NumTTStepsPlots+1)
 
 XASOn_Norm_t0, XASOff_Norm_t0, EnergyPlot, Num_On, Num_Off = makeXAS(NumEnergySteps, NumTTStepsPlots, Ipm2Sum, Diode2, UniXEnergy, XEnergy, Filter, LOn, XOn, TTDelay-t0, TTSteps, FPlots)
 
@@ -121,7 +121,7 @@ fig = plt.figure()
 
 for ii in range(NumTTStepsPlots):
     
-    plt.errorbar(EnergyPlot, savgol_filter(XASDiffPlot[ii],7,2), XASDiffError[ii], marker='.', label = str(round(TTSteps[ii],0)) + ' to ' + str(round(TTSteps[ii+1])) + ' fs delay')
+    plt.errorbar(EnergyPlot, savgol_filter(XASDiffPlot[ii],5,2), XASDiffError[ii], marker='.', label = str(round(TTSteps[ii],0)) + ' to ' + str(round(TTSteps[ii+1])) + ' fs delay')
 
 plt.xlabel('x-ray energy (keV)')
 plt.ylabel('change in x-ray absorption')

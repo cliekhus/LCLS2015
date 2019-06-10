@@ -98,7 +98,7 @@ def loadData(FileNums, XAS):
         ScanNum = ScanNum + [filenum for x in range(len(diode))]
         
         rowlandy = list(ScanName['/Rowland/ROI_proj_ythres'])
-        RowlandY = RowlandY + rowlandy
+        RowlandY = RowlandY + [sum(x) for x in rowlandy]
         
         
         
