@@ -5,15 +5,15 @@ Created on Mon May 13 17:34:21 2019
 @author: chelsea
 """
 
-def makeXES(NumEnergySteps, NumTTSteps, Ipm2Sum, RowlandY, UniXEnergy, XEnergy, Filter, LOn, XOn, TTDelay, TTSteps, ploton):
+def makeXES(NumTTSteps, Ipm2Sum, RowlandY, Filter, LOn, XOn, TTDelay, TTSteps, ploton):
 
     from itertools import compress
     import matplotlib.pyplot as plt
     
-    XESOn = [[0 for x in range(NumEnergySteps)] for y in range(NumTTSteps)]
-    NormFactor_On = [[0 for x in range(NumEnergySteps)] for y in range(NumTTSteps)]
-    XESOn_Norm = [[0 for x in range(NumEnergySteps)] for y in range(NumTTSteps)]
-    Num_On = [[0 for x in range(NumEnergySteps)] for y in range(NumTTSteps)]
+    XESOn = [0 for y in range(NumTTSteps)]
+    NormFactor_On = [0 for y in range(NumTTSteps)]
+    XESOn_Norm = [0 for y in range(NumTTSteps)]
+    Num_On = [0 for y in range(NumTTSteps)]
     
     off = [not a and b for a,b in zip(LOn, Filter)]
     XESOff = sum(list(compress(RowlandY, off)))
@@ -24,45 +24,35 @@ def makeXES(NumEnergySteps, NumTTSteps, Ipm2Sum, RowlandY, UniXEnergy, XEnergy, 
     if NormFactor_Off == 0:
         XESOff_Norm = 0
     else:
-        #XESOff_Norm = [x/NormFactor_Off for x in XESOff]
-        XESOff_Norm = [x/sum(XESOff) for x in XESOff]
+        XESOff_Norm = XESOff/NormFactor_Off
+        #XESOff_Norm = [x/sum(XESOff) for x in XESOff]
         
     for ii in range(NumTTSteps):
     
         on = [bool(a) and bool(b) and bool(c > TTSteps[ii]) and bool(c <= TTSteps[ii+1]) for a,b,c in zip(LOn, Filter, TTDelay )]
-        print(sum([int(x) for x in on]))
         XESOn[ii] = sum(list(compress(RowlandY, on)))
-        print(len(list(compress(RowlandY, on))))
     
         NormFactor_On[ii] = sum(list(compress(Ipm2Sum, on)))
         Num_On[ii] = sum([int(x) for x in on])
     
         if Num_On[ii] == 0:
-            XESOn_Norm[ii] = [0 for x in range(len(XESOff_Norm))]
+            XESOn_Norm[ii] = 0
         else:
-            #XESOn_Norm[ii] = [x/NormFactor_On[ii] for x in XESOn[ii]]
-            XESOn_Norm[ii] = [x/sum(XESOn[ii]) for x in XESOn[ii]]
-            
-    EnergyPlot = UniXEnergy
+            XESOn_Norm[ii] = XESOn[ii]/NormFactor_On[ii]
+            #XESOn_Norm[ii] = [x/sum(XESOn[ii]) for x in XESOn[ii]]
+
                 
     if ploton:
         
         plt.figure()
-        
-        for ii in range(NumTTSteps):
-            
-            plt.plot(XESOn[ii])
-        plt.xlabel('x-ray energy (keV)')
-        plt.ylabel('x-ray emission on')
-        
-        plt.figure()
-        plt.plot(XESOff)
-        plt.xlabel('x-ray energy (keV)')
-        plt.ylabel('x-ray emission off')
+        plt.plot(TTSteps[1:],XESOn_Norm)
+        plt.plot([TTSteps[1], TTSteps[-1]], [XESOff_Norm, XESOff_Norm])
+        plt.xlabel('time')
+        plt.ylabel('XES')
         
         plt.figure()
         plt.plot(TTSteps[1:],NormFactor_On)
         plt.xlabel('time')
         plt.ylabel('norm factor')
             
-    return XESOn_Norm, XESOff_Norm, EnergyPlot, Num_On, Num_Off, NormFactor_Off, NormFactor_On
+    return XESOn_Norm, XESOff_Norm, Num_On, Num_Off, NormFactor_Off, NormFactor_On

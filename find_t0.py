@@ -41,22 +41,17 @@ def find_t0_XAS(TTSteps, Peak, ploton):
 
     return mintime
 
-def find_t0_XES(TTSteps, Peak, ploton):
+def find_t0_XES(Times, Peak, ploton):
     
     import numpy as np
     import matplotlib.pyplot as plt
     from scipy.signal import savgol_filter
     from itertools import compress
     
-    minrange = -145
-    maxrange = -125
+    minrange = -950
+    maxrange = -650
     
     Filtered = savgol_filter(Peak, 5, 2)
-    
-    Times = []
-    
-    for ii in range(len(TTSteps)-1):
-        Times = Times + [(TTSteps[ii]+TTSteps[ii+1])/2]
     
     cond = [x >= minrange and x <= maxrange for x in Times] 
     

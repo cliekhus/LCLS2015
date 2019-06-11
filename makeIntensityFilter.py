@@ -141,8 +141,8 @@ def makeRowlandFilter(ipm2, rowlandsum, xOn, ploton):
     if ploton:
             
         plt.scatter(list(compress(ipm2, slopefilter)),list(compress(rowlandsum,slopefilter)),s=2)
-        plt.xlabel('rowlandsum')
-        plt.ylabel('slope')
+        plt.xlabel('ipm2')
+        plt.ylabel('rowlandsum')
     
     
     return slopefilter

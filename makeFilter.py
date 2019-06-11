@@ -4,33 +4,41 @@ Created on Fri May  3 11:07:12 2019
 
 @author: chelsea
 """
-def makeFilter(Diode2, Ipm2Sum, Ipm2Median, Ipm2STD, Signal, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, TimeTool, TTMedian, TTSTD, TTAmp, TTAmpMedian, TTAmpSTD, TTFWHM, TTFWHMMedian, TTFWHMSTD, ploton, diode):
+def makeFilter(Diode2, Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, ploton, ScanNum, choice):
     
     from makeIntensityFilter import makeDiodeFilter
     from makeIntensityFilter import makeRowlandFilter
     from itertools import compress
     import matplotlib.pyplot as plt
+    from getMedianAndSTD import getMedianAndSTD
         
     #Set up the intensity filter - the diode and cspad sum should respond linearly with the x-ray intensity
-    IpmNumSTDs = 2
+    IpmNumSTDs = 1
+    
+    Ipm2Median, Ipm2STD = getMedianAndSTD(Ipm2Sum, ScanNum)
+    
     IpmFilter = list(a < b+IpmNumSTDs*c and a > b-IpmNumSTDs*c for a,b,c in zip(Ipm2Sum, Ipm2Median, Ipm2STD))
     
-    if diode:
+    if choice == 1:
+        DISMedian, DISSTD = getMedianAndSTD(DiodeIpmSlope, ScanNum)
         DiodeFilter = makeDiodeFilter(Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, ploton)
         IntensityFilter = [a and b for a,b in zip(IpmFilter, DiodeFilter)]
-    else:
+    elif choice == 2:
         RowlandFilter = makeRowlandFilter(Diode2, Signal, XOn, ploton)
         IntensityFilter = [a and b for a,b in zip(IpmFilter, RowlandFilter)]
     
     
     #Convert the timetool signal into femtosecond delays and create the time tool filters
-    TTSTDs = 1.5
+    TTSTDs = 1
+    TTMedian, TTSTD = getMedianAndSTD(TimeTool, ScanNum)
     TTValueFilter = list(a < b+TTSTDs*c and a > b-TTSTDs*c for a,b,c in zip(TimeTool, TTMedian, TTSTD))
     
-    TTAmpSTDs = 1.5
+    TTAmpSTDs = .5
+    TTAmpMedian, TTAmpSTD = getMedianAndSTD(TTAmp, ScanNum)
     TTAmpFilter = list(a < b+TTAmpSTDs*c and a > b-TTAmpSTDs*c for a,b,c in zip(TTAmp, TTAmpMedian, TTAmpSTD))
     
-    TTFWHMSTDs = 1.5
+    TTFWHMSTDs = .5
+    TTFWHMMedian, TTFWHMSTD = getMedianAndSTD(TTFWHM, ScanNum)
     TTFWHMFilter = list(a < b+TTFWHMSTDs*c and a > b-TTFWHMSTDs*c for a,b,c in zip(TTFWHM, TTFWHMMedian, TTFWHMSTD))
     
     TTFilter = list((a and b and c) or not d or not e for a,b,c,d,e in zip(TTValueFilter, TTAmpFilter, TTFWHMFilter, XOn, LOn))
