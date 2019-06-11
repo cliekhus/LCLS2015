@@ -33,11 +33,11 @@ def makeFilter(Diode2, Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, TimeTool, TTAmp
     TTMedian, TTSTD = getMedianAndSTD(TimeTool, ScanNum)
     TTValueFilter = list(a < b+TTSTDs*c and a > b-TTSTDs*c for a,b,c in zip(TimeTool, TTMedian, TTSTD))
     
-    TTAmpSTDs = .5
+    TTAmpSTDs = 1
     TTAmpMedian, TTAmpSTD = getMedianAndSTD(TTAmp, ScanNum)
     TTAmpFilter = list(a < b+TTAmpSTDs*c and a > b-TTAmpSTDs*c for a,b,c in zip(TTAmp, TTAmpMedian, TTAmpSTD))
     
-    TTFWHMSTDs = .5
+    TTFWHMSTDs = 1
     TTFWHMMedian, TTFWHMSTD = getMedianAndSTD(TTFWHM, ScanNum)
     TTFWHMFilter = list(a < b+TTFWHMSTDs*c and a > b-TTFWHMSTDs*c for a,b,c in zip(TTFWHM, TTFWHMMedian, TTFWHMSTD))
     

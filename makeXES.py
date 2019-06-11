@@ -25,7 +25,7 @@ def makeXES(NumTTSteps, Ipm2Sum, RowlandY, Filter, LOn, XOn, TTDelay, TTSteps, p
         XESOff_Norm = 0
     else:
         XESOff_Norm = XESOff/NormFactor_Off
-        #XESOff_Norm = [x/sum(XESOff) for x in XESOff]
+        #XESOff_Norm = XESOff/Num_Off
         
     for ii in range(NumTTSteps):
     
@@ -39,7 +39,7 @@ def makeXES(NumTTSteps, Ipm2Sum, RowlandY, Filter, LOn, XOn, TTDelay, TTSteps, p
             XESOn_Norm[ii] = 0
         else:
             XESOn_Norm[ii] = XESOn[ii]/NormFactor_On[ii]
-            #XESOn_Norm[ii] = [x/sum(XESOn[ii]) for x in XESOn[ii]]
+            #XESOn_Norm[ii] = XESOn[ii]/Num_On[ii]
 
                 
     if ploton:
