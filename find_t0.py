@@ -48,8 +48,8 @@ def find_t0_XES(Times, Peak, ploton):
     from scipy.signal import savgol_filter
     from itertools import compress
     
-    minrange = -950
-    maxrange = -650
+    minrange = -1600
+    maxrange = -1440
     
     Filtered = savgol_filter(Peak, 5, 2)
     

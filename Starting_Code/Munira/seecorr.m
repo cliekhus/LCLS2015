@@ -17,7 +17,7 @@ close all;
 %DiodeU_all = [];
 %ScanVar = [];
 %%
-Run=133;
+Run=182;
 str1=num2str(Run);
 f = strcat('ldat_xppj6715_Run',str1,'.h5');
 Stacker = ones(size((h5read(f,'/lightStatus/xray')))); %Label runs that shouldn't get averaged together
@@ -81,10 +81,10 @@ lOff=abs(lOn-1);
 filt1=lOff&xOn;
 %ipm2_f=ipm2(filt1);
 %DiodeU_f=DiodeU(filt1);
-ipmminf2 = nanmedian(ipm2)-nanstd(ipm2);
-ipmmaxf2 = nanmedian(ipm2)+nanstd(ipm2);
-DiodeUminf2 = nanmedian(DiodeU)-nanstd(DiodeU);
-DiodeUmaxf2 = nanmedian(DiodeU)+nanstd(DiodeU);
+ipmminf2 = nanmedian(ipm2)-2*nanstd(ipm2);
+ipmmaxf2 = nanmedian(ipm2)+2*nanstd(ipm2);
+DiodeUminf2 = nanmedian(DiodeU)-2*nanstd(DiodeU);
+DiodeUmaxf2 = nanmedian(DiodeU)+2*nanstd(DiodeU);
 CutOff = 0.035; %correlation filter variable
 
 zz = 1;  %If scans shouldn't be averaged together they will have different correlation filters as well
@@ -148,10 +148,10 @@ CorrFilter = zeros(size(ipm2));
 filt2=lOn&xOn;
 ipm2_f2=ipm2(filt2);
 DiodeU_f2=DiodeU(filt2);
-ipmmin = nanmedian(ipm2)-nanstd(ipm2);
-ipmmax = nanmedian(ipm2)+nanstd(ipm2);
-DiodeUmin = nanmedian(DiodeU)-nanstd(DiodeU);
-DiodeUmax = nanmedian(DiodeU)+nanstd(DiodeU);
+ipmmin = nanmedian(ipm2)-2*nanstd(ipm2);
+ipmmax = nanmedian(ipm2)+2*nanstd(ipm2);
+DiodeUmin = nanmedian(DiodeU)-2*nanstd(DiodeU);
+DiodeUmax = nanmedian(DiodeU)+2*nanstd(DiodeU);
 %CutOff = 0.035; %correlation filter variable
 
 zz = 1;  %If scans shouldn't be averaged together they will have different correlation filters as well
@@ -241,7 +241,8 @@ Times = [tmin:tstep:tmax];
 Binedges = [60000:1000:70000];
 
 for ii = 1:length(Times)-1;
-    Shots = RealTimes>=Times(ii)&RealTimes<=Times(ii+1)&TTFilter&Filton;
+    Shots = RealTimes>=Times(ii)&RealTimes<=Times(ii+1)&xOn&lOn;
+    %&TTFilter&Filton;
        RowlandTT(ii) = double(nanmean(Rowlandsum1(Shots)));
         Ncount(ii) = sum(Shots);
         RowlandOn_norm(ii) = double(nanmean(Rowlandsum1(Shots)./DiodeU(Shots)));
@@ -286,7 +287,7 @@ save(strcat('delta_T_',str1,'_norm','.mat'), 'pTimes','RowlandOn_norm','RowlandO
 
 
 
-
+%{
 %%%%%% inputs %%%%%%
 Info = 'FeRu_XES_TG12_smallbins';
 Runs = [180:188];
@@ -565,4 +566,5 @@ ylabel('ste');
 
 %% Save Data Matrices
 
-%save(strcat('AveragedData_',Info),'RowlandTT','vonHamosTT','pTimes');       
+%save(strcat('AveragedData_',Info),'RowlandTT','vonHamosTT','pTimes');   
+    %}

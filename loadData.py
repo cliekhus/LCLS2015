@@ -30,6 +30,7 @@ def loadData(FileNums, XAS):
     ScanNum = []
     
     RowlandY = []
+    Offset = []
     
     #Fill the lists with data from the h5 file
     for filenum in FileNums:
@@ -65,6 +66,34 @@ def loadData(FileNums, XAS):
         ScanNum = ScanNum + [filenum for x in range(len(diode))]
         
         rowlandy = list(ScanName['/Rowland/ROI_proj_ythres'])
+        
         RowlandY = RowlandY + [sum(x) for x in rowlandy]
         
-    return XOn, LOn, Var0, Diode2, Ipm2Sum, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, ScanNum, RowlandY
+        Offset = Offset + [(np.mean(x[0:50])+np.mean(x[100:150]))/2*len(x) for x in rowlandy]
+        
+    return XOn, LOn, Var0, Diode2, Ipm2Sum, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, ScanNum, RowlandY, Offset
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
