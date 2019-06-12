@@ -134,7 +134,7 @@ def makeRowlandFilter(ipm2, rowlandsum, xOn, ploton):
         
         plt.plot(ipm2, list(line(ipm2)))
     
-    numstds = 10
+    numstds = 2
     
     slopefilter = [a < numstds*statstdev and b for a,b in zip(rowlandres,rowlandfilter)]
     
