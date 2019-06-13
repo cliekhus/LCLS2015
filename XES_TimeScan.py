@@ -100,7 +100,7 @@ TTDelaymp = [x-t0 for x in TTDelaym]
 
 
 
-TTSteps = np.linspace(-150, 1500, NumTTStepsPlots+1)
+TTSteps = np.linspace(-150, 1400, NumTTStepsPlots+1)
 
 XESOn_Normp, XESOff_Normp, Num_Onp, Num_Offp, NormFactor_Offp, NormFactor_Onp = makeXES(NumTTStepsPlots, IpmWOffsetp, RowlandWOffsetp, Filterp, LOnp, XOnp, TTDelaypp, TTSteps, FPlots)
 XESDiffplus = [(x-XESOff_Normp)*1000/XESOff_Normp for x in XESOn_Normp]
@@ -123,36 +123,45 @@ for ii in range(len(TTSteps)-1):
 
 Fitp, Fitm, params, info = fitXES(TCenters, XESDiffplus, XESDiffminus, 0, FPlots)
 
-tt = np.linspace(-150,800,1000)
+tt = np.linspace(-150,1400,1000)
+
+pluscolor = '#0070DF'
+minuscolor = '#54A60C'
+darkpluscolor = '#004B95'
+darkminuscolor = '#376E08'
 
 plt.figure()
-plt.plot(TCenters, XESDiffplus, 'o')
-plt.plot(tt, convolved(tt, params[0], params[1], params[4], params[5]))
-plt.plot(TCenters, XESDiffminus, 'x')
-plt.plot(tt, convolved(tt, params[2], params[3], params[4], params[5]))
-
+line0 = plt.plot(TCenters, XESDiffplus, 'o', color = pluscolor)
+line1 = plt.plot(TCenters, XESDiffminus, 's', color = minuscolor)
+line2 = plt.plot(tt, convolved(tt, params[0], params[1], params[4], params[5]), color = darkpluscolor)
+line3 = plt.plot(tt, convolved(tt, params[2], params[3], params[4], params[5]), '--', color = darkminuscolor)
 plt.ylabel('$\Delta$ T x 10$^3$')
 plt.xlabel('time delay (fs)')
+plt.legend((line0[0], line1[0], line2[0], line3[0]), ('6402.0 eV', '6404.5 eV', '6402.0 eV fit', '6404.5 eV fit'))
 
 plt.figure()
-plt.plot(TCenters, savgol_filter(XESDiffplus,7,2), 'o')
-plt.plot(tt, convolved(tt, params[0], params[1], params[4], params[5]))
-plt.plot(TCenters, savgol_filter(XESDiffminus,7,2), 'x')
-plt.plot(tt, convolved(tt, params[2], params[3], params[4], params[5]))
+line0 = plt.plot(TCenters, savgol_filter(XESDiffplus,7,2), 'o', color = pluscolor)
+line1 = plt.plot(TCenters, savgol_filter(XESDiffminus,7,2), 's', color = minuscolor)
+line2 = plt.plot(tt, convolved(tt, params[0], params[1], params[4], params[5]), color = darkpluscolor)
+line3 = plt.plot(tt, convolved(tt, params[2], params[3], params[4], params[5]), '--', color = darkminuscolor)
 plt.title('smoothed')
+plt.ylabel('$\Delta$ T x 10$^3$')
+plt.xlabel('time delay (fs)')
+plt.legend((line0[0], line1[0], line2[0], line3[0]), ('6402.0 eV', '6404.5 eV', '6402.0 eV fit', '6404.5 eV fit'))
 
 
-Residualp = [x-y for x,y,z in zip(XESDiffplus,Fitp,TCenters) if z>200]
-Residualm = [x-y for x,y,z in zip(XESDiffminus,Fitm,TCenters) if z>200]
-
-#Residualp = [x-y for x,y,z in zip(savgol_filter(XESDiffplus,7,2),Fitp,TCenters) if z>200]
-#Residualm = [x-y for x,y,z in zip(savgol_filter(XESDiffminus,7,2),Fitm,TCenters) if z>200]
+Residualp = [x-y for x,y,z in zip(savgol_filter(XESDiffplus,7,2),Fitp,TCenters) if z>200]
+Residualm = [x-y for x,y,z in zip(savgol_filter(XESDiffminus,7,2),Fitm,TCenters) if z>200]
 
 TCP = [x for x in TCenters if x>200]
 
 plt.figure()
-plt.plot(TCP, Residualp, 'o')
-plt.plot(TCP, Residualm, 'x')
+line0 = plt.plot(TCP, Residualp, marker = 'o', color = pluscolor)
+line1 = plt.plot(TCP, Residualm, marker = 's', color = minuscolor)
+plt.ylabel('residuals')
+plt.xlabel('time delay (fs)')
+plt.legend((line0[0], line1[0]), ('6402.0 eV', '6404.5 eV'))
+plt.title('smoothed')
 
 FTp = np.fft.rfft(Residualp)
 FTm = np.fft.rfft(Residualm)
@@ -162,5 +171,29 @@ Freq = np.fft.rfftfreq(len(Residualp), d=(TCenters[0]-TCenters[1])*1e-15)
 Freq = [-x*1e-12*33.356 for x in Freq]
 
 plt.figure()
-plt.plot(Freq, abs(FTp))
-plt.plot(Freq, abs(FTm))
+line0 = plt.plot(Freq, abs(FTp), color = pluscolor)
+line1 = plt.plot(Freq, abs(FTm), color = minuscolor)
+plt.ylabel('fourier amplitude')
+plt.xlabel('cm$^{-1}$')
+plt.legend((line0[0], line1[0]), ('6402.0 eV', '6404.5 eV'))
+plt.title('smoothed')
+
+Residualp = [x-y for x,y,z in zip(XESDiffplus,Fitp,TCenters) if z>200]
+Residualm = [x-y for x,y,z in zip(XESDiffminus,Fitm,TCenters) if z>200]
+
+plt.figure()
+line0 = plt.plot(TCP, Residualp, marker = 'o', color = pluscolor)
+line1 = plt.plot(TCP, Residualm, marker = 's', color = minuscolor)
+plt.ylabel('residuals')
+plt.xlabel('time delay (fs)')
+plt.legend((line0[0], line1[0]), ('6402.0 eV', '6404.5 eV'))
+
+FTp = np.fft.rfft(Residualp)
+FTm = np.fft.rfft(Residualm)
+
+plt.figure()
+line0 = plt.plot(Freq, abs(FTp), color = pluscolor)
+line1 = plt.plot(Freq, abs(FTm), color = minuscolor)
+plt.ylabel('fourier amplitude')
+plt.xlabel('cm$^{-1}$')
+plt.legend((line0[0], line1[0]), ('6402.0 eV', '6404.5 eV'))
