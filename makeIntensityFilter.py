@@ -21,7 +21,7 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd, ploton)
         plt.figure()
         plt.scatter(list(compress(diode, xonfilter)),list(compress(slope, xonfilter)),s=2)
     
-    numstds = 2
+    numstds = 1.5
     
     slopefilter = [abs(a-c) < numstds*d and b for a,b,c,d in zip(slope,xonfilter,slopemedian, slopestd)]
     
@@ -134,7 +134,7 @@ def makeRowlandFilter(ipm2, rowlandsum, xOn, ploton):
         
         plt.plot(ipm2, list(line(ipm2)))
     
-    numstds = 2
+    numstds = 1.75
     
     slopefilter = [a < numstds*statstdev and b for a,b in zip(rowlandres,rowlandfilter)]
     

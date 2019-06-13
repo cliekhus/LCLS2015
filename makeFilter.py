@@ -29,7 +29,7 @@ def makeFilter(Diode2, Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, TimeTool, TTAmp
     
     
     #Convert the timetool signal into femtosecond delays and create the time tool filters
-    TTSTDs = 2
+    TTSTDs = 3
     TTMedian, TTSTD = getMedianAndSTD(TimeTool, ScanNum)
     TTValueFilter = list(a < b+TTSTDs*c and a > b-TTSTDs*c for a,b,c in zip(TimeTool, TTMedian, TTSTD))
     
