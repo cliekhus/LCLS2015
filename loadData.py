@@ -5,12 +5,9 @@ Created on Fri May  3 10:37:18 2019
 @author: chelsea
 """
 
-def loadData(FileNums, XAS):
+def loadData(FileNums, XAS, setting):
     
     import h5py
-    from itertools import compress
-    import math
-    import statistics as stat
     import numpy as np
     
     
@@ -69,7 +66,11 @@ def loadData(FileNums, XAS):
         
         RowlandY = RowlandY + [sum(x) for x in rowlandy]
         
-        Offset = Offset + [(np.mean(x[0:50])+np.mean(x[100:150]))/2*len(x) for x in rowlandy]
+        if setting == 1:
+            Offset = Offset + [(np.mean(x[0:50])+np.mean(x[100:150]))/2*len(x) for x in rowlandy]
+        elif setting == 2:
+            Offset = Offset + [(sum(x[150:175]))/25*len(x) for x in rowlandy]
+        
         
     return XOn, LOn, Var0, Diode2, Ipm2Sum, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, ScanNum, RowlandY, Offset
 

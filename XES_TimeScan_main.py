@@ -33,7 +33,7 @@ if ReEnterData:
 
     #FileNums = [180]+ list(range(182,188+1))
     FileNums = list(range(155, 158+1)) + list(range(160, 164+1))
-    XOnp, LOnp, StageDelayp, Diode2p, Ipm2Sump, DiodeIpmSlopep, TimeToolp, TTAmpp, TTFWHMp, ScanNump, RowlandYp, RowOffsetp = loadData(FileNums, False)
+    XOnp, LOnp, StageDelayp, Diode2p, Ipm2Sump, DiodeIpmSlopep, TimeToolp, TTAmpp, TTFWHMp, ScanNump, RowlandYp, RowOffsetp = loadData(FileNums, False, 1)
 
 RowlandWOffsetp = [x-y for x,y in zip(RowlandYp, RowOffsetp)]
 
@@ -65,7 +65,7 @@ if ReEnterData:
 
     FileNums = [180]+ list(range(182,188+1))
     #FileNums = list(range(155, 158+1)) + list(range(160, 164+1))
-    XOnm, LOnm, StageDelaym, Diode2m, Ipm2Summ, DiodeIpmSlopem, TimeToolm, TTAmpm, TTFWHMm, ScanNumm, RowlandYm, RowOffsetm = loadData(FileNums, False)
+    XOnm, LOnm, StageDelaym, Diode2m, Ipm2Summ, DiodeIpmSlopem, TimeToolm, TTAmpm, TTFWHMm, ScanNumm, RowlandYm, RowOffsetm = loadData(FileNums, False, 1)
 
 RowlandWOffsetm = [x-y for x,y in zip(RowlandYm, RowOffsetm)]
 

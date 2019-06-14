@@ -4,3 +4,4 @@ $ cat .gitignore
 *.png
 /__pycache__
 /Figures
+/Starting_Code
