@@ -6,10 +6,10 @@ Created on Fri Jun  7 11:03:44 2019
 """
 
 import numpy as np
-from itertools import compress
 import matplotlib.pyplot as plt
-from makeFilter import makeFilter
 from loadData import loadData
+from APSXESCalibration import makeConversion
+from makeStaticXES import makeStaticXES
 
 ReEnterData = False
 FPlots = False
@@ -26,50 +26,43 @@ RowlandWOffset = [x-y for x,y in zip(RowlandY, RowOffset)]
 #RowlandWOffset = RowlandY
 UniqueAngle = np.unique(Angle)
 
-SpectraOn = []
-SpectraOff = []
 
-ii = 0
+Times = np.linspace(-0.2, 0.1, num=10)
+plt.figure()
 
-for uangle in UniqueAngle:
+for ii in range(len(Times)):
     
-    selectAngle = [x == uangle for x in Angle]
-    ii = ii+1
-    if ii%6 == 1:
-        FPlots = False
-
-    rowlandwoffset = list(compress(RowlandWOffset, selectAngle))
-    diode2 = list(compress(Diode2, selectAngle))
-    timetool = list(compress(TimeTool, selectAngle))
-
-
-    Filter, Offset = makeFilter(list(compress(Diode2, selectAngle)), list(compress(Ipm2Sum, selectAngle)), rowlandwoffset, \
-                                list(compress(XOn, selectAngle)), list(compress(LOn, selectAngle)), list(compress(DiodeIpmSlope, selectAngle)), \
-                                list(compress(TimeTool, selectAngle)), list(compress(TTAmp, selectAngle)), list(compress(TTFWHM, selectAngle)), \
-                                FPlots, list(compress(ScanNum, selectAngle)), 2)
+    MaxTime = Times[ii]+0.1
+    MinTime = Times[ii]
     
-    diode2 = [x-Offset for x in diode2]
+    SpectraOn, SpectraOff, UniqueAnglep = makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, ScanNum, MaxTime, MinTime, FPlots)
+            
+    UniqueAnglep = [76*2-x for x in UniqueAnglep]
+    LCLSEnergy, slope, x0 = makeConversion(UniqueAnglep, SpectraOff, FPlots)
+            
     
-    Filteroff = [x and y and not z for x,y,z in zip(Filter, XOn, LOn)]
-    Filteron = [(w < .01) and (w > -.01) and x and y and z for w,x,y,z in zip(timetool, Filter, XOn, LOn)]
+    #plt.plot(LCLSEnergy, SpectraOn, marker = 'o')
+    #plt.plot(LCLSEnergy, SpectraOff, marker = 'o')
     
-
-    SpectraOn = SpectraOn + [sum(list(compress(rowlandwoffset, Filteroff)))/sum(list(compress(diode2, Filteroff)))]
-    SpectraOff = SpectraOff + [sum(list(compress(rowlandwoffset, Filteron)))/sum(list(compress(diode2, Filteron)))]
-
-    if ii%6 == 1:
-        FPlots = False
+    #SpectraOnNorm = [x/max(SpectraOn) for x in SpectraOn]
+    #SpectraOffNorm = [x/max(SpectraOff) for x in SpectraOff]
+    
+    diff = [(x-y)/y for x,y in zip(SpectraOn, SpectraOff)]
+    
+    if ii == 0:
         
-plt.figure()
-plt.plot(UniqueAngle, SpectraOn)
-plt.plot(UniqueAngle, SpectraOff)
+        Matrix = [diff]
+    
+    else:
+        Matrix.append(diff)
+    
+    plt.plot(LCLSEnergy, diff, marker = 'o')
+
+#plt.figure()
+#plt.plot(LCLSEnergy, [x-y for x,y in zip(SpectraOnNorm, SpectraOffNorm)], marker = 'o')
 
 plt.figure()
-plt.plot(UniqueAngle, [x-y for x,y in zip(SpectraOn, SpectraOff)])
-
-
-
-
+plt.pcolor(Matrix)
 
 
 

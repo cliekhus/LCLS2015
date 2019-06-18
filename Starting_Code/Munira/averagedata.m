@@ -1,81 +1,140 @@
 clear all
-close all
 hold off
-%Runs=[371:373,375:394];
-Runs=[371:373, 375:377, 379:382, 384:391, 393:394];
+Runs=[190 191];
+
 dataon=[];
 dataoff=[];
 rtheta=[];
 
 for aa=1:length(Runs);
     str1=num2str(Runs(aa));
-    dataon=[dataon; load(strcat('delta_T_cee',str1,'.mat'),'Rowland_On')];
-    dataoff=[dataoff; load(strcat('delta_T_cee',str1,'.mat'),'Rowland_off')];
-    energy= load(strcat('delta_T_cee',str1,'.mat'),'monoaxis');
-    times=load(strcat('delta_T_cee',str1,'.mat'),'Timesaxis');
+    dataon=[dataon; load(strcat('deltaTKalphaenergy_',str1,'.mat'),'RowlandOn_norm')];
+    dataoff=[dataoff; load(strcat('deltaTKalphaenergy_',str1,'.mat'),'RowlandOff_norm')];
+    rtheta=[rtheta; load(strcat('deltaTKalphaenergy_',str1,'.mat'),'rtheta')];
+    times=load(strcat('deltaTKalphaenergy_',str1,'.mat'),'Timesaxis');
 end
 % figure
 % plot(Timesmat(1,:), datamaton)
-%% Plotting all the Rowland off
+%% averaging 190 and 191
+dataon190=nanmean(dataon(1).RowlandOn_norm(4:6,:));
+dataoff190=dataoff(1).RowlandOff_norm;
+dataon191=nanmean(dataon(2).RowlandOn_norm(4:6,:));
+dataoff191=dataoff(2).RowlandOff_norm;
+rth=rtheta(1).rtheta;
+for zz=1:length(rth);
+    eshots=rtheta(2).rtheta==rth(zz);
+    dataon1(zz)=double(nansum(dataon191(eshots)));
+    dataoff1(zz)=double(nansum(dataoff191(eshots)));  
+end
+totdata(1,:)=dataon190;
+totdata(2,:)=dataon1;
+
+totdataoff(1,:)=dataoff190;
+totdataoff(2,:)=dataoff1;
+
+%dataonavg=nanmean(totdata);
+%dataoffavg=nanmean(totdataoff);
+
+delT190=dataon190-dataoff190;
+delT191=dataon1-dataoff1;
+
+plot(rth, delT190, rth-0.005, delT191)
+
+%cannot average 190 and 191 together because there is a difference in the
+%energy scales of the two data sets. 
+
+
+%% First average all the data for Run 190
+
+%construct delta T averaged over a specific time interval 4:5
+
+delT46=(nanmean(dataon(1).RowlandOn_norm(4:6,:)))-dataoff(1).RowlandOff_norm;
 figure
-for aa=1:length(Runs);
-    y=dataoff(aa).Rowland_off;
-    doff(:,aa)=(y);
-    plot(energy.monoaxis, y);
-    hold on
+plot(rtheta(1).rtheta, delT46)
+figure
+plot(rtheta(1).rtheta, delT46./dataoff(1).RowlandOff_norm)
+%% Filter the data and then plot it
+
+dataoff_filt=sgolayfilt(dataoff(1).RowlandOff_norm, 2,5);
+dataon_filt=sgolayfilt(nanmean(dataon(1).RowlandOn_norm(4:6,:)), 2,5);
+figure
+figure
+plot(rtheta(1).rtheta, (dataon_filt-dataoff_filt),rtheta(1).rtheta, delT46, rtheta(1).rtheta, sgolayfilt(delT46, 2,5))
+figure
+plot(rtheta(1).rtheta, (dataon_filt-dataoff_filt)./dataoff_filt,rtheta(1).rtheta, delT46./dataoff_filt )
+
+
+%%
+
+%% First average all the data for Run 190
+
+%construct delta T averaged over a specific time interval 4:5
+
+delT56=((dataon(1).RowlandOn_norm(5,:)))-dataoff(1).RowlandOff_norm;
+figure
+plot(rtheta(1).rtheta, delT56)
+figure
+plot(rtheta(1).rtheta, delT56./dataoff(1).RowlandOff_norm)
+%% Filter the data and then plot it
+
+dataoff_filt=sgolayfilt(dataoff(1).RowlandOff_norm, 2,5);
+dataon_filt=sgolayfilt((dataon(1).RowlandOn_norm(5,:)), 2,5);
+figure
+figure
+plot(rtheta(1).rtheta, (dataon_filt-dataoff_filt),rtheta(1).rtheta, delT56, rtheta(1).rtheta, sgolayfilt(delT56, 2,5))
+figure
+plot(rtheta(1).rtheta, (dataon_filt-dataoff_filt)./dataoff_filt,rtheta(1).rtheta, delT56./dataoff_filt )
+%%
+
+    
+
+
+dataon_avg=nanmean(datamaton(1:end,:));
+dataoff_avg=nanmean(dataoff(1:end));
+delta_Tavg=(dataon_avg-dataoff_avg)/(dataoff_avg);
+
+figure
+plot(Timesmat(1,:), delta_Tavg)
+
+%error propagation
+dataon_std=nanstd(datamaton(1:end,:),1)./sqrt(9);
+dataoff_std=nanstd(dataoff(1:end),1)./(sqrt(9));
+delta_Tstd=sqrt(((dataon_std)./(dataon_avg)).^2+(dataoff_std/dataoff_avg)^2);
+
+figure
+plot(Timesmat(2,:), delta_Tavg)
+title('Average delta_T Runs 155-158 and 160-164')
+
+figure
+errorbar(Timesmat(2,:), delta_Tavg, delta_Tstd/2)
+title('Average delta_T Runs 155-158 and 160-164 with standard mean error')
+
+% figure
+% errorbar(Timesmat(1,:), delta_Tavg, ((dataon_std)./(dataon_avg))./2)
+
+%% First calculate delta_T and then average. 
+
+for zz=1:length(Runs)-1;
+    delta_Tmat(zz,:)=(datamaton(zz+1,:)-dataoff_avg)./dataoff_avg;
 end
 
-hold off
-
-%% Plotting all the Rowland on
-
-for aa=1:length(Runs);
-    y=dataon(aa).Rowland_On;
-    don(:,:,aa)=y;
+for zz=1:length(Runs)-1;
+    delta_Tmat1(zz,:)=(datamaton(zz+1,:)-dataoff(zz+1))./dataoff(zz+1);
 end
 
-don_sum=sum(don,3);
-contourf(energy.monoaxis, times.Timesaxis, don_sum, 30)
-
-
-
-%% Plotting don and doff
 
 figure
-plot(energy.monoaxis, nanmean(don_sum(4:7,:),1), energy.monoaxis,sum(doff,2).*3)
+plot(Timesmat(1,:), nanmean(delta_Tmat), Timesmat(1,:), delta_Tmat)
+ 
 figure
-plot(energy.monoaxis, (nanmean(don_sum(4:7,:),1)-sum(doff,2)')./(sum(doff,2)'))
+plot(Timesmat(1,:), delta_Tavg, Timesmat(1,:), nanmean(delta_Tmat))
 
+%% Sticking with delta_Tavg assembling final data set
 
-%% First smoothing and then taking the difference
+Ncount_avg=nansum(countmat(2:end,:));
+Timedelay=Timesmat(2,:);
+delta_Tstdmeanerror=delta_Tstd;
+save('data_155_164_FeRu.mat','Timedelay','delta_Tavg','delta_Tstdmeanerror','Ncount_avg');
 
-dataonsm=sgolayfilt(nanmean(don_sum(4:7,:),1), 3,5);
-dataonavg=nanmean(don_sum(4:7,:),1);
-doffavg=sum(doff,2,'double');
-dataoffsm=sgolayfilt(doffavg, 3,5);
-figure
-plot(energy.monoaxis, dataonsm, energy.monoaxis,dataoffsm)
-figure
-plot(energy.monoaxis, (dataonsm-dataoffsm')./(dataoffsm'),energy.monoaxis, (dataonavg-doffavg')./(doffavg'),energy.monoaxis,zeros(length(energy.monoaxis)),energy.monoaxis, dataoffsm./100000)
+%%
 
-%% constructing difference signals by taking difference of each run with d_off and then smoothing
-for aa=1:length(Runs);
-    yoff=doff(:,aa);
-    for bb=1:8;
-        deltmat(bb,:,aa)=don(bb,:,aa)-yoff';
-        deltmat1(bb,:,aa)=(don(bb,:,aa)-yoff')./(doffavg'); %percent difference for each run
-    end
-end
-deltmat_sum=sum(deltmat,3,'double');
-deltmat1_sum=sum(deltmat1,3,'double');
-deltaT=(nanmean(deltmat1_sum(4:7,:),1));
-deltaTsm=sgolayfilt(nanmean(deltmat1_sum(4:7,:),1),2,5);
-
-figure
-plot(energy.monoaxis, (nanmean(deltmat1_sum(4:7,:),1)),energy.monoaxis, sgolayfilt(nanmean(deltmat1_sum(4:7,:),1),2,5),energy.monoaxis,zeros(length(energy.monoaxis))) 
-
-figure
-plot(energy.monoaxis, sgolayfilt(nanmean(deltmat1_sum(4:7,:),1),2,5),energy.monoaxis, (dataonsm-dataoffsm')./(dataoffsm')) 
-%% Saving file
-
-save('FsCEEavg.mat','energy','doffavg','dataoffsm','deltaT','deltaTsm');

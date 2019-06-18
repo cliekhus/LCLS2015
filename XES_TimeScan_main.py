@@ -14,8 +14,8 @@ from fitXES import fitXES
 from fittingfunctions import convolved
 from scipy.signal import savgol_filter
 
-ReEnterData = False
-FPlots = False
+ReEnterData = True
+FPlots = True
 
 NumTTSteps = 200
 NumTTStepsPlots = 50
@@ -63,7 +63,9 @@ XESDiffplus = [(x-XESOff_Normp)*1000/XESOff_Normp for x in XESOn_Normp]
 
 if ReEnterData:
 
-    FileNums = [180]+ list(range(182,188+1))
+    #FileNums = [180]+ list(range(182,188+1))
+    FileNums = list(range(165, 178+1))
+    
     #FileNums = list(range(155, 158+1)) + list(range(160, 164+1))
     XOnm, LOnm, StageDelaym, Diode2m, Ipm2Summ, DiodeIpmSlopem, TimeToolm, TTAmpm, TTFWHMm, ScanNumm, RowlandYm, RowOffsetm = loadData(FileNums, False, 1)
 
