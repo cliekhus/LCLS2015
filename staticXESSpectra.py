@@ -27,12 +27,12 @@ RowlandWOffset = [x-y for x,y in zip(RowlandY, RowOffset)]
 UniqueAngle = np.unique(Angle)
 
 
-Times = np.linspace(-0.2, 0.1, num=10)
+Times = np.linspace(-0.2, 0.1, num=1)
 plt.figure()
 
 for ii in range(len(Times)):
     
-    MaxTime = Times[ii]+0.1
+    MaxTime = Times[ii]+.1
     MinTime = Times[ii]
     
     SpectraOn, SpectraOff, UniqueAnglep = makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, ScanNum, MaxTime, MinTime, FPlots)

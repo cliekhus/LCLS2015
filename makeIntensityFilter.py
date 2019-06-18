@@ -103,7 +103,7 @@ def makeDiodeFilter(ipm2, diode, xOn, lOn, slope, slopemedian, slopestd, ploton)
     return gaussfilter
 
 
-def makeRowlandFilter(ipm2, rowlandsum, xOn, ploton):
+def makeRowlandFilter(diode2, rowlandsum, xOn, lon, ploton):
     
     import matplotlib.pyplot as plt
     from itertools import compress
@@ -111,38 +111,51 @@ def makeRowlandFilter(ipm2, rowlandsum, xOn, ploton):
     import numpy as np
     import statistics as stat
     
-    xonnan = [not math.isnan(x) and y and not math.isnan(z) for x,y,z in zip(rowlandsum, xOn, ipm2)]
+    xonnan = [not math.isnan(x) and y and not math.isnan(z) for x,y,z in zip(rowlandsum, xOn, diode2)]
     
     if ploton:
             
         plt.figure()
-        plt.scatter(list(compress(ipm2, xonnan)), list(compress(rowlandsum, xonnan)),s=2)
+        plt.scatter(list(compress(diode2, xonnan)), list(compress(rowlandsum, xonnan)),s=2)
     
     meanrowlandsum = stat.mean(rowlandsum)
     stdrowlandsum = stat.stdev(rowlandsum)
     
     stdlimit = 2
     
-    rowlandfilter = [abs(x-meanrowlandsum)<stdlimit*stdrowlandsum and y for x,y in zip(rowlandsum, xonnan)]
+    rowlandfilteron = [abs(x-meanrowlandsum)<stdlimit*stdrowlandsum and y and z for x,y,z in zip(rowlandsum, xonnan, lon)]
     
-    linfit = np.polyfit(list(compress(ipm2, rowlandfilter)), list(compress(rowlandsum, rowlandfilter)), 1)
-    line = np.poly1d(linfit)
-    rowlandres = [abs(x-y) for x,y in zip(list(line(ipm2)),rowlandsum)]
-    statstdev = stat.stdev(list(compress(rowlandres, rowlandfilter)))
+    linfiton = np.polyfit(list(compress(diode2, rowlandfilteron)), list(compress(rowlandsum, rowlandfilteron)), 1)
+    lineon = np.poly1d(linfiton)
+    rowlandreson = [abs(x-y) for x,y in zip(list(lineon(diode2)),rowlandsum)]
+    statstdevon = stat.stdev(list(compress(rowlandreson, rowlandfilteron)))
+    
+    
+    rowlandfilteroff = [abs(x-meanrowlandsum)<stdlimit*stdrowlandsum and y and not z for x,y,z in zip(rowlandsum, xonnan, lon)]
+    
+    linfitoff = np.polyfit(list(compress(diode2, rowlandfilteroff)), list(compress(rowlandsum, rowlandfilteroff)), 1)
+    lineoff = np.poly1d(linfitoff)
+    rowlandresoff = [abs(x-y) for x,y in zip(list(lineoff(diode2)),rowlandsum)]
+    statstdevoff = stat.stdev(list(compress(rowlandresoff, rowlandfilteroff)))
+    
+    
     
     if ploton:
         
-        plt.plot(ipm2, list(line(ipm2)))
+        plt.plot(list(compress(diode2,rowlandreson)), list(lineon(list(compress(diode2,rowlandreson)))))
+        plt.plot(list(compress(diode2, rowlandresoff)), list(lineon(list(compress(diode2,rowlandresoff)))))
     
     numstds = 1.75
     
-    slopefilter = [a < numstds*statstdev and b for a,b in zip(rowlandres,rowlandfilter)]
+    slopefilteron = [a < numstds*statstdevon and b for a,b in zip(rowlandreson,rowlandfilteron)]
+    slopefilteroff = [a < numstds*statstdevon and b for a,b in zip(rowlandresoff,rowlandfilteroff)]
     
     if ploton:
         
-        plt.scatter(list(compress(ipm2, slopefilter)),list(compress(rowlandsum,slopefilter)),s=2,c='r')
-        plt.xlabel('ipm2')
+        plt.scatter(list(compress(diode2, slopefilteron)),list(compress(rowlandsum,slopefilteron)),s=2,c='r')
+        plt.scatter(list(compress(diode2, slopefilteroff)),list(compress(rowlandsum,slopefilteroff)),s=2,c='r')
+        plt.xlabel('diode2')
         plt.ylabel('rowlandsum')
     
     
-    return slopefilter, -linfit[1]/linfit[0]
+    return slopefilteron, slopefilteroff, -linfiton[1]/linfiton[0], -linfitoff[1]/linfitoff[0]
