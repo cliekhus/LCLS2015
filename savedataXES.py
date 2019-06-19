@@ -6,7 +6,7 @@ Created on Thu May 16 10:22:18 2019
 """
 import pickle
 
-folder = "D://LCLS_Data/LCLS_python_data/XES/"
+folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved_some/"
 
 with open(folder + "XOnp.pkl", "wb") as f:
     pickle.dump(XOnp, f)

@@ -27,8 +27,7 @@ def makeFilter(Diode2, Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, TimeTool, TTAmp
         RowlandFilterOn, RowlandFilterOff, OffsetOn, OffsetOff = makeRowlandFilter(Diode2, Signal, XOn, LOn, ploton)
         IntensityFilterOn = [a and b for a,b in zip(IpmFilter, RowlandFilterOn)]
         IntensityFilterOff = [a and b for a,b in zip(IpmFilter, RowlandFilterOff)]
-    
-    
+
     #Convert the timetool signal into femtosecond delays and create the time tool filters
     TTSTDs = 3
     TTMedian, TTSTD = getMedianAndSTD(TimeTool, ScanNum)
@@ -56,5 +55,5 @@ def makeFilter(Diode2, Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, TimeTool, TTAmp
     
     FilterOn = list(a and b for a,b in zip(TTFilter, IntensityFilterOn))
     FilterOff = list(a and b for a,b in zip(TTFilter, IntensityFilterOff))
-    
+
     return FilterOn, FilterOff, (OffsetOn+OffsetOff)/2

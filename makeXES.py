@@ -5,7 +5,7 @@ Created on Mon May 13 17:34:21 2019
 @author: chelsea
 """
 
-def makeXES(NumTTSteps, Ipm2Sum, RowlandY, Filter, LOn, XOn, TTDelay, TTSteps, ploton):
+def makeXES(NumTTSteps, Diode2, RowlandY, FilterOn, FilterOff, LOn, XOn, TTDelay, TTSteps, ploton):
     
     from itertools import compress
     import matplotlib.pyplot as plt
@@ -15,10 +15,11 @@ def makeXES(NumTTSteps, Ipm2Sum, RowlandY, Filter, LOn, XOn, TTDelay, TTSteps, p
     XESOn_Norm = [0 for y in range(NumTTSteps)]
     Num_On = [0 for y in range(NumTTSteps)]
 
-    off = [not a and b for a,b in zip(LOn, Filter)]
+    #off = [not a and b for a,b in zip(LOn, FilterOff)]
+    off = FilterOff
     XESOff = sum(list(compress(RowlandY, off)))
 
-    NormFactor_Off = sum(list(compress(Ipm2Sum, off)))
+    NormFactor_Off = sum(list(compress(Diode2, off)))
     Num_Off = sum([int(x) for x in off])
     
     if Num_Off == 0:
@@ -28,10 +29,10 @@ def makeXES(NumTTSteps, Ipm2Sum, RowlandY, Filter, LOn, XOn, TTDelay, TTSteps, p
         
     for ii in range(NumTTSteps):
     
-        on = [bool(a) and bool(b) and bool(c >= TTSteps[ii]) and bool(c < TTSteps[ii+1]) and d for a,b,c,d in zip(LOn, Filter, TTDelay, XOn)]
+        on = [bool(a) and bool(b) and bool(c >= TTSteps[ii]) and bool(c < TTSteps[ii+1]) and d for a,b,c,d in zip(LOn, FilterOn, TTDelay, XOn)]
         XESOn[ii] = sum(list(compress(RowlandY, on)))
         
-        NormFactor_On[ii] = sum(list(compress(Ipm2Sum, on)))
+        NormFactor_On[ii] = sum(list(compress(Diode2, on)))
         Num_On[ii] = sum([int(x) for x in on])
     
         if Num_On[ii] == 0:

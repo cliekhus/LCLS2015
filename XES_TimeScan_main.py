@@ -13,12 +13,14 @@ from makeXES import makeXES
 from fitXES import fitXES
 from fittingfunctions import convolved
 from scipy.signal import savgol_filter
+from APSXESCalibration import convertAngle2Energy
+import pickle
 
-ReEnterData = True
-FPlots = True
+ReEnterData = False
+FPlots = False
 
-NumTTSteps = 200
-NumTTStepsPlots = 50
+NumTTSteps = 100
+NumTTStepsPlots = 75
 
 TTSteps = np.linspace(-2000,0,NumTTSteps+1)
 
@@ -33,17 +35,25 @@ if ReEnterData:
 
     #FileNums = [180]+ list(range(182,188+1))
     FileNums = list(range(155, 158+1)) + list(range(160, 164+1))
+    #FileNums = list(range(155, 164+1))
     XOnp, LOnp, StageDelayp, Diode2p, Ipm2Sump, DiodeIpmSlopep, TimeToolp, TTAmpp, TTFWHMp, ScanNump, RowlandYp, RowOffsetp = loadData(FileNums, False, 1)
 
 RowlandWOffsetp = [x-y for x,y in zip(RowlandYp, RowOffsetp)]
 
-Filterp, IpmOffsetp = makeFilter(Diode2p, Ipm2Sump, RowlandWOffsetp, XOnp, LOnp, DiodeIpmSlopep, TimeToolp, TTAmpp, TTFWHMp, FPlots, ScanNump, 2)
+#RowlandWOffsetp = RowOffsetp
 
-IpmWOffsetp = [x-IpmOffsetp for x in Diode2p]
+FilterpOn, FilterpOff, DiodeOffsetp = makeFilter(Diode2p, Ipm2Sump, RowlandWOffsetp, XOnp, LOnp, DiodeIpmSlopep, TimeToolp, TTAmpp, TTFWHMp, FPlots, ScanNump, 2)
+
+#FilterpOn = [x and y for x,y in zip(XOnp, LOnp)]
+#FilterpOff = [x and not y for x,y in zip(XOnp, LOnp)]
+
+DiodeWOffsetp = [x-DiodeOffsetp for x in Diode2p]
+
+#DiodeWOffsetp = Diode2p
 
 TTDelayp = [(x*1e-12 + y)*1e15 for x,y in zip(TimeToolp,StageDelayp)]
 
-XESOn_Normp, XESOff_Normp, Num_Onp, Num_Offp, NormFactor_Offp, NormFactor_Onp = makeXES(NumTTSteps, IpmWOffsetp, RowlandWOffsetp, Filterp, LOnp, XOnp, TTDelayp, TTSteps, FPlots)
+XESOn_Normp, XESOff_Normp, Num_Onp, Num_Offp, NormFactor_Offp, NormFactor_Onp = makeXES(NumTTSteps, DiodeWOffsetp, RowlandWOffsetp, FilterpOn, FilterpOff, LOnp, XOnp, TTDelayp, TTSteps, FPlots)
 
 TCenters = []
 for ii in range(len(TTSteps)-1):
@@ -51,7 +61,7 @@ for ii in range(len(TTSteps)-1):
     
 XESDiffplus = [(x-XESOff_Normp)*1000/XESOff_Normp for x in XESOn_Normp]
 
-
+Energyplus = str(round(convertAngle2Energy(ScanNump[0])*1000,1))
 
 
 
@@ -63,21 +73,27 @@ XESDiffplus = [(x-XESOff_Normp)*1000/XESOff_Normp for x in XESOn_Normp]
 
 if ReEnterData:
 
-    #FileNums = [180]+ list(range(182,188+1))
-    FileNums = list(range(165, 178+1))
+    #FileNums = list(range(180,188+1))
+    FileNums = list(range(182,188+1))
+    #FileNums = list(range(165, 178+1))
     
     #FileNums = list(range(155, 158+1)) + list(range(160, 164+1))
     XOnm, LOnm, StageDelaym, Diode2m, Ipm2Summ, DiodeIpmSlopem, TimeToolm, TTAmpm, TTFWHMm, ScanNumm, RowlandYm, RowOffsetm = loadData(FileNums, False, 1)
 
 RowlandWOffsetm = [x-y for x,y in zip(RowlandYm, RowOffsetm)]
 
-Filterm, IpmOffsetm = makeFilter(Diode2m, Ipm2Summ, RowlandWOffsetm, XOnm, LOnm, DiodeIpmSlopem, TimeToolm, TTAmpm, TTFWHMm, FPlots, ScanNumm, 2)
+FiltermOn, FiltermOff, DiodeOffsetm = makeFilter(Diode2m, Ipm2Summ, RowlandWOffsetm, XOnm, LOnm, DiodeIpmSlopem, TimeToolm, TTAmpm, TTFWHMm, FPlots, ScanNumm, 2)
 
-IpmWOffsetm = [x-IpmOffsetm for x in Diode2m]
+#FilterpOn = [x and y for x,y in zip(XOnp, LOnp)]
+#FilterpOff = [x and not y for x,y in zip(XOnp, LOnp)]
+
+DiodeWOffsetm = [x-DiodeOffsetm for x in Diode2m]
+
+#DiodeWOffsetm = Diode2m
 
 TTDelaym = [(x*1e-12 + y)*1e15 for x,y in zip(TimeToolm,StageDelaym)]
 
-XESOn_Normm, XESOff_Normm, Num_Onm, Num_Offm, NormFactor_Offm, NormFactor_Onm = makeXES(NumTTSteps, IpmWOffsetm, RowlandWOffsetm, Filterm, LOnm, XOnm, TTDelaym, TTSteps, FPlots)
+XESOn_Normm, XESOff_Normm, Num_Onm, Num_Offm, NormFactor_Offm, NormFactor_Onm = makeXES(NumTTSteps, DiodeWOffsetm, RowlandWOffsetm, FiltermOn, FiltermOff, LOnm, XOnm, TTDelaym, TTSteps, FPlots)
 
 TCenters = []
 for ii in range(len(TTSteps)-1):
@@ -85,16 +101,20 @@ for ii in range(len(TTSteps)-1):
     
 XESDiffminus = [(x-XESOff_Normm)*1000/XESOff_Normm for x in XESOn_Normm]
 
+Energyminus = str(round(convertAngle2Energy(ScanNumm[0])*1000,1))
 
 
 
 
 
 
+Fit1, Fit2, params, info = fitXES(TCenters, XESDiffplus, XESDiffminus, -1534, True)
 
-Fit1, Fit2, params, info = fitXES(TCenters, XESDiffplus, XESDiffminus, -1534, FPlots)
+t0 = params[6]
 
-t0 = params[4]
+folder = "D://LCLS_Data/LCLS_python_data/XES_conversion_info/"
+with open(folder + "t0.pkl", "wb") as f:
+        pickle.dump(t0, f)
 
 
 TTDelaypp = [x-t0 for x in TTDelayp]
@@ -102,12 +122,12 @@ TTDelaymp = [x-t0 for x in TTDelaym]
 
 
 
-TTSteps = np.linspace(-150, 1400, NumTTStepsPlots+1)
+TTSteps = np.linspace(-400, 1500, NumTTStepsPlots+1)
 
-XESOn_Normp, XESOff_Normp, Num_Onp, Num_Offp, NormFactor_Offp, NormFactor_Onp = makeXES(NumTTStepsPlots, IpmWOffsetp, RowlandWOffsetp, Filterp, LOnp, XOnp, TTDelaypp, TTSteps, FPlots)
+XESOn_Normp, XESOff_Normp, Num_Onp, Num_Offp, NormFactor_Offp, NormFactor_Onp = makeXES(NumTTStepsPlots, DiodeWOffsetp, RowlandWOffsetp, FilterpOn, FilterpOff, LOnp, XOnp, TTDelaypp, TTSteps, FPlots)
 XESDiffplus = [(x-XESOff_Normp)*1000/XESOff_Normp for x in XESOn_Normp]
 
-XESOn_Normm, XESOff_Normm, Num_Onm, Num_Offm, NormFactor_Offm, NormFactor_Onm = makeXES(NumTTStepsPlots, IpmWOffsetm, RowlandWOffsetm, Filterm, LOnm, XOnm, TTDelaymp, TTSteps, FPlots)
+XESOn_Normm, XESOff_Normm, Num_Onm, Num_Offm, NormFactor_Offm, NormFactor_Onm = makeXES(NumTTStepsPlots, DiodeWOffsetm, RowlandWOffsetm, FiltermOn, FiltermOff, LOnm, XOnm, TTDelaymp, TTSteps, FPlots)
 XESDiffminus = [(x-XESOff_Normm)*1000/XESOff_Normm for x in XESOn_Normm]
 
 
@@ -123,7 +143,7 @@ for ii in range(len(TTSteps)-1):
     TCenters = TCenters + [(TTSteps[ii]+TTSteps[ii])/2]
 
 
-Fitp, Fitm, params, info = fitXES(TCenters, XESDiffplus, XESDiffminus, 0, FPlots)
+Fitp, Fitm, params, info = fitXES(TCenters, XESDiffplus, XESDiffminus, 0, True)
 
 tt = np.linspace(-150,1400,1000)
 
@@ -135,34 +155,34 @@ darkminuscolor = '#376E08'
 plt.figure()
 line0 = plt.plot(TCenters, XESDiffplus, 'o', color = pluscolor)
 line1 = plt.plot(TCenters, XESDiffminus, 's', color = minuscolor)
-line2 = plt.plot(tt, convolved(tt, params[0], params[1], params[4], params[5]), color = darkpluscolor)
-line3 = plt.plot(tt, convolved(tt, params[2], params[3], params[4], params[5]), '--', color = darkminuscolor)
+line2 = plt.plot(tt, convolved(tt, params[0], params[1], params[2], params[6], params[7]), color = darkpluscolor)
+line3 = plt.plot(tt, convolved(tt, params[3], params[4], params[5], params[6], params[7]), '--', color = darkminuscolor)
 plt.ylabel('$\Delta$ T x 10$^3$')
 plt.xlabel('time delay (fs)')
-plt.legend((line0[0], line1[0], line2[0], line3[0]), ('6402.0 eV', '6404.5 eV', '6402.0 eV fit', '6404.5 eV fit'))
+plt.legend((line0[0], line1[0], line2[0], line3[0]), (Energyplus +' eV', Energyminus +' eV', Energyplus +' eV fit', Energyminus +' eV fit'))
 
 plt.figure()
-line0 = plt.plot(TCenters, savgol_filter(XESDiffplus,7,2), 'o', color = pluscolor)
-line1 = plt.plot(TCenters, savgol_filter(XESDiffminus,7,2), 's', color = minuscolor)
-line2 = plt.plot(tt, convolved(tt, params[0], params[1], params[4], params[5]), color = darkpluscolor)
-line3 = plt.plot(tt, convolved(tt, params[2], params[3], params[4], params[5]), '--', color = darkminuscolor)
+line0 = plt.plot(TCenters, savgol_filter(XESDiffplus,5,2), 'o', color = pluscolor)
+line1 = plt.plot(TCenters, savgol_filter(XESDiffminus,5,2), 's', color = minuscolor)
+line2 = plt.plot(tt, convolved(tt, params[0], params[1], params[2], params[6], params[7]), color = darkpluscolor)
+line3 = plt.plot(tt, convolved(tt, params[3], params[4], params[5], params[6], params[7]), '--', color = darkminuscolor)
 plt.title('smoothed')
 plt.ylabel('$\Delta$ T x 10$^3$')
 plt.xlabel('time delay (fs)')
-plt.legend((line0[0], line1[0], line2[0], line3[0]), ('6402.0 eV', '6404.5 eV', '6402.0 eV fit', '6404.5 eV fit'))
+plt.legend((line0[0], line1[0], line2[0], line3[0]), (Energyplus +' eV', Energyminus +' eV', Energyplus +' eV fit', Energyminus +' eV fit'))
 
 
-Residualp = [x-y for x,y,z in zip(savgol_filter(XESDiffplus,7,2),Fitp,TCenters) if z>200]
-Residualm = [x-y for x,y,z in zip(savgol_filter(XESDiffminus,7,2),Fitm,TCenters) if z>200]
+Residualp = [x-y for x,y,z in zip(savgol_filter(XESDiffplus,5,2),Fitp,TCenters) if z>-200]
+Residualm = [x-y for x,y,z in zip(savgol_filter(XESDiffminus,5,2),Fitm,TCenters) if z>-200]
 
-TCP = [x for x in TCenters if x>200]
+TCP = [x for x in TCenters if x>-200]
 
 plt.figure()
 line0 = plt.plot(TCP, Residualp, marker = 'o', color = pluscolor)
 line1 = plt.plot(TCP, Residualm, marker = 's', color = minuscolor)
 plt.ylabel('residuals')
 plt.xlabel('time delay (fs)')
-plt.legend((line0[0], line1[0]), ('6402.0 eV', '6404.5 eV'))
+plt.legend((line0[0], line1[0]), (Energyplus +' eV', Energyminus +' eV'))
 plt.title('smoothed')
 
 FTp = np.fft.rfft(Residualp)
@@ -177,18 +197,18 @@ line0 = plt.plot(Freq, abs(FTp), color = pluscolor)
 line1 = plt.plot(Freq, abs(FTm), color = minuscolor)
 plt.ylabel('fourier amplitude')
 plt.xlabel('cm$^{-1}$')
-plt.legend((line0[0], line1[0]), ('6402.0 eV', '6404.5 eV'))
+plt.legend((line0[0], line1[0]), (Energyplus +' eV', Energyminus +' eV'))
 plt.title('smoothed')
 
-Residualp = [x-y for x,y,z in zip(XESDiffplus,Fitp,TCenters) if z>200]
-Residualm = [x-y for x,y,z in zip(XESDiffminus,Fitm,TCenters) if z>200]
+Residualp = [x-y for x,y,z in zip(XESDiffplus,Fitp,TCenters) if z>-200]
+Residualm = [x-y for x,y,z in zip(XESDiffminus,Fitm,TCenters) if z>-200]
 
 plt.figure()
 line0 = plt.plot(TCP, Residualp, marker = 'o', color = pluscolor)
 line1 = plt.plot(TCP, Residualm, marker = 's', color = minuscolor)
 plt.ylabel('residuals')
 plt.xlabel('time delay (fs)')
-plt.legend((line0[0], line1[0]), ('6402.0 eV', '6404.5 eV'))
+plt.legend((line0[0], line1[0]), (Energyplus +' eV', Energyminus +' eV'))
 
 FTp = np.fft.rfft(Residualp)
 FTm = np.fft.rfft(Residualm)
@@ -198,4 +218,4 @@ line0 = plt.plot(Freq, abs(FTp), color = pluscolor)
 line1 = plt.plot(Freq, abs(FTm), color = minuscolor)
 plt.ylabel('fourier amplitude')
 plt.xlabel('cm$^{-1}$')
-plt.legend((line0[0], line1[0]), ('6402.0 eV', '6404.5 eV'))
+plt.legend((line0[0], line1[0]), (Energyplus +' eV', Energyminus +' eV'))

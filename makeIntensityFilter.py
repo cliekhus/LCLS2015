@@ -148,7 +148,7 @@ def makeRowlandFilter(diode2, rowlandsum, xOn, lon, ploton):
     numstds = 1.75
     
     slopefilteron = [a < numstds*statstdevon and b for a,b in zip(rowlandreson,rowlandfilteron)]
-    slopefilteroff = [a < numstds*statstdevon and b for a,b in zip(rowlandresoff,rowlandfilteroff)]
+    slopefilteroff = [a < numstds*statstdevoff and b for a,b in zip(rowlandresoff,rowlandfilteroff)]
     
     if ploton:
         

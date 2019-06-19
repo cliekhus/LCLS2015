@@ -6,7 +6,7 @@ Created on Thu May 16 10:31:17 2019
 """
 import pickle
 
-folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
+folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved_some/"
 
 
 

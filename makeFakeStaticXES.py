@@ -18,7 +18,7 @@ from fittingfunctions import lorwoffset
 import statistics as stat
 
 numAngle = 31
-multiplier = 100
+multiplier = 1000
 num = numAngle*multiplier
 
 TimeTool = [-random.randint(-700,700)/1000 for x in range(num)]
@@ -44,7 +44,7 @@ rowland = lorwoffset(Angle, 0.07, 75.438, 300000,0,0)
 
 
 #RowlandY = [w*int(y)*(x+v*int(z)) for v,w,x,y,z in zip(TimeTool, Diode2, rowland, XOn, LOn)]
-RowlandY = [w*int(y)*(x+int(z)) for v,w,x,y,z in zip(TimeTool, Diode2, rowland, XOn, LOn)]
+RowlandY = [w*int(y)*(x+v*int(z)) for v,w,x,y,z in zip(TimeTool, Diode2, rowland, XOn, LOn)]
 
 RowOffset = [0 for x in range(len(RowlandY))]
 

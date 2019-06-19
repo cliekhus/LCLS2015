@@ -25,22 +25,22 @@ def expdecay(a,t,t0,rate):
     return out
 
 
-def convolved(t,a,rate,t0,sig):
+def convolved(t,a,rate,offset,t0,sig):
     
     import math
    
-    out = [a*(1-math.erf(1/math.sqrt(2)*(sig/rate-(tt-t0)/sig)))*math.exp(-(tt-t0)/rate) for tt in t]
+    out = [a*(1-math.erf(1/math.sqrt(2)*(sig/rate-(tt-t0)/sig)))*math.exp(-(tt-t0)/rate) + offset for tt in t]
     
     return out
 
 
-def combinedconvolved(t, a1, rate1, a2, rate2, t0, sig):
+def combinedconvolved(t, a1, rate1, offset1, a2, rate2, offset2, t0, sig):
     
     tfirst = t[0:int(len(t)/2)]
-    out1 = convolved(tfirst, a1,rate1,t0,sig)
+    out1 = convolved(tfirst, a1,rate1,offset1, t0,sig)
     
     tsecond = t[int(len(t)/2):]
-    out2 = convolved(tsecond, a2, rate2, t0, sig)
+    out2 = convolved(tsecond, a2, rate2, offset2, t0, sig)
     
     return out1+out2
 

@@ -12,25 +12,27 @@ def fitXES(TCenters, XESDiffplus, XESDiffminus, startt0, ploton):
     from fittingfunctions import convolved
     from fittingfunctions import combinedconvolved
     
-    starta = 10
+    starta = 7
     startrate = 60
     startsig = 7
+    startoffsetp = 2
+    startoffsetm = -2
     
     if ploton:
             
         plt.figure()
         plt.plot(TCenters, XESDiffplus, 'o')
-        plt.plot(TCenters, convolved(TCenters, starta, startrate, startt0, startsig))
+        plt.plot(TCenters, convolved(TCenters, starta, startrate, startoffsetp, startt0, startsig))
         plt.plot(TCenters, XESDiffminus, 'o')
-        plt.plot(TCenters, convolved(TCenters, -starta, startrate, startt0, startsig))
+        plt.plot(TCenters, convolved(TCenters, -starta, startrate, startoffsetm, startt0, startsig))
         plt.title('start parameters')
         plt.xlabel('time (fs)')
     
 
-    params,cov = curve_fit(combinedconvolved, TCenters+TCenters, XESDiffplus+XESDiffminus, p0 = [starta, startrate, -starta, startrate, startt0, startsig])
+    params,cov = curve_fit(combinedconvolved, TCenters+TCenters, XESDiffplus+XESDiffminus, p0 = [starta, startrate, startoffsetp, -starta, startrate, startoffsetm, startt0, startsig])
     
-    Fitp = convolved(TCenters, params[0], params[1], params[4], params[5])
-    Fitm = convolved(TCenters, params[2], params[3], params[4], params[5])
+    Fitp = convolved(TCenters, params[0], params[1], params[2], params[6], params[7])
+    Fitm = convolved(TCenters, params[3], params[4], params[5], params[6], params[7])
     
     if ploton:
             

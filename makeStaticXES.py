@@ -8,7 +8,6 @@ def makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn,
     
     from itertools import compress
     from makeFilter import makeFilter
-    import matplotlib.pyplot as plt
 
     SpectraOn = []
     SpectraOff = []
@@ -47,13 +46,13 @@ def makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn,
         #FilterOn = [x and y for x,y in zip(xon, lon)]
         #FilterOff = [x and not y for x,y in zip(xon, lon)]
 
-        diode2 = [x-Offset for x in diode2]
+        #diode2 = [x-Offset for x in diode2]
 
         Filteron = [(w < MaxTime) and (w > MinTime) and x for w,x in zip(timetool, FilterOn)]
         
         if sum(list(compress(diode2, FilterOff))) > 0 and sum(list(compress(diode2, Filteron))) > 0:
-            SpectraOn = SpectraOn + [sum(list(compress(rowlandwoffset, FilterOff)))/sum(list(compress(diode2, FilterOff)))]
-            SpectraOff = SpectraOff + [sum(list(compress(rowlandwoffset, Filteron)))/sum(list(compress(diode2, Filteron)))]
+            SpectraOn = SpectraOn + [sum(list(compress(rowlandwoffset, Filteron)))/sum(list(compress(diode2, Filteron)))]
+            SpectraOff = SpectraOff + [sum(list(compress(rowlandwoffset, FilterOff)))/sum(list(compress(diode2, FilterOff)))]
             UniqueAnglep = UniqueAnglep + [uangle]
     
         if ii%6 == 1:
