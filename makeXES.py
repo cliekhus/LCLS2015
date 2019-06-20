@@ -14,11 +14,13 @@ def makeXES(NumTTSteps, Diode2, RowlandY, FilterOn, FilterOff, LOn, XOn, TTDelay
     NormFactor_On = [0 for y in range(NumTTSteps)]
     XESOn_Norm = [0 for y in range(NumTTSteps)]
     Num_On = [0 for y in range(NumTTSteps)]
+    
+    Normed = [x/y for x,y in zip(RowlandY, Diode2)]
 
     #off = [not a and b for a,b in zip(LOn, FilterOff)]
     off = FilterOff
     XESOff = sum(list(compress(RowlandY, off)))
-
+    
     NormFactor_Off = sum(list(compress(Diode2, off)))
     Num_Off = sum([int(x) for x in off])
     
@@ -26,6 +28,8 @@ def makeXES(NumTTSteps, Diode2, RowlandY, FilterOn, FilterOff, LOn, XOn, TTDelay
         XESOff_Norm = 0
     else:
         XESOff_Norm = XESOff/NormFactor_Off
+        #XESOff_Norm = XESOff/Num_Off
+        #XESOff_Norm = sum(list(compress(Normed, off)))/Num_Off
         
     for ii in range(NumTTSteps):
     
@@ -39,6 +43,8 @@ def makeXES(NumTTSteps, Diode2, RowlandY, FilterOn, FilterOff, LOn, XOn, TTDelay
             XESOn_Norm[ii] = 0
         else:
             XESOn_Norm[ii] = XESOn[ii]/NormFactor_On[ii]
+            #XESOn_Norm[ii] = XESOn[ii]/Num_On[ii]
+            #XESOn_Norm[ii] = sum(list(compress(Normed, on)))/Num_On[ii]
 
                 
     if ploton:

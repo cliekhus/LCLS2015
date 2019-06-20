@@ -32,8 +32,8 @@ exists = os.path.isfile(folder+'t0.pkl')
 if exists:
     with open(folder + "t0.pkl", "rb") as f:
         t0 = pickle.load(f)
-    TDelay = [(x*1e-12 - 1.4e-12)*1e15 - t0 for x in TimeTool]
-    Times = np.linspace(-0.2, 0.15, num=11)
+    TDelay = [(x*1e-12 - 1.4e-12)*1e15 -t0 for x in TimeTool]
+    Times = np.linspace(-100, 300, num=11)
     print('read')
 else:
     TDelay = TimeTool

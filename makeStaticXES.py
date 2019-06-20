@@ -50,6 +50,10 @@ def makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn,
 
         Filteron = [(w < MaxTime) and (w > MinTime) and x for w,x in zip(timetool, FilterOn)]
         
+        
+        #print(sum([int(x) for x in Filteron]))
+        #print(sum([int(x) for x in FilterOff]))
+        
         if sum(list(compress(diode2, FilterOff))) > 0 and sum(list(compress(diode2, Filteron))) > 0:
             SpectraOn = SpectraOn + [sum(list(compress(rowlandwoffset, Filteron)))/sum(list(compress(diode2, Filteron)))]
             SpectraOff = SpectraOff + [sum(list(compress(rowlandwoffset, FilterOff)))/sum(list(compress(diode2, FilterOff)))]

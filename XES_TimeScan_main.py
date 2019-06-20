@@ -20,7 +20,7 @@ ReEnterData = False
 FPlots = False
 
 NumTTSteps = 100
-NumTTStepsPlots = 75
+NumTTStepsPlots = 50
 
 TTSteps = np.linspace(-2000,0,NumTTSteps+1)
 
@@ -33,16 +33,18 @@ TTSteps = np.linspace(-2000,0,NumTTSteps+1)
 
 if ReEnterData:
 
-    #FileNums = [180]+ list(range(182,188+1))
-    FileNums = list(range(155, 158+1)) + list(range(160, 164+1))
+    FileNums = [159]
+    #FileNums = list(range(155, 158+1)) + list(range(160, 164+1))
     #FileNums = list(range(155, 164+1))
+    #FileNums = list(range(122,130+1))
     XOnp, LOnp, StageDelayp, Diode2p, Ipm2Sump, DiodeIpmSlopep, TimeToolp, TTAmpp, TTFWHMp, ScanNump, RowlandYp, RowOffsetp = loadData(FileNums, False, 1)
 
 RowlandWOffsetp = [x-y for x,y in zip(RowlandYp, RowOffsetp)]
 
 #RowlandWOffsetp = RowOffsetp
 
-FilterpOn, FilterpOff, DiodeOffsetp = makeFilter(Diode2p, Ipm2Sump, RowlandWOffsetp, XOnp, LOnp, DiodeIpmSlopep, TimeToolp, TTAmpp, TTFWHMp, FPlots, ScanNump, 2)
+#FilterpOn, FilterpOff, DiodeOffsetp = makeFilter(Diode2p, Ipm2Sump, RowlandWOffsetp, XOnp, LOnp, DiodeIpmSlopep, TimeToolp, TTAmpp, TTFWHMp, False, ScanNump, 2)
+Filter, DiodeOffsetp = makeFilter(Diode2p, Ipm2Sump, RowlandWOffsetp, XOnp, LOnp, DiodeIpmSlopep, TimeToolp, TTAmpp, TTFWHMp, False, ScanNump, 2)
 
 #FilterpOn = [x and y for x,y in zip(XOnp, LOnp)]
 #FilterpOff = [x and not y for x,y in zip(XOnp, LOnp)]
@@ -53,7 +55,8 @@ DiodeWOffsetp = [x-DiodeOffsetp for x in Diode2p]
 
 TTDelayp = [(x*1e-12 + y)*1e15 for x,y in zip(TimeToolp,StageDelayp)]
 
-XESOn_Normp, XESOff_Normp, Num_Onp, Num_Offp, NormFactor_Offp, NormFactor_Onp = makeXES(NumTTSteps, DiodeWOffsetp, RowlandWOffsetp, FilterpOn, FilterpOff, LOnp, XOnp, TTDelayp, TTSteps, FPlots)
+#XESOn_Normp, XESOff_Normp, Num_Onp, Num_Offp, NormFactor_Offp, NormFactor_Onp = makeXES(NumTTSteps, DiodeWOffsetp, RowlandWOffsetp, FilterpOn, FilterpOff, LOnp, XOnp, TTDelayp, TTSteps, FPlots)
+XESOn_Normp, XESOff_Normp, Num_Onp, Num_Offp, NormFactor_Offp, NormFactor_Onp = makeXES(NumTTSteps, DiodeWOffsetp, RowlandWOffsetp, Filter, Filter, LOnp, XOnp, TTDelayp, TTSteps, FPlots)
 
 TCenters = []
 for ii in range(len(TTSteps)-1):
@@ -82,7 +85,8 @@ if ReEnterData:
 
 RowlandWOffsetm = [x-y for x,y in zip(RowlandYm, RowOffsetm)]
 
-FiltermOn, FiltermOff, DiodeOffsetm = makeFilter(Diode2m, Ipm2Summ, RowlandWOffsetm, XOnm, LOnm, DiodeIpmSlopem, TimeToolm, TTAmpm, TTFWHMm, FPlots, ScanNumm, 2)
+#FiltermOn, FiltermOff, DiodeOffsetm = makeFilter(Diode2m, Ipm2Summ, RowlandWOffsetm, XOnm, LOnm, DiodeIpmSlopem, TimeToolm, TTAmpm, TTFWHMm, False, ScanNumm, 2)
+Filterm, DiodeOffsetm = makeFilter(Diode2m, Ipm2Summ, RowlandWOffsetm, XOnm, LOnm, DiodeIpmSlopem, TimeToolm, TTAmpm, TTFWHMm, False, ScanNumm, 2)
 
 #FilterpOn = [x and y for x,y in zip(XOnp, LOnp)]
 #FilterpOff = [x and not y for x,y in zip(XOnp, LOnp)]
@@ -93,7 +97,7 @@ DiodeWOffsetm = [x-DiodeOffsetm for x in Diode2m]
 
 TTDelaym = [(x*1e-12 + y)*1e15 for x,y in zip(TimeToolm,StageDelaym)]
 
-XESOn_Normm, XESOff_Normm, Num_Onm, Num_Offm, NormFactor_Offm, NormFactor_Onm = makeXES(NumTTSteps, DiodeWOffsetm, RowlandWOffsetm, FiltermOn, FiltermOff, LOnm, XOnm, TTDelaym, TTSteps, FPlots)
+XESOn_Normm, XESOff_Normm, Num_Onm, Num_Offm, NormFactor_Offm, NormFactor_Onm = makeXES(NumTTSteps, DiodeWOffsetm, RowlandWOffsetm, Filterm, Filterm, LOnm, XOnm, TTDelaym, TTSteps, FPlots)
 
 TCenters = []
 for ii in range(len(TTSteps)-1):
