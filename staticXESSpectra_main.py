@@ -23,26 +23,31 @@ FPlots = False
 
 if ReEnterData:
 
-    FileNums = list(range(190,190+1))
-    XOn, LOn, Angle, Diode2, Ipm2Sum, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, ScanNum, RowlandY, RowOffset = loadData(FileNums, False, 2)
+    FileNums = list(range(191,191+1))
+    XOn, LOn, Angle, Diode2, Ipm2Sum, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, ScanNum, RowlandY, RowOffset, L3E, CspadSum = loadData(FileNums, False, 2)
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_conversion_info/"
 exists = os.path.isfile(folder+'t0.pkl')
 
-if exists:
+if False:
     with open(folder + "t0.pkl", "rb") as f:
         t0 = pickle.load(f)
     TDelay = [(x*1e-12 - 1.4e-12)*1e15 -t0 for x in TimeTool]
-    Times = np.linspace(-100, 300, num=11)
+    Times = np.linspace(-100, 300, num=2)
     print('read')
 else:
     TDelay = TimeTool
-    Times = np.linspace(-0.2, 0.15, num=11)
+    Times = np.linspace(-0.2, 0.15, num=6)
 
 
 RowlandWOffset = [x-y for x,y in zip(RowlandY, RowOffset)]
 UniqueAngle = np.unique(Angle)
 
+spectraOn, SpectraOff, UniqueAnglep = makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn, DiodeIpmSlope, TDelay, TTAmp, TTFWHM, \
+                                                    ScanNum, L3E, CspadSum, 10000, -10000, FPlots)
+LCLSEnergy, slope, x0 = makeConversion(UniqueAnglep, SpectraOff, False)
+
+CenterTime = []
 
 plt.figure()
 
@@ -51,10 +56,10 @@ for ii in range(len(Times)-1):
     MaxTime = Times[ii+1]
     MinTime = Times[ii]
     
-    SpectraOn, SpectraOff, UniqueAnglep = makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn, DiodeIpmSlope, TDelay, TTAmp, TTFWHM, ScanNum, MaxTime, MinTime, FPlots)
-            
-    LCLSEnergy, slope, x0 = makeConversion(UniqueAnglep, SpectraOff, False)
-            
+    CenterTime = CenterTime + [(MaxTime+MinTime)/2]
+    
+    SpectraOn, spectraOff, UniqueAnglep = makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn, DiodeIpmSlope, TDelay, TTAmp, TTFWHM, \
+                                                        ScanNum, L3E, CspadSum, MaxTime, MinTime, FPlots)
     
     #plt.plot(LCLSEnergy, SpectraOn, marker = 'o')
     #plt.plot(LCLSEnergy, SpectraOff, marker = 'o')
@@ -66,18 +71,20 @@ for ii in range(len(Times)-1):
     
     if ii == 0:
         
+        #Matrix = [savgol_filter(diff, 5,2)]
         Matrix = [diff]
     
     else:
-        Matrix.append(diff)
+        #Matrix = np.concatenate((Matrix, np.array([savgol_filter(diff,5,2)])))
+        Matrix = np.concatenate((Matrix, np.array([diff])))
     
     plt.plot(LCLSEnergy, diff, marker = 'o')
 
 #plt.figure()
 #plt.plot(LCLSEnergy, [x-y for x,y in zip(SpectraOnNorm, SpectraOffNorm)], marker = 'o')
-
+x,y = np.meshgrid(LCLSEnergy,CenterTime)
 plt.figure()
-plt.pcolor(Matrix)
+plt.pcolor(x,y,Matrix)
 
 
 

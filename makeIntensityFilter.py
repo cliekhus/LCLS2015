@@ -171,7 +171,7 @@ def makeRowlandFilter(diode2, rowlandsum, xOn, lon, ploton):
 
 
 
-def makeOneRowlandFilter(diode2, rowlandsum, xOn, lon, ploton):
+def makeOneRowlandFilter(diode2, rowlandsum, xOn, ploton):
     
     import matplotlib.pyplot as plt
     from itertools import compress

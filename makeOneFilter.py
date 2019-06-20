@@ -11,42 +11,67 @@ Created on Fri May  3 11:07:12 2019
 
 @author: chelsea
 """
-def makeOneFilter(Diode2, Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, ploton, ScanNum, choice):
+def makeOneFilter(Diode2, Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, L3E, CspadSum, ploton, choice):
 
     from makeIntensityFilter import makeDiodeFilter
     from makeIntensityFilter import makeOneRowlandFilter
     from itertools import compress
     import matplotlib.pyplot as plt
     from getMedianAndSTD import getMedianAndSTD
+    import statistics as stat
         
-    #Set up the intensity filter - the diode and cspad sum should respond linearly with the x-ray intensity
+
     IpmNumSTDs = 2
     
-    Ipm2Median, Ipm2STD = getMedianAndSTD(Ipm2Sum, ScanNum)
+    Ipm2Median = stat.median(Ipm2Sum)
+    Ipm2STD = stat.stdev(Ipm2Sum)
     
-    IpmFilter = list(a < b+IpmNumSTDs*c and a > b-IpmNumSTDs*c for a,b,c in zip(Ipm2Sum, Ipm2Median, Ipm2STD))
+    IpmFilter = list(a < Ipm2Median+Ipm2STD*IpmNumSTDs and a > Ipm2Median-Ipm2STD*IpmNumSTDs for a in Ipm2Sum)
+    
+    
+    L3ENumSTDs = 1.5
+    
+    L3EMedian = stat.median(L3E)
+    L3ESTD = stat.stdev(L3E)
+    
+    L3EFilter = list(a < L3EMedian+L3ESTD*L3ENumSTDs and a > L3EMedian-L3ESTD*L3ENumSTDs for a in L3E)
+    
+    CspadSumSTDs = 2
+    
+    CspadSumMedian = stat.median(CspadSum)
+    CspadSumSTD = stat.stdev(CspadSum)
+    
+    CspadSumFilter = list(a < CspadSumMedian+CspadSumSTD*CspadSumSTDs and a > CspadSumMedian-CspadSumSTD*CspadSumSTDs for a in CspadSum)
+    
+    if ploton:
+        plt.figure()
+        plt.plot(L3E)
+        plt.plot(list(compress(L3E, L3EFilter)))
+    
     
     if choice == 1:
         DISMedian, DISSTD = getMedianAndSTD(DiodeIpmSlope, ScanNum)
         DiodeFilter = makeDiodeFilter(Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, ploton)
         IntensityFilter = [a and b for a,b in zip(IpmFilter, DiodeFilter)]
     elif choice == 2:
-        RowlandFilterOn, RowlandFilterOff, OffsetOn, OffsetOff = makeOneRowlandFilter(Diode2, Signal, XOn, LOn, ploton)
-        IntensityFilterOn = [a and b for a,b in zip(IpmFilter, RowlandFilterOn)]
-        IntensityFilterOff = [a and b for a,b in zip(IpmFilter, RowlandFilterOff)]
+        RowlandFilter, Offset = makeOneRowlandFilter(Diode2, Signal, XOn, ploton)
+        IntensityFilter = [a and b and c and d for a,b,c,d in zip(IpmFilter, RowlandFilter, L3EFilter, CspadSumFilter)]
 
     #Convert the timetool signal into femtosecond delays and create the time tool filters
     TTSTDs = 3
-    TTMedian, TTSTD = getMedianAndSTD(TimeTool, ScanNum)
-    TTValueFilter = list(a < b+TTSTDs*c and a > b-TTSTDs*c for a,b,c in zip(TimeTool, TTMedian, TTSTD))
+    TTMedian = stat.median(TimeTool)
+    TTSTD = stat.stdev(TimeTool)
+    TTValueFilter = list(a < TTMedian+TTSTDs*TTSTD and a > TTMedian-TTSTDs*TTSTD for a in TimeTool)
     
     TTAmpSTDs = 2
-    TTAmpMedian, TTAmpSTD = getMedianAndSTD(TTAmp, ScanNum)
-    TTAmpFilter = list(a < b+TTAmpSTDs*c and a > b-TTAmpSTDs*c for a,b,c in zip(TTAmp, TTAmpMedian, TTAmpSTD))
+    TTAmpMedian = stat.median(TTAmp)
+    TTAmpSTD = stat.stdev(TTAmp)
+    TTAmpFilter = list(a < TTAmpMedian+TTAmpSTDs*TTAmpSTD and a > TTAmpMedian-TTAmpSTDs*TTAmpSTD for a in TTAmp)
     
     TTFWHMSTDs = 2
-    TTFWHMMedian, TTFWHMSTD = getMedianAndSTD(TTFWHM, ScanNum)
-    TTFWHMFilter = list(a < b+TTFWHMSTDs*c and a > b-TTFWHMSTDs*c for a,b,c in zip(TTFWHM, TTFWHMMedian, TTFWHMSTD))
+    TTFWHMMedian = stat.median(TTFWHM)
+    TTFWHMSTD = stat.stdev(TTFWHM)
+    TTFWHMFilter = list(a < TTFWHMMedian+TTFWHMSTDs*TTFWHMSTD and a > TTFWHMMedian-TTFWHMSTDs*TTFWHMSTD for a in TTFWHM)
     
     TTFilter = list(((a and b and c) or not e) and d for a,b,c,d,e in zip(TTValueFilter, TTAmpFilter, TTFWHMFilter, XOn, LOn))
     
@@ -60,7 +85,6 @@ def makeOneFilter(Diode2, Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, TimeTool, TT
         plt.hist(list(compress(TimeTool, [a and b and c for a,b,c in zip(TTFilter, XOn, LOn)])), 1000)
         plt.title('time tool after filters')
     
-    FilterOn = list(a and b for a,b in zip(TTFilter, IntensityFilterOn))
-    FilterOff = list(a and b for a,b in zip(TTFilter, IntensityFilterOff))
+    Filter = list(a and b for a,b in zip(TTFilter, IntensityFilter))
 
-    return FilterOn, FilterOff, (OffsetOn+OffsetOff)/2
+    return Filter, Offset

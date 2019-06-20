@@ -9,6 +9,7 @@ def loadData(FileNums, XAS, setting):
     
     import h5py
     import numpy as np
+    import math
     
     
     #Initialize the necessary lists
@@ -28,6 +29,9 @@ def loadData(FileNums, XAS, setting):
     
     RowlandY = []
     Offset = []
+    
+    L3E = []
+    CspadSum = []
     
     #Fill the lists with data from the h5 file
     for filenum in FileNums:
@@ -70,9 +74,18 @@ def loadData(FileNums, XAS, setting):
             Offset = Offset + [(np.mean(x[0:50])+np.mean(x[100:150]))/2*len(x) for x in rowlandy]
         elif setting == 2:
             Offset = Offset + [(sum(x[150:175]))/25*len(x) for x in rowlandy]
+            
+        L3E = L3E + list(ScanName['/ebeam/L3Energy'])
         
-        
-    return XOn, LOn, Var0, Diode2, Ipm2Sum, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, ScanNum, RowlandY, Offset
+        cspad = list(ScanName['cspad/azav'])
+        cspadsum = []
+        for cs in cspad:
+            cspadsum = cspadsum + [sum([x for x in cs if not math.isnan(x)])]
+        CspadSum = CspadSum + cspadsum
+    
+    L3E = [float(x) for x in L3E]
+    
+    return XOn, LOn, Var0, Diode2, Ipm2Sum, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, ScanNum, RowlandY, Offset, L3E, CspadSum
 
 
 
