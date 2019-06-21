@@ -19,17 +19,18 @@ def makeOneFilter(Diode2, Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, TimeTool, TT
     import matplotlib.pyplot as plt
     from getMedianAndSTD import getMedianAndSTD
     import statistics as stat
+    import math
         
 
     IpmNumSTDs = 2
     
-    Ipm2Median = stat.median(Ipm2Sum)
-    Ipm2STD = stat.stdev(Ipm2Sum)
+    Ipm2Median = stat.median([x for x in Ipm2Sum if not math.isnan(x)])
+    Ipm2STD = stat.stdev([x for x in Ipm2Sum if not math.isnan(x)])
     
     IpmFilter = list(a < Ipm2Median+Ipm2STD*IpmNumSTDs and a > Ipm2Median-Ipm2STD*IpmNumSTDs for a in Ipm2Sum)
     
     
-    L3ENumSTDs = 1.5
+    L3ENumSTDs = 2
     
     L3EMedian = stat.median(L3E)
     L3ESTD = stat.stdev(L3E)
@@ -47,6 +48,20 @@ def makeOneFilter(Diode2, Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, TimeTool, TT
         plt.figure()
         plt.plot(L3E)
         plt.plot(list(compress(L3E, L3EFilter)))
+        plt.title('L3E')
+        plt.xlabel('shot number')
+        
+        plt.figure()
+        plt.plot(Ipm2Sum)
+        plt.plot(list(compress(Ipm2Sum, IpmFilter)))
+        plt.title('Ipm')
+        plt.xlabel('shotnumber')
+        
+        plt.figure()
+        plt.plot(CspadSum)
+        plt.plot(list(compress(CspadSum, CspadSumFilter)))
+        plt.title('Cspad')
+        plt.xlabel('shotnumber')
     
     
     if choice == 1:

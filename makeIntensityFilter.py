@@ -206,7 +206,7 @@ def makeOneRowlandFilter(diode2, rowlandsum, xOn, ploton):
         
         plt.plot(list(compress(diode2,rowlandres)), list(line(list(compress(diode2,rowlandres)))))
     
-    numstds = 1.75
+    numstds = 2
     
     slopefilter = [a < numstds*statstdev and b for a,b in zip(rowlandres,rowlandfilter)]
     

@@ -23,7 +23,7 @@ FPlots = False
 
 if ReEnterData:
 
-    FileNums = list(range(191,191+1))
+    FileNums = list(range(190,190+1))
     XOn, LOn, Angle, Diode2, Ipm2Sum, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, ScanNum, RowlandY, RowOffset, L3E, CspadSum = loadData(FileNums, False, 2)
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_conversion_info/"
@@ -45,7 +45,7 @@ UniqueAngle = np.unique(Angle)
 
 spectraOn, SpectraOff, UniqueAnglep = makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn, DiodeIpmSlope, TDelay, TTAmp, TTFWHM, \
                                                     ScanNum, L3E, CspadSum, 10000, -10000, FPlots)
-LCLSEnergy, slope, x0 = makeConversion(UniqueAnglep, SpectraOff, False)
+LCLSEnergy, slope, x0 = makeConversion(UniqueAnglep, SpectraOff, True)
 
 CenterTime = []
 

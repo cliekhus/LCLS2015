@@ -6,7 +6,7 @@ Created on Thu May 16 10:31:17 2019
 """
 import pickle
 
-folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved_some/"
+folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
 
 
 
@@ -46,7 +46,11 @@ with open(folder + "RowlandYp.pkl", "rb") as f:
 with open(folder + "RowOffsetp.pkl", "rb") as f:
     RowOffsetp = pickle.load(f)
     
+with open(folder + "L3Ep.pkl", "rb") as f:
+    L3Ep = pickle.load(f)
     
+with open(folder + "CspadSump.pkl", "rb") as f:
+    CspadSump = pickle.load(f)
     
     
     
@@ -86,4 +90,8 @@ with open(folder + "RowlandYm.pkl", "rb") as f:
 with open(folder + "RowOffsetm.pkl", "rb") as f:
     RowOffsetm = pickle.load(f)
 
+with open(folder + "L3Em.pkl", "rb") as f:
+    L3Em = pickle.load(f)
     
+with open(folder + "CspadSumm.pkl", "rb") as f:
+    CspadSumm = pickle.load(f)
