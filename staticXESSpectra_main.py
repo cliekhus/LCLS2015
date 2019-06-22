@@ -15,7 +15,7 @@ import os
 import pickle
 
 
-ReEnterData = False
+ReEnterData = True
 FPlots = False
 
 #Set up the scans and the number of time steps
@@ -23,17 +23,17 @@ FPlots = False
 
 if ReEnterData:
 
-    FileNums = list(range(190,190+1))
+    FileNums = list(range(190,191+1))
     XOn, LOn, Angle, Diode2, Ipm2Sum, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, ScanNum, RowlandY, RowOffset, L3E, CspadSum = loadData(FileNums, False, 2)
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_conversion_info/"
 exists = os.path.isfile(folder+'t0.pkl')
 
-if False:
+if exists:
     with open(folder + "t0.pkl", "rb") as f:
         t0 = pickle.load(f)
     TDelay = [(x*1e-12 - 1.4e-12)*1e15 -t0 for x in TimeTool]
-    Times = np.linspace(-100, 300, num=2)
+    Times = np.linspace(-120, 280, num=6)
     print('read')
 else:
     TDelay = TimeTool
@@ -43,9 +43,13 @@ else:
 RowlandWOffset = [x-y for x,y in zip(RowlandY, RowOffset)]
 UniqueAngle = np.unique(Angle)
 
+maxEnergy = 6.408
+minEnergy = 6.401
+
 spectraOn, SpectraOff, UniqueAnglep = makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn, DiodeIpmSlope, TDelay, TTAmp, TTFWHM, \
                                                     ScanNum, L3E, CspadSum, 10000, -10000, FPlots)
-LCLSEnergy, slope, x0 = makeConversion(UniqueAnglep, SpectraOff, True)
+LCLSEnergy, slope, x0 = makeConversion(UniqueAnglep, SpectraOff, False)
+LCLSEnergyp = [x for x in LCLSEnergy if x < maxEnergy and x > minEnergy]
 
 CenterTime = []
 
@@ -67,7 +71,7 @@ for ii in range(len(Times)-1):
     #SpectraOnNorm = [x/max(SpectraOn) for x in SpectraOn]
     #SpectraOffNorm = [x/max(SpectraOff) for x in SpectraOff]
     SpectraOffSmooth = savgol_filter(SpectraOff, 5, 2)
-    diff = [(x-y)/y for x,y in zip(SpectraOn, SpectraOff)]
+    diff = [(x-y)/y for x,y,z in zip(SpectraOn, SpectraOff, LCLSEnergy) if z < maxEnergy and z > minEnergy]
     
     if ii == 0:
         
@@ -78,11 +82,11 @@ for ii in range(len(Times)-1):
         #Matrix = np.concatenate((Matrix, np.array([savgol_filter(diff,5,2)])))
         Matrix = np.concatenate((Matrix, np.array([diff])))
     
-    plt.plot(LCLSEnergy, diff, marker = 'o')
+    plt.plot(LCLSEnergyp, diff, marker = 'o')
 
 #plt.figure()
 #plt.plot(LCLSEnergy, [x-y for x,y in zip(SpectraOnNorm, SpectraOffNorm)], marker = 'o')
-x,y = np.meshgrid(LCLSEnergy,CenterTime)
+x,y = np.meshgrid(LCLSEnergyp,CenterTime)
 plt.figure()
 plt.pcolor(x,y,Matrix)
 

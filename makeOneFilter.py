@@ -17,7 +17,6 @@ def makeOneFilter(Diode2, Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, TimeTool, TT
     from makeIntensityFilter import makeOneRowlandFilter
     from itertools import compress
     import matplotlib.pyplot as plt
-    from getMedianAndSTD import getMedianAndSTD
     import statistics as stat
     import math
         
@@ -30,7 +29,7 @@ def makeOneFilter(Diode2, Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, TimeTool, TT
     IpmFilter = list(a < Ipm2Median+Ipm2STD*IpmNumSTDs and a > Ipm2Median-Ipm2STD*IpmNumSTDs for a in Ipm2Sum)
     
     
-    L3ENumSTDs = 2
+    L3ENumSTDs = 1
     
     L3EMedian = stat.median(L3E)
     L3ESTD = stat.stdev(L3E)
@@ -44,12 +43,13 @@ def makeOneFilter(Diode2, Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, TimeTool, TT
     
     CspadSumFilter = list(a < CspadSumMedian+CspadSumSTD*CspadSumSTDs and a > CspadSumMedian-CspadSumSTD*CspadSumSTDs for a in CspadSum)
     
+    
+    plt.xlabel('shot number')
     if ploton:
         plt.figure()
         plt.plot(L3E)
         plt.plot(list(compress(L3E, L3EFilter)))
         plt.title('L3E')
-        plt.xlabel('shot number')
         
         plt.figure()
         plt.plot(Ipm2Sum)
