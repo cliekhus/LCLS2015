@@ -23,7 +23,7 @@ import pickle
 
 ReEnterData = False
 FPlots = False
-ReLoadData = True
+ReLoadData = False
 SaveData = True
 folder = "D://LCLS_Data/LCLS_python_data/XAS/"
 
@@ -34,9 +34,9 @@ NumTTStepsPlots = 3
 
 if ReEnterData:
 
-    #FileNums = list(range(371, 395+1))
+    FileNums = list(range(372, 395+1))
     #FileNums = list(range(371,373+1))+list(range(375,377+1))+list(range(379,382+1))+list(range(384,391+1))+list(range(393,394+1))
-    FileNums = list(range(371, 371+1))
+    #FileNums = list(range(371, 371+1))
     xasRawData = loadData(FileNums, True, 1)
 
 
