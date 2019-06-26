@@ -5,3 +5,4 @@ $ cat .gitignore
 /__pycache__
 /Figures
 /Starting_Code
+/Object_Oriented_Code/__pycache__

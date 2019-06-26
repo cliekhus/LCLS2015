@@ -11,9 +11,9 @@ Created on Fri May  3 11:07:12 2019
 
 @author: chelsea
 """
-def makeOneFilter(Diode2, Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, L3E, CspadSum, ploton, choice):
+def makeOneFilter(Diode2, Ipm2Sum, Signal, XOn, LOn, TimeTool, TTAmp, TTFWHM, L3E, CspadSum, ploton, choice):
 
-    from makeIntensityFilter import makeDiodeFilter
+    from makeIntensityFilter import makeOneDiodeFilter
     from makeIntensityFilter import makeOneRowlandFilter
     from itertools import compress
     import matplotlib.pyplot as plt
@@ -65,9 +65,8 @@ def makeOneFilter(Diode2, Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, TimeTool, TT
     
     
     if choice == 1:
-        DISMedian, DISSTD = getMedianAndSTD(DiodeIpmSlope, ScanNum)
-        DiodeFilter = makeDiodeFilter(Ipm2Sum, Signal, XOn, LOn, DiodeIpmSlope, DISMedian, DISSTD, ploton)
-        IntensityFilter = [a and b for a,b in zip(IpmFilter, DiodeFilter)]
+        DiodeFilter, Offset = makeOneDiodeFilter(CspadSum, Signal, XOn, ploton)
+        IntensityFilter = [a and b and b and d for a,b,c,d in zip(IpmFilter, DiodeFilter, L3EFilter, CspadSumFilter)]
     elif choice == 2:
         RowlandFilter, Offset = makeOneRowlandFilter(Diode2, Signal, XOn, ploton)
         IntensityFilter = [a and b and c and d for a,b,c,d in zip(IpmFilter, RowlandFilter, L3EFilter, CspadSumFilter)]

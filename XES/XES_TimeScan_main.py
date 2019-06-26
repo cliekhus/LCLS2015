@@ -44,7 +44,7 @@ RowlandWOffsetp = [x-y for x,y in zip(RowlandYp, RowOffsetp)]
 #RowlandWOffsetp = RowOffsetp
 
 #FilterpOn, FilterpOff, DiodeOffsetp = makeFilter(Diode2p, Ipm2Sump, RowlandWOffsetp, XOnp, LOnp, DiodeIpmSlopep, TimeToolp, TTAmpp, TTFWHMp, False, ScanNump, 2)
-Filterp, DiodeOffsetp = makeOneFilter(Diode2p, Ipm2Sump, RowlandWOffsetp, XOnp, LOnp, DiodeIpmSlopep, TimeToolp, TTAmpp, TTFWHMp, L3Ep, CspadSump, False, 2)
+Filterp, DiodeOffsetp = makeOneFilter(Diode2p, Ipm2Sump, RowlandWOffsetp, XOnp, LOnp, TimeToolp, TTAmpp, TTFWHMp, L3Ep, CspadSump, False, 2)
 
 #FilterpOn = [x and y for x,y in zip(XOnp, LOnp)]
 #FilterpOff = [x and not y for x,y in zip(XOnp, LOnp)]
@@ -55,8 +55,8 @@ DiodeWOffsetp = [x-DiodeOffsetp for x in Diode2p]
 
 TTDelayp = [(x*1e-12 + y)*1e15 for x,y in zip(TimeToolp,StageDelayp)]
 
-#XESOn_Normp, XESOff_Normp, Num_Onp, Num_Offp, NormFactor_Offp, NormFactor_Onp = makeXES(NumTTSteps, DiodeWOffsetp, RowlandWOffsetp, FilterpOn, FilterpOff, LOnp, XOnp, TTDelayp, TTSteps, FPlots)
-XESOn_Normp, XESOff_Normp, Num_Onp, Num_Offp, NormFactor_Offp, NormFactor_Onp = makeXES(NumTTSteps, DiodeWOffsetp, RowlandWOffsetp, Filterp, LOnp, XOnp, TTDelayp, TTSteps, FPlots)
+XESOn_Normp, XESOff_Normp, Num_Onp, Num_Offp, NormFactor_Offp, NormFactor_Onp = makeXES(NumTTSteps, CspadSump, RowlandWOffsetp, Filterp, LOnp, XOnp, TTDelayp, TTSteps, FPlots)
+#XESOn_Normp, XESOff_Normp, Num_Onp, Num_Offp, NormFactor_Offp, NormFactor_Onp = makeXES(NumTTSteps, DiodeWOffsetp, RowlandWOffsetp, Filterp, LOnp, XOnp, TTDelayp, TTSteps, FPlots)
 
 TCenters = []
 for ii in range(len(TTSteps)-1):
@@ -86,7 +86,7 @@ if ReEnterData:
 RowlandWOffsetm = [x-y for x,y in zip(RowlandYm, RowOffsetm)]
 
 #FiltermOn, FiltermOff, DiodeOffsetm = makeFilter(Diode2m, Ipm2Summ, RowlandWOffsetm, XOnm, LOnm, DiodeIpmSlopem, TimeToolm, TTAmpm, TTFWHMm, False, ScanNumm, 2)
-Filterm, DiodeOffsetm = makeOneFilter(Diode2m, Ipm2Summ, RowlandWOffsetm, XOnm, LOnm, DiodeIpmSlopem, TimeToolm, TTAmpm, TTFWHMm, L3Em, CspadSumm, False, 2)
+Filterm, DiodeOffsetm = makeOneFilter(Diode2m, Ipm2Summ, RowlandWOffsetm, XOnm, LOnm, TimeToolm, TTAmpm, TTFWHMm, L3Em, CspadSumm, False, 2)
 
 #FilterpOn = [x and y for x,y in zip(XOnp, LOnp)]
 #FilterpOff = [x and not y for x,y in zip(XOnp, LOnp)]

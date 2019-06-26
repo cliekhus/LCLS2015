@@ -19,7 +19,6 @@ def loadData(FileNums, XAS, setting):
     Diode2 = []
     
     Ipm2Sum = []
-    DiodeIpmSlope = []
     
     TimeTool = []
     TTAmp = []
@@ -52,9 +51,6 @@ def loadData(FileNums, XAS, setting):
         ipm2 = [float(x[1])+float(x[3]) for x in list(ScanName['/ipm2/channels'])]  #Intensity (and position) monitor #2.  Quad cells 1 and 3 had signal - use these
         Ipm2Sum = Ipm2Sum + ipm2
         
-        slope = [y/x for y,x in zip(diode, ipm2)]
-        DiodeIpmSlope = DiodeIpmSlope + slope
-        
         timetool = [float(x) for x in list(ScanName['/ttCorr/tt'])]
         TimeTool = TimeTool + timetool
         
@@ -85,7 +81,7 @@ def loadData(FileNums, XAS, setting):
     
     L3E = [float(x) for x in L3E]
     
-    return XOn, LOn, Var0, Diode2, Ipm2Sum, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, ScanNum, RowlandY, Offset, L3E, CspadSum
+    return XOn, LOn, Var0, Diode2, Ipm2Sum, TimeTool, TTAmp, TTFWHM, ScanNum, RowlandY, Offset, L3E, CspadSum
 
 
 
