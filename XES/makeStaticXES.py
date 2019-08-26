@@ -4,7 +4,7 @@ Created on Mon Jun 17 18:11:08 2019
 
 @author: chelsea
 """
-def makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, ScanNum, L3E, CspadSum, MaxTime, MinTime, ploton):
+def makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn, TimeTool, TTAmp, TTFWHM, ScanNum, L3E, CspadSum, MaxTime, MinTime, ploton):
     
     from itertools import compress
     from makeOneFilter import makeOneFilter
@@ -33,10 +33,10 @@ def makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn,
         timetool = list(compress(TimeTool, selectAngle))
         lon = list(compress(LOn, selectAngle))
         xon = list(compress(XOn, selectAngle))
-    
+
+
         Filter, Offset = makeOneFilter(diode2, list(compress(Ipm2Sum, selectAngle)), rowlandwoffset, xon, lon, \
-                                    list(compress(DiodeIpmSlope, selectAngle)), timetool, \
-                                    list(compress(TTAmp, selectAngle)), list(compress(TTFWHM, selectAngle)), \
+                                    timetool, list(compress(TTAmp, selectAngle)), list(compress(TTFWHM, selectAngle)), \
                                     list(compress(L3E, selectAngle)), list(compress(CspadSum, selectAngle)), FPlots, 2)
         
         #print(Offset)

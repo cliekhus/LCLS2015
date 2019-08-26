@@ -23,8 +23,8 @@ FPlots = False
 
 if ReEnterData:
 
-    FileNums = list(range(190,191+1))
-    XOn, LOn, Angle, Diode2, Ipm2Sum, DiodeIpmSlope, TimeTool, TTAmp, TTFWHM, ScanNum, RowlandY, RowOffset, L3E, CspadSum = loadData(FileNums, False, 2)
+    FileNums = list(range(190,190+1))
+    XOn, LOn, Angle, Diode2, Ipm2Sum, TimeTool, TTAmp, TTFWHM, ScanNum, RowlandY, RowOffset, L3E, CspadSum = loadData(FileNums, False, 2)
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_conversion_info/"
 exists = os.path.isfile(folder+'t0.pkl')
@@ -46,7 +46,7 @@ UniqueAngle = np.unique(Angle)
 maxEnergy = 6.408
 minEnergy = 6.401
 
-spectraOn, SpectraOff, UniqueAnglep = makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn, DiodeIpmSlope, TDelay, TTAmp, TTFWHM, \
+spectraOn, SpectraOff, UniqueAnglep = makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn, TDelay, TTAmp, TTFWHM, \
                                                     ScanNum, L3E, CspadSum, 10000, -10000, FPlots)
 LCLSEnergy, slope, x0 = makeConversion(UniqueAnglep, SpectraOff, False)
 LCLSEnergyp = [x for x in LCLSEnergy if x < maxEnergy and x > minEnergy]
@@ -62,7 +62,7 @@ for ii in range(len(Times)-1):
     
     CenterTime = CenterTime + [(MaxTime+MinTime)/2]
     
-    SpectraOn, spectraOff, UniqueAnglep = makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn, DiodeIpmSlope, TDelay, TTAmp, TTFWHM, \
+    SpectraOn, spectraOff, UniqueAnglep = makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn, TDelay, TTAmp, TTFWHM, \
                                                         ScanNum, L3E, CspadSum, MaxTime, MinTime, FPlots)
     
     #plt.plot(LCLSEnergy, SpectraOn, marker = 'o')
@@ -82,7 +82,9 @@ for ii in range(len(Times)-1):
         #Matrix = np.concatenate((Matrix, np.array([savgol_filter(diff,5,2)])))
         Matrix = np.concatenate((Matrix, np.array([diff])))
     
-    plt.plot(LCLSEnergyp, diff, marker = 'o')
+    plt.plot(LCLSEnergyp, diff, marker = 'o', label = str((MaxTime+MinTime)/2))
+
+plt.legend()
 
 #plt.figure()
 #plt.plot(LCLSEnergy, [x-y for x,y in zip(SpectraOnNorm, SpectraOffNorm)], marker = 'o')
