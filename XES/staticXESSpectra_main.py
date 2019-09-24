@@ -33,7 +33,7 @@ if exists:
     with open(folder + "t0.pkl", "rb") as f:
         t0 = pickle.load(f)
     TDelay = [(x*1e-12 - 1.4e-12)*1e15 -t0 for x in TimeTool]
-    Times = np.linspace(-120, 280, num=6)
+    Times = np.linspace(-75, 125, num=4)
     print('read')
 else:
     TDelay = TimeTool

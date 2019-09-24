@@ -24,4 +24,11 @@ class XASProcessedData:
         XASOn_Norm, XASOff_Norm, EnergyPlot, Num_On, Num_Off = makeXAS(xasRawData, self, FPlots)
         
         self.__dict__.update(XASOn_Norm = XASOn_Norm, XASOff_Norm = XASOff_Norm, EnergyPlot = EnergyPlot, Num_On = Num_On, Num_Off = Num_Off)
+    
+    def makeProHERFD(self, xasRawData, FPlots):
+        from makeHERFD import makeHERFD
+        
+        XASOn_Norm, XASOff_Norm, EnergyPlot, Num_On, Num_Off = makeHERFD(xasRawData, self, FPlots)
+        
+        self.__dict__.update(XASOn_Norm = XASOn_Norm, XASOff_Norm = XASOff_Norm, EnergyPlot = EnergyPlot, Num_On = Num_On, Num_Off = Num_Off)
         

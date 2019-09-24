@@ -21,7 +21,7 @@ import math
 import ProcessedDataClass as PDC
 import pickle
 
-ReEnterData = True
+ReEnterData = False
 FPlots = False
 ReLoadData = False
 SaveData = False
@@ -29,14 +29,14 @@ folder = "D://LCLS_Data/LCLS_python_data/XAS/"
 
 
 
-NumTTSteps = 20
+NumTTSteps = 10
 NumTTStepsPlots = 4
 
 if ReEnterData:
 
     #FileNums = list(range(372, 395+1))
     #FileNums = list(range(371,373+1))+list(range(375,377+1))+list(range(379,382+1))+list(range(384,391+1))+list(range(393,394+1))
-    FileNums = list(range(372, 373+1))
+    FileNums = list(range(372, 372+1))
     xasRawData = loadData(FileNums, True, 1)
 
 
@@ -48,7 +48,7 @@ if ReLoadData:
 xasProData = PDC.XASProcessedData(TTSteps = np.linspace(-200,-50,NumTTSteps+1), TTDelay = [x*1000 for x in xasRawData.TimeTool], \
                               XEnergy = [round(x*500,1)*2 for x in xasRawData.XEnergyRaw])
 xasProData.changeValue(UniXEnergy = np.unique(list(compress(xasProData.XEnergy, [x >= 7108 and x <= 7120 for x in xasProData.XEnergy]))))
-xasProData.makeProXAS(xasRawData, FPlots)
+xasProData.makeProHERFD(xasRawData, FPlots)
 
 
 
@@ -93,29 +93,24 @@ for ii in range(NumTTStepsPlots):
 
 
 
+
+LegendLabel = []
 fig = plt.figure()
 
 for ii in range(NumTTStepsPlots):
     
-    plt.plot(xasProData_t0.EnergyPlot, XASDiffPlot[ii], marker='.', label = str(round(xasProData_t0.TTSteps[ii],0)) + ' to ' + str(round(xasProData_t0.TTSteps[ii+1])) + ' fs delay')
+    #LegendLabel = LegendLabel + plt.plot(xasProData_t0.EnergyPlot, savgol_filter(XASDiffPlot[ii],7,2), marker='.')
+    LegendLabel = LegendLabel + plt.plot(xasProData_t0.EnergyPlot, XASDiffPlot[ii], marker='.')
 
 
 plt.xlabel('x-ray energy (eV)')
 plt.ylabel('change in x-ray absorption')
-plt.legend()
 
-
-
-fig = plt.figure()
-
+LegendWords = []
 for ii in range(NumTTStepsPlots):
-    
-    plt.plot(xasProData_t0.EnergyPlot, xasProData_t0.XASOn_Norm[ii], marker='.', label = str(round(xasProData_t0.TTSteps[ii],0)) + ' to ' + str(round(xasProData_t0.TTSteps[ii+1])) + ' fs delay')
+    LegendWords = LegendWords + [str(round(xasProData_t0.TTSteps[ii],0)) + ' to ' + str(round(xasProData_t0.TTSteps[ii+1])) + ' fs delay']
 
-
-plt.xlabel('x-ray energy (eV)')
-plt.ylabel('x-ray absorption')
-plt.legend()
+plt.legend(LegendLabel, LegendWords)
 
 
 

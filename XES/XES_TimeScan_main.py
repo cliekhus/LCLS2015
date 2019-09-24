@@ -16,7 +16,7 @@ from scipy.signal import savgol_filter
 from APSXESCalibration import convertAngle2Energy
 import pickle
 
-ReEnterData = False
+ReEnterData = True
 FPlots = False
 
 NumTTSteps = 100
@@ -37,7 +37,8 @@ if ReEnterData:
     #FileNums = list(range(155, 158+1)) + list(range(160, 164+1))
     FileNums = list(range(155, 164+1))
     #FileNums = list(range(122,130+1))
-    XOnp, LOnp, StageDelayp, Diode2p, Ipm2Sump, DiodeIpmSlopep, TimeToolp, TTAmpp, TTFWHMp, ScanNump, RowlandYp, RowOffsetp, L3Ep, CspadSump = loadData(FileNums, False, 1)
+    #FileNums = list(range(155, 155+1))
+    XOnp, LOnp, StageDelayp, Diode2p, Ipm2Sump, TimeToolp, TTAmpp, TTFWHMp, ScanNump, RowlandYp, RowOffsetp, L3Ep, CspadSump = loadData(FileNums, False, 1)
 
 RowlandWOffsetp = [x-y for x,y in zip(RowlandYp, RowOffsetp)]
 
@@ -77,11 +78,11 @@ Energyplus = str(round(convertAngle2Energy(ScanNump[0])*1000,1))
 if ReEnterData:
 
     FileNums = list(range(180,188+1))
-    #FileNums = list(range(182,188+1))
+    #FileNums = list(range(180,180+1))
     #FileNums = list(range(165, 178+1))
     
     #FileNums = list(range(155, 158+1)) + list(range(160, 164+1))
-    XOnm, LOnm, StageDelaym, Diode2m, Ipm2Summ, DiodeIpmSlopem, TimeToolm, TTAmpm, TTFWHMm, ScanNumm, RowlandYm, RowOffsetm, L3Em, CspadSumm = loadData(FileNums, False, 1)
+    XOnm, LOnm, StageDelaym, Diode2m, Ipm2Summ, TimeToolm, TTAmpm, TTFWHMm, ScanNumm, RowlandYm, RowOffsetm, L3Em, CspadSumm = loadData(FileNums, False, 1)
 
 RowlandWOffsetm = [x-y for x,y in zip(RowlandYm, RowOffsetm)]
 
