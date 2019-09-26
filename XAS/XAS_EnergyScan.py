@@ -11,17 +11,15 @@ XES energy scan - k beta
 
 import numpy as np
 import matplotlib.pyplot as plt
-from itertools import compress
 from find_t0 import find_t0_XAS
 from loadData import loadData
 from scipy.signal import savgol_filter
 #from makeXAS import makeXAS
 from APSXASCalibration import findEnergyShift
-import math
 import ProcessedDataClass as PDC
 import pickle
 
-ReEnterData = True
+ReEnterData = False
 FPlots = False
 ReLoadData = False
 SaveData = False
@@ -30,13 +28,13 @@ folder = "D://LCLS_Data/LCLS_python_data/XAS/"
 
 
 NumTTSteps = 20
-NumTTStepsPlots = 4
+NumTTStepsPlots = 5
 
 if ReEnterData:
 
     #FileNums = list(range(372, 395+1))
     #FileNums = list(range(371,373+1))+list(range(375,377+1))+list(range(379,382+1))+list(range(384,391+1))+list(range(393,394+1))
-    FileNums = list(range(372, 373+1))
+    FileNums = list(range(374, 374+1))
     xasRawData = loadData(FileNums, True, 1)
 
 
@@ -45,21 +43,22 @@ if ReLoadData:
     with open(folder + "xasRawData.pkl", "rb") as f:
         xasRawData = pickle.load(f)
 
-xasProData = PDC.XASProcessedData(TTSteps = np.linspace(-200,-50,NumTTSteps+1), TTDelay = [x*1000 for x in xasRawData.TimeTool], \
-                              XEnergy = [round(x*500,1)*2 for x in xasRawData.XEnergyRaw])
-xasProData.changeValue(UniXEnergy = np.unique(list(compress(xasProData.XEnergy, [x >= 7108 and x <= 7120 for x in xasProData.XEnergy]))))
+xasProData = PDC.XASProcessedData(TTSteps = np.linspace(-200,-50,NumTTSteps+1), TTDelay = 1000*xasRawData.TimeTool, \
+                              XEnergy = np.round(xasRawData.XEnergyRaw*500,1)*2)
+uniXEnergy = np.unique(xasProData.XEnergy)
+xasProData.changeValue(UniXEnergy = uniXEnergy[np.logical_and(uniXEnergy >= 7108, uniXEnergy <= 7120)])
 xasProData.makeProXAS(xasRawData, FPlots)
 
 
 
 
-XASDiff = [[0 for x in range(len(xasProData.UniXEnergy))] for y in range(NumTTSteps)]
-Peak = []
+XASDiff = np.empty((NumTTSteps, len(xasProData.UniXEnergy)))
+Peak = np.empty(NumTTSteps)
 
 for ii in range(NumTTSteps):
-    xasdiff = [a - b for a,b in zip(xasProData.XASOn_Norm[ii], xasProData.XASOff_Norm)]
-    XASDiff[ii] = xasdiff
-    Peak = Peak + [sum(compress(xasdiff, [a and b for a,b in zip((xasProData.EnergyPlot >= np.float64(7114)), (xasProData.EnergyPlot <= np.float64(7117)))]))]
+    xasdiff = xasProData.XASOn_Norm[ii] - xasProData.XASOff_Norm
+    XASDiff[ii,:] = xasdiff
+    Peak[ii] = sum(xasdiff[np.logical_and(xasProData.EnergyPlot >= np.float64(7110), xasProData.EnergyPlot <= np.float64(7112))])
 
 t0 = find_t0_XAS(xasProData.TTSteps, Peak, True)
 EnergyShift = findEnergyShift(xasProData.XASOff_Norm, xasProData.UniXEnergy, False)
@@ -67,30 +66,34 @@ EnergyShift = findEnergyShift(xasProData.XASOff_Norm, xasProData.UniXEnergy, Fal
 
 
 
-xasProData_t0 = PDC.XASProcessedData(TTSteps = np.linspace(-75,125,NumTTStepsPlots+1), TTDelay = [x*1000 - t0 for x in xasRawData.TimeTool], \
-                              XEnergy = [round((x+EnergyShift/1000)*1000,1) for x in xasRawData.XEnergyRaw])
-xasProData_t0.changeValue(UniXEnergy = np.unique(list(compress(xasProData_t0.XEnergy, [x >= 7109 and x <= 7121 for x in xasProData_t0.XEnergy]))))
-
+xasProData_t0 = PDC.XASProcessedData(TTSteps = np.linspace(-200-t0,-50-t0,NumTTStepsPlots+1), TTDelay = 1000*xasRawData.TimeTool-t0, \
+                              XEnergy = np.round(xasRawData.XEnergyRaw*500,1)*2)
+uniXEnergy = np.unique(xasProData.XEnergy)
+xasProData_t0.changeValue(UniXEnergy = uniXEnergy[np.logical_and(uniXEnergy >= 7108, uniXEnergy <= 7120)])
 xasProData_t0.makeProXAS(xasRawData, FPlots)
 
+#xasProData_t0 = PDC.XASProcessedData(TTSteps = np.linspace(-75,125,NumTTStepsPlots+1), TTDelay = 1000*xasRawData.TimeTool-t0, \
+#                              XEnergy = np.round((xasRawData.XEnergyRaw*500+EnergyShift/2),1)*2)
+#uniXEnergy = np.unique(xasProData.XEnergy)
+#xasProData_t0.changeValue(UniXEnergy = uniXEnergy[np.logical_and(uniXEnergy >= 7109, uniXEnergy <= 7121)])
+#
+#xasProData_t0.makeProXAS(xasRawData, FPlots)
 
 
 
 
-TTDelayPlot = []
 
-XASDiffPlot = [[0 for x in range(len(xasProData_t0.UniXEnergy))] for y in range(NumTTStepsPlots)]
-XASDiffError = [[0 for x in range(len(xasProData_t0.UniXEnergy))] for y in range(NumTTStepsPlots)]
+XASDiffPlot = np.empty((NumTTStepsPlots, len(xasProData_t0.UniXEnergy)))
+XASDiffError = np.empty((NumTTStepsPlots, len(xasProData_t0.UniXEnergy)))
 
 for ii in range(NumTTStepsPlots):
-    for jj in range(len(xasProData_t0.UniXEnergy)):
-        XASDiffPlot[ii][jj] = xasProData_t0.XASOn_Norm[ii][jj] - xasProData_t0.XASOff_Norm[jj]
-        if xasProData_t0.Num_On[ii][jj] > 0 and xasProData_t0.Num_Off[jj] > 0:
-            XASDiffError[ii][jj] = XASDiffPlot[ii][jj]*(math.sqrt(1/xasProData_t0.Num_On[ii][jj]+1/xasProData_t0.Num_Off[jj]))
-        else:
-            XASDiffError[ii][jj] = 0
-
-
+    
+    xasdiff = xasProData_t0.XASOn_Norm[ii] - xasProData_t0.XASOff_Norm
+    XASDiffPlot[ii,:] = xasdiff
+    xasdifferror = xasdiff*(np.sqrt(1/xasProData_t0.Num_On[ii,:]+1/xasProData_t0.Num_Off))
+    XASDiffError[ii,:] = xasdifferror
+    
+XASDiffError[np.isnan(XASDiffError)] = 0
 
 
 fig = plt.figure()

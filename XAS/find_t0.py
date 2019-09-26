@@ -8,21 +8,24 @@ def find_t0_XAS(TTSteps, Peak, ploton):
     import numpy as np
     import matplotlib.pyplot as plt
     from scipy.signal import savgol_filter
-    from itertools import compress
     
-    minrange = -130
-    maxrange = -75
+    minrange = -200
+    maxrange = -140
     
     Filtered = savgol_filter(Peak, 5, 2)
     
-    Times = []
+    Times = np.empty(0)
     
     for ii in range(len(TTSteps)-1):
-        Times = Times + [(TTSteps[ii]+TTSteps[ii+1])/2]
+        Times = np.append(Times,(TTSteps[ii]+TTSteps[ii+1])/2)
     
-    cond = [x >= minrange and x <= maxrange for x in Times] 
+    cond = np.logical_and(Times >= minrange, Times <= maxrange) 
     
-    fit = np.polyfit(list(compress(Times, cond)), list(compress(Peak, cond)), 2)
+    plt.figure()
+    plt.plot(Times, Peak, 'x')
+    
+    fit = np.polyfit(Times[cond], Peak[cond], 2)
+    
     poly = np.poly1d(fit)
     mintime = -fit[1]/(2*fit[0])    
 

@@ -10,7 +10,6 @@ def findEnergyShift(XASOff, UniXEnergy, ploton):
     import numpy as np
     import matplotlib.pyplot as plt
     import scipy.signal as scisig
-    from itertools import compress
     
     APSName = h5py.File('D:\LCLS_Data\APS\APS_Aug_2015_Fesamples.mat')
     
@@ -37,11 +36,11 @@ def findEnergyShift(XASOff, UniXEnergy, ploton):
     fit = np.polyfit(incident_axis, APSXASNorm, 3)
     poly = np.poly1d(fit)
     
-    UniXEnergy = list(compress(UniXEnergy, [x>0 for x in XASOff]))
+    UniXEnergy = UniXEnergy[XASOff>0]
     UniXEnergy = np.array(UniXEnergy)
-    XASOff = list(compress(XASOff, [x>0 for x in XASOff]))
+    XASOff = XASOff[XASOff>0]
 
-    XASOff_Norm = [(x-min(XASOff))/sum(XASOff)*100 for x in XASOff]
+    XASOff_Norm = (XASOff-min(XASOff))/np.sum(XASOff)*100
     fitData = np.polyfit(UniXEnergy, XASOff_Norm,3)
     polyData = np.poly1d(fitData)
     

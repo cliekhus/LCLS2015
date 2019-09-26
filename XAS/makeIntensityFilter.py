@@ -8,52 +8,50 @@ Created on Mon Apr 29 11:29:47 2019
 def makeOneDiodeFilter(cspadsum, diode2, xOn, selectedRuns, ploton):
     
     import matplotlib.pyplot as plt
-    from itertools import compress
-    import math
     import numpy as np
-    import statistics as stat
     
-    xonnan = [w and not math.isnan(x) and y and not math.isnan(z) for w,x,y,z in zip(selectedRuns, cspadsum, xOn, diode2)]
+    xonnan = np.logical_and.reduce((selectedRuns, np.logical_not(np.isnan(cspadsum)), xOn, np.logical_not(np.isnan(diode2))))
     
     if ploton:
             
         plt.figure()
-        plt.scatter(list(compress(diode2, xonnan)), list(compress(cspadsum, xonnan)),s=2)
+        plt.scatter(diode2[xonnan], cspadsum[xonnan],s=2)
     
-    meancspadsum = stat.mean(list(compress(cspadsum, xonnan)))
+    meancspadsum = np.nanmean(cspadsum)
     
-    stdcspadsum = stat.stdev(list(compress(cspadsum, xonnan)))
+    stdcspadsum = np.nanstd(cspadsum)
     
     stdlimit = 2
     
-    cspadfilter = [abs(x-meancspadsum)<stdlimit*stdcspadsum and y for x,y in zip(cspadsum, xonnan)]
-    
-    linfit = np.polyfit(list(compress(cspadsum, cspadfilter)), list(compress(diode2, cspadfilter)), 1)
-    line = np.poly1d(linfit)
-    rowlandres = [abs(x-y) for x,y in zip(list(line(cspadsum)),diode2)]
-    statstdev = stat.stdev(list(compress(rowlandres, cspadfilter)))
-    
-    
-    
-    
-    if ploton:
-        
-        plt.plot(list(compress(diode2,rowlandres)), list(line(list(compress(diode2,rowlandres)))))
-    
-    numstds = 2
-    
-    slopefilter = [a < numstds*statstdev and b for a,b in zip(rowlandres, cspadfilter)]
-    
-    if ploton:
-        
-        plt.scatter(list(compress(cspadsum,slopefilter)),list(compress(diode2, slopefilter)),s=2,c='r')
-        plt.ylabel('diode2')
-        plt.xlabel('cspadsum')
-    
-    
-    return slopefilter, -linfit[1]/linfit[0]
+    cspadfilter = np.logical_and(np.abs(cspadsum-meancspadsum) < stdlimit*stdcspadsum, xonnan)
 
+    if sum(cspadfilter.astype(int))>0:
+            
+        linfit = np.polyfit(cspadsum[cspadfilter], diode2[cspadfilter], 1)
+        line = np.poly1d(linfit)
+        rowlandres = line(cspadsum)-diode2
+        statstdev = np.std(rowlandres[cspadfilter])
+    
+        if ploton:
+            
+            plt.plot(diode2, line(diode2))
+        
+        numstds = 2
+        
+        slopefilter = np.logical_and(rowlandres < numstds*statstdev, cspadfilter)
+        
+        if ploton:
+            
+            plt.scatter(cspadsum[slopefilter],diode2[slopefilter],s=2,c='r')
+            plt.ylabel('diode2')
+            plt.xlabel('cspadsum')
+        
+        
+        return slopefilter, -linfit[1]/linfit[0]
 
+    else:
+        
+        return cspadfilter, 0
 
 
 

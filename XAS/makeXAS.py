@@ -7,62 +7,62 @@ Created on Mon May 13 17:34:21 2019
 
 def makeXAS(xasRawData, xasProData, ploton):
     
-    import math
-    from itertools import compress
     import matplotlib.pyplot as plt
     from makeOneFilter import makeOneFilter
+    import numpy as np
     
     NumEnergySteps = len(xasProData.UniXEnergy)
     NumTTSteps = len(xasProData.TTSteps)-1
     
-    XASOn = [[0 for x in range(NumEnergySteps)] for y in range(NumTTSteps)]
-    XASOff = [0 for x in range(NumEnergySteps)]
+    XASOn = np.empty((NumTTSteps, NumEnergySteps))
+    XASOff = np.empty(NumEnergySteps)
     
-    NormFactor_On = [[0 for x in range(NumEnergySteps)] for y in range(NumTTSteps)]
-    NormFactor_Off = [0 for x in range(NumEnergySteps)]
+    NormFactor_On = np.empty((NumTTSteps, NumEnergySteps))
+    NormFactor_Off = np.empty(NumEnergySteps)
     
-    XASOn_Norm = [[0 for x in range(NumEnergySteps)] for y in range(NumTTSteps)]
-    XASOff_Norm = [0 for x in range(NumEnergySteps)]
+    XASOn_Norm = np.empty((NumTTSteps, NumEnergySteps))
+    XASOff_Norm = np.empty(NumEnergySteps)
     
-    Num_On = [[0 for x in range(NumEnergySteps)] for y in range(NumTTSteps)]
-    Num_Off = [0 for x in range(NumEnergySteps)]
+    Num_On = np.empty((NumTTSteps, NumEnergySteps))
+    Num_Off = np.empty(NumEnergySteps)
     
-    NanCheck = [not math.isnan(a) and not math.isnan(b) for a,b in zip(xasRawData.Diode2, xasRawData.Ipm2Sum)]
+    NanCheck = np.logical_and(np.isnan(xasRawData.Diode2), np.isnan(xasRawData.Ipm2Sum))
     
     for jj in range(NumEnergySteps):
 
-        SelectedRuns = list(a and b and c for a,b,c in zip(xasRawData.XOn, (xasProData.XEnergy == xasProData.UniXEnergy[jj]), NanCheck))
+        SelectedRuns = np.logical_and.reduce((xasRawData.XOn, (xasProData.XEnergy == xasProData.UniXEnergy[jj]), np.logical_not(NanCheck)))
+        
+        print('makeXAS line 35')
+        print(sum(SelectedRuns.astype(int)))
+        print(xasProData.UniXEnergy[jj])
         
         ffilter, Offset = makeOneFilter(xasRawData, SelectedRuns, ploton, 1)
         
-        SelectedRuns = [a and b for a,b in zip(SelectedRuns, ffilter)]
+        SelectedRuns = np.logical_and(SelectedRuns, ffilter)
         
-        off = list(not a and b for a,b in zip(xasRawData.LOn, SelectedRuns))
-        XASOff[jj] = sum(list(compress(xasRawData.Diode2, off)))
+        off = np.logical_and(xasRawData.LOn, SelectedRuns)
+        XASOff[jj] = sum(xasRawData.Diode2[off])
 
-        NormFactor_Off[jj] = sum(list(compress(xasRawData.Ipm2Sum, off)))
-        Num_Off[jj] = sum([int(x) for x in off])
-        
+        NormFactor_Off[jj] = sum(xasRawData.Ipm2Sum[off])
+        Num_Off[jj] = sum(off.astype(int))
 
-        
-        if NormFactor_Off[jj] == 0:
-            XASOff_Norm[jj] = 0
-        else:
-            XASOff_Norm[jj] = XASOff[jj]/NormFactor_Off[jj]
         
         for ii in range(NumTTSteps):
             
-            on = list(bool(a and b and c and d) for a,b,c,d in zip(xasRawData.LOn, SelectedRuns, \
+            on = np.logical_and.reduce((xasRawData.LOn, SelectedRuns, \
                       (xasProData.TTDelay > xasProData.TTSteps[ii]), (xasProData.TTDelay <= xasProData.TTSteps[ii+1])))
-            XASOn[ii][jj] = sum(list(compress(xasRawData.Diode2, on)))
+            XASOn[ii,jj] = sum(xasRawData.Diode2[on])
 
-            NormFactor_On[ii][jj] = sum(list(compress(xasRawData.Ipm2Sum, on)))
-            Num_On[ii][jj] = sum([int(x) for x in on])
-            
-            if NormFactor_On[ii][jj] == 0:
-                XASOn_Norm[ii][jj] = 0
-            else:
-                XASOn_Norm[ii][jj] = XASOn[ii][jj]/NormFactor_On[ii][jj]
+            NormFactor_On[ii,jj] = sum(xasRawData.Ipm2Sum[on])
+            Num_On[ii,jj] = sum(on.astype(int))
+    
+    XASOff_Norm = XASOff/NormFactor_Off
+    XASOn_Norm = XASOn/NormFactor_On
+    
+    XASOff_Norm[np.isinf(XASOff_Norm)] = 0
+    XASOn_Norm[np.isinf(XASOn_Norm)] = 0
+    XASOff_Norm[np.isnan(XASOff_Norm)] = 0
+    XASOn_Norm[np.isnan(XASOn_Norm)] = 0
     
     EnergyPlot = xasProData.UniXEnergy
                 
