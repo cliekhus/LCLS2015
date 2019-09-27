@@ -5,44 +5,36 @@ Created on Mon Apr 29 11:29:47 2019
 @author: chelsea
 """
 
-def makeOneDiodeFilter(cspadsum, diode2, xOn, selectedRuns, ploton):
+def makeOneDiodeFilter(xasRawData, selectedRuns, ploton):
     
     import matplotlib.pyplot as plt
     import numpy as np
     
-    xonnan = np.logical_and.reduce((selectedRuns, np.logical_not(np.isnan(cspadsum)), xOn, np.logical_not(np.isnan(diode2))))
-    
     if ploton:
             
         plt.figure()
-        plt.scatter(diode2[xonnan], cspadsum[xonnan],s=2)
+        plt.scatter(xasRawData.Diode2[selectedRuns], xasRawData.CspadSum[selectedRuns],s=2)
     
-    meancspadsum = np.nanmean(cspadsum)
-    
-    stdcspadsum = np.nanstd(cspadsum)
-    
-    stdlimit = 2
-    
-    cspadfilter = np.logical_and(np.abs(cspadsum-meancspadsum) < stdlimit*stdcspadsum, xonnan)
-
-    if sum(cspadfilter.astype(int))>0:
+    if sum(selectedRuns.astype(int))>0:
             
-        linfit = np.polyfit(cspadsum[cspadfilter], diode2[cspadfilter], 1)
+        linfit = np.polyfit(xasRawData.CspadSum[selectedRuns], xasRawData.Diode2[selectedRuns], 1)
         line = np.poly1d(linfit)
-        rowlandres = line(cspadsum)-diode2
-        statstdev = np.std(rowlandres[cspadfilter])
+        rowlandres = line(xasRawData.CspadSum)-xasRawData.Diode2
+        statstdev = np.std(rowlandres[selectedRuns])
     
         if ploton:
             
-            plt.plot(diode2, line(diode2))
+            plt.plot(xasRawData.Diode2, line(xasRawData.Diode2))
         
         numstds = 2
         
-        slopefilter = np.logical_and(rowlandres < numstds*statstdev, cspadfilter)
+        slopefilter = np.abs(rowlandres) < numstds*statstdev
+        
+        plotfilter = np.logical_and(np.abs(rowlandres) < numstds*statstdev, selectedRuns)
         
         if ploton:
             
-            plt.scatter(cspadsum[slopefilter],diode2[slopefilter],s=2,c='r')
+            plt.scatter(xasRawData.CspadSum[plotfilter], xasRawData.Diode2[plotfilter], s=2, c='r')
             plt.ylabel('diode2')
             plt.xlabel('cspadsum')
         
@@ -51,7 +43,7 @@ def makeOneDiodeFilter(cspadsum, diode2, xOn, selectedRuns, ploton):
 
     else:
         
-        return cspadfilter, 0
+        return selectedRuns, float('NaN')
 
 
 

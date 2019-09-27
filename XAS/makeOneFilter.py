@@ -11,42 +11,38 @@ Created on Fri May  3 11:07:12 2019
 
 @author: chelsea
 """
-def makeOneFilter(xasRawData, selectedRuns, ploton, choice):
+def makeOneFilter(xasRawData, ploton):
 
-    from makeIntensityFilter import makeOneDiodeFilter
-    from makeIntensityFilter import makeOneRowlandFilter
     import matplotlib.pyplot as plt
-    import statistics as stat
     import numpy as np
         
 
+    NanCheck = np.logical_not(np.logical_or.reduce((np.isnan(xasRawData.Diode2), np.isnan(xasRawData.Ipm2Sum), np.isnan(xasRawData.CspadSum), np.isnan(xasRawData.L3E))))
+
     IpmNumSTDs = 2
-    
     Ipm2Median = np.nanmedian(xasRawData.Ipm2Sum[xasRawData.XOn])
     Ipm2STD = np.nanstd(xasRawData.Ipm2Sum[xasRawData.XOn])
+    IpmFilter = np.abs(xasRawData.Ipm2Sum - Ipm2Median) < Ipm2STD*IpmNumSTDs
+                               
     
-    print("makeOneFilter")
-    nancheck = np.isinf(xasRawData.Ipm2Sum)
-    print(sum(nancheck.astype(int)))
-    
-    IpmFilter = np.logical_and(xasRawData.Ipm2Sum < Ipm2Median+Ipm2STD*IpmNumSTDs, xasRawData.Ipm2Sum > Ipm2Median-Ipm2STD*IpmNumSTDs)
-    
-    
-    L3ENumSTDs = 1
-    
-    L3EMedian = stat.median(xasRawData.L3E)
-    L3ESTD = stat.stdev(xasRawData.L3E)
-    
-    L3EFilter = np.logical_and(xasRawData.L3E < L3EMedian+L3ESTD*L3ENumSTDs, xasRawData.L3E > L3EMedian-L3ESTD*L3ENumSTDs)
-    
+    L3ENumSTDs = 2
+    L3EMedian = np.nanmedian(xasRawData.L3E[xasRawData.XOn])
+    L3ESTD = np.nanstd(xasRawData.L3E[xasRawData.XOn])
+    L3EFilter = np.abs(xasRawData.L3E - L3EMedian) < L3ESTD*L3ENumSTDs
     
     CspadSumSTDs = 2
+    CspadSumMedian = np.nanmedian(xasRawData.CspadSum[xasRawData.XOn])
+    CspadSumSTD = np.nanstd(xasRawData.CspadSum[xasRawData.XOn])
+    CspadSumFilter = np.abs(xasRawData.CspadSum - CspadSumMedian) < CspadSumSTD*CspadSumSTDs
+
     
-    CspadSumMedian = np.median(xasRawData.CspadSum[selectedRuns])
-    CspadSumSTD = np.std(xasRawData.CspadSum[selectedRuns])
+    RowlandSTDs = 2
+    RowlandMedian = np.nanmedian(xasRawData.RowlandY[xasRawData.XOn])
+    RowlandSTD = np.nanstd(xasRawData.RowlandY[xasRawData.XOn])
+    RowlandFilter = np.abs(xasRawData.RowlandY - RowlandMedian) < RowlandSTD*RowlandSTDs
     
-    CspadSumFilter = np.logical_and(xasRawData.CspadSum < CspadSumMedian+CspadSumSTD*CspadSumSTDs, xasRawData.CspadSum > CspadSumMedian-CspadSumSTD*CspadSumSTDs)
     
+    AllFilter = np.logical_and.reduce((IpmFilter, L3EFilter, CspadSumFilter, RowlandFilter, NanCheck))
     
     plt.xlabel('shot number')
     if ploton:
@@ -66,32 +62,33 @@ def makeOneFilter(xasRawData, selectedRuns, ploton, choice):
         plt.plot(xasRawData.CspadSum[CspadSumFilter])
         plt.title('Cspad')
         plt.xlabel('shotnumber')
+        
+        plt.figure()
+        plt.plot(xasRawData.RowlandY)
+        plt.plot(xasRawData.RowlandY[RowlandFilter])
+        plt.title('RowlandY')
+        plt.xlabel('shotnumber')
     
     
-    if choice == 1:
-        DiodeFilter, Offset = makeOneDiodeFilter(xasRawData.CspadSum, xasRawData.Diode2, xasRawData.XOn, selectedRuns, ploton)
-        IntensityFilter = np.logical_and.reduce((IpmFilter, DiodeFilter, L3EFilter, CspadSumFilter))
-    elif choice == 2:
-        RowlandFilter, Offset = makeOneRowlandFilter(xasRawData.Diode2, xasRawData.RowlandSum, xasRawData.XOn, ploton)
-        IntensityFilter = np.logical_and.reduce((IpmFilter, RowlandFilter, L3EFilter, CspadSumFilter))
-
-    #Convert the timetool signal into femtosecond delays and create the time tool filters
     TTSTDs = 3
-    TTMedian = stat.median(xasRawData.TimeTool)
-    TTSTD = stat.stdev(xasRawData.TimeTool)
-    TTValueFilter = np.logical_and(xasRawData.TimeTool < TTMedian+TTSTDs*TTSTD, xasRawData.TimeTool > TTMedian-TTSTDs*TTSTD)
+    TTMedian = np.median(xasRawData.TimeTool[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
+    TTSTD = np.std(xasRawData.TimeTool[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
+    TTValueFilter = np.abs(xasRawData.TimeTool - TTMedian) < TTSTDs*TTSTD
+    
     
     TTAmpSTDs = 2
-    TTAmpMedian = stat.median(xasRawData.TTAmp)
-    TTAmpSTD = stat.stdev(xasRawData.TTAmp)
-    TTAmpFilter = np.logical_and(xasRawData.TTAmp < TTAmpMedian+TTAmpSTDs*TTAmpSTD, xasRawData.TTAmp > TTAmpMedian-TTAmpSTDs*TTAmpSTD)
+    TTAmpMedian = np.median(xasRawData.TTAmp[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
+    TTAmpSTD = np.std(xasRawData.TTAmp[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
+    TTAmpFilter = np.abs(xasRawData.TTAmp - TTAmpMedian) < TTAmpSTDs*TTAmpSTD
+    
     
     TTFWHMSTDs = 2
-    TTFWHMMedian = stat.median(xasRawData.TTFWHM)
-    TTFWHMSTD = stat.stdev(xasRawData.TTFWHM)
-    TTFWHMFilter = np.logical_and(xasRawData.TTFWHM < TTFWHMMedian+TTFWHMSTDs*TTFWHMSTD, xasRawData.TTFWHM > TTFWHMMedian-TTFWHMSTDs*TTFWHMSTD)
+    TTFWHMMedian = np.median(xasRawData.TTFWHM[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
+    TTFWHMSTD = np.std(xasRawData.TTFWHM[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
+    TTFWHMFilter = np.abs(xasRawData.TTFWHM - TTFWHMMedian) < TTFWHMSTDs*TTFWHMSTD
+
     
-    TTFilter = np.logical_and(np.logical_or(np.logical_and.reduce((TTValueFilter, TTAmpFilter, TTFWHMFilter)), np.logical_not(xasRawData.XOn)), xasRawData.LOn)
+    TTFilter = np.logical_and.reduce((TTValueFilter, TTAmpFilter, TTFWHMFilter))
     
     if ploton:
             
@@ -103,6 +100,5 @@ def makeOneFilter(xasRawData, selectedRuns, ploton, choice):
         plt.hist(xasRawData.TimeTool[np.logical_and.reduce((TTFilter, xasRawData.XOn, xasRawData.LOn))], 1000)
         plt.title('time tool after filters')
     
-    Filter = np.logical_and(TTFilter, IntensityFilter)
 
-    return Filter, Offset
+    return AllFilter, TTFilter

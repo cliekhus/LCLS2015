@@ -10,6 +10,7 @@ def makeXAS(xasRawData, xasProData, ploton):
     import matplotlib.pyplot as plt
     from makeOneFilter import makeOneFilter
     import numpy as np
+    from makeIntensityFilter import makeOneDiodeFilter
     
     NumEnergySteps = len(xasProData.UniXEnergy)
     NumTTSteps = len(xasProData.TTSteps)-1
@@ -26,21 +27,16 @@ def makeXAS(xasRawData, xasProData, ploton):
     Num_On = np.empty((NumTTSteps, NumEnergySteps))
     Num_Off = np.empty(NumEnergySteps)
     
-    NanCheck = np.logical_and(np.isnan(xasRawData.Diode2), np.isnan(xasRawData.Ipm2Sum))
+    
+    AllFilter, TTFilter = makeOneFilter(xasRawData, ploton)
     
     for jj in range(NumEnergySteps):
 
-        SelectedRuns = np.logical_and.reduce((xasRawData.XOn, (xasProData.XEnergy == xasProData.UniXEnergy[jj]), np.logical_not(NanCheck)))
+        selectedRuns = np.logical_and(AllFilter, xasProData.XEnergy == xasProData.UniXEnergy[jj])
+
+        DiodeFilter, Offset = makeOneDiodeFilter(xasRawData, selectedRuns, ploton)
         
-        print('makeXAS line 35')
-        print(sum(SelectedRuns.astype(int)))
-        print(xasProData.UniXEnergy[jj])
-        
-        ffilter, Offset = makeOneFilter(xasRawData, SelectedRuns, ploton, 1)
-        
-        SelectedRuns = np.logical_and(SelectedRuns, ffilter)
-        
-        off = np.logical_and(xasRawData.LOn, SelectedRuns)
+        off = np.logical_and.reduce((np.logical_not(xasRawData.LOn), selectedRuns, DiodeFilter))
         XASOff[jj] = sum(xasRawData.Diode2[off])
 
         NormFactor_Off[jj] = sum(xasRawData.Ipm2Sum[off])
@@ -49,7 +45,7 @@ def makeXAS(xasRawData, xasProData, ploton):
         
         for ii in range(NumTTSteps):
             
-            on = np.logical_and.reduce((xasRawData.LOn, SelectedRuns, \
+            on = np.logical_and.reduce((xasRawData.LOn, selectedRuns, TTFilter, DiodeFilter, \
                       (xasProData.TTDelay > xasProData.TTSteps[ii]), (xasProData.TTDelay <= xasProData.TTSteps[ii+1])))
             XASOn[ii,jj] = sum(xasRawData.Diode2[on])
 

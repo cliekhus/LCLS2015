@@ -28,13 +28,13 @@ folder = "D://LCLS_Data/LCLS_python_data/XAS/"
 
 
 NumTTSteps = 20
-NumTTStepsPlots = 5
+NumTTStepsPlots = 3
 
 if ReEnterData:
 
-    #FileNums = list(range(372, 395+1))
+    FileNums = list(range(372, 395+1))
     #FileNums = list(range(371,373+1))+list(range(375,377+1))+list(range(379,382+1))+list(range(384,391+1))+list(range(393,394+1))
-    FileNums = list(range(374, 374+1))
+    #FileNums = list(range(372, 374+1))
     xasRawData = loadData(FileNums, True, 1)
 
 
@@ -58,7 +58,7 @@ Peak = np.empty(NumTTSteps)
 for ii in range(NumTTSteps):
     xasdiff = xasProData.XASOn_Norm[ii] - xasProData.XASOff_Norm
     XASDiff[ii,:] = xasdiff
-    Peak[ii] = sum(xasdiff[np.logical_and(xasProData.EnergyPlot >= np.float64(7110), xasProData.EnergyPlot <= np.float64(7112))])
+    Peak[ii] = sum(xasdiff[np.logical_and(xasProData.EnergyPlot >= np.float64(7114), xasProData.EnergyPlot <= np.float64(7118))])
 
 t0 = find_t0_XAS(xasProData.TTSteps, Peak, True)
 EnergyShift = findEnergyShift(xasProData.XASOff_Norm, xasProData.UniXEnergy, False)
@@ -100,7 +100,7 @@ fig = plt.figure()
 
 for ii in range(NumTTStepsPlots):
     
-    plt.plot(xasProData_t0.EnergyPlot, XASDiffPlot[ii], marker='.', label = str(round(xasProData_t0.TTSteps[ii],0)) + ' to ' + str(round(xasProData_t0.TTSteps[ii+1])) + ' fs delay')
+    plt.plot(xasProData_t0.EnergyPlot, XASDiffPlot[ii]/xasProData_t0.XASOff_Norm, marker='.', label = str(round(xasProData_t0.TTSteps[ii],0)) + ' to ' + str(round(xasProData_t0.TTSteps[ii+1])) + ' fs delay')
 
 
 plt.xlabel('x-ray energy (eV)')
@@ -115,7 +115,7 @@ for ii in range(NumTTStepsPlots):
     
     plt.plot(xasProData_t0.EnergyPlot, xasProData_t0.XASOn_Norm[ii], marker='.', label = str(round(xasProData_t0.TTSteps[ii],0)) + ' to ' + str(round(xasProData_t0.TTSteps[ii+1])) + ' fs delay')
 
-
+plt.plot(xasProData_t0.EnergyPlot, xasProData_t0.XASOff_Norm, marker='.', label = 'laser off')
 plt.xlabel('x-ray energy (eV)')
 plt.ylabel('x-ray absorption')
 plt.legend()
