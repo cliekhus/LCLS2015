@@ -13,24 +13,23 @@ def makeOneDiodeFilter(xasRawData, selectedRuns, ploton):
     if ploton:
             
         plt.figure()
-        plt.scatter(xasRawData.Diode2[selectedRuns], xasRawData.CspadSum[selectedRuns],s=2)
+        plt.scatter(xasRawData.CspadSum[selectedRuns], xasRawData.Diode2[selectedRuns],s=2)
     
     if sum(selectedRuns.astype(int))>0:
             
         linfit = np.polyfit(xasRawData.CspadSum[selectedRuns], xasRawData.Diode2[selectedRuns], 1)
         line = np.poly1d(linfit)
-        rowlandres = line(xasRawData.CspadSum)-xasRawData.Diode2
-        statstdev = np.std(rowlandres[selectedRuns])
+        res = line(xasRawData.CspadSum)-xasRawData.Diode2
+        statstdev = np.std(res[selectedRuns])
     
         if ploton:
             
-            plt.plot(xasRawData.Diode2, line(xasRawData.Diode2))
+            plt.plot(xasRawData.CspadSum, line(xasRawData.CspadSum))
         
-        numstds = 2
+        numstds = 3
+        slopefilter = np.abs(res) < numstds*statstdev
         
-        slopefilter = np.abs(rowlandres) < numstds*statstdev
-        
-        plotfilter = np.logical_and(np.abs(rowlandres) < numstds*statstdev, selectedRuns)
+        plotfilter = np.logical_and(np.abs(res) < numstds*statstdev, selectedRuns)
         
         if ploton:
             

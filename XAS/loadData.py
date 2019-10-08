@@ -9,7 +9,6 @@ def loadData(FileNums, XAS, setting):
     
     import h5py
     import numpy as np
-    import math
     import RawDataClass as RDC
     import numpy.matlib
     

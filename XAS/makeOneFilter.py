@@ -19,37 +19,46 @@ def makeOneFilter(xasRawData, ploton):
 
     NanCheck = np.logical_not(np.logical_or.reduce((np.isnan(xasRawData.Diode2), np.isnan(xasRawData.Ipm2Sum), np.isnan(xasRawData.CspadSum), np.isnan(xasRawData.L3E))))
 
-    IpmNumSTDs = 2
+    IpmNumSTDs = 5
     Ipm2Median = np.nanmedian(xasRawData.Ipm2Sum[xasRawData.XOn])
     Ipm2STD = np.nanstd(xasRawData.Ipm2Sum[xasRawData.XOn])
     IpmFilter = np.abs(xasRawData.Ipm2Sum - Ipm2Median) < Ipm2STD*IpmNumSTDs
                                
     
-    L3ENumSTDs = 2
+    L3ENumSTDs = 5
     L3EMedian = np.nanmedian(xasRawData.L3E[xasRawData.XOn])
     L3ESTD = np.nanstd(xasRawData.L3E[xasRawData.XOn])
     L3EFilter = np.abs(xasRawData.L3E - L3EMedian) < L3ESTD*L3ENumSTDs
     
-    CspadSumSTDs = 2
+    
+    CspadSumSTDs = 5
+    CspadSumMin = 0.2
     CspadSumMedian = np.nanmedian(xasRawData.CspadSum[xasRawData.XOn])
     CspadSumSTD = np.nanstd(xasRawData.CspadSum[xasRawData.XOn])
-    CspadSumFilter = np.abs(xasRawData.CspadSum - CspadSumMedian) < CspadSumSTD*CspadSumSTDs
+    CspadSumFilter = np.logical_and(np.abs(xasRawData.CspadSum - CspadSumMedian) < CspadSumSTD*CspadSumSTDs, xasRawData.CspadSum > CspadSumMin*CspadSumMedian)
 
     
-    RowlandSTDs = 2
+    RowlandSTDs = 5
     RowlandMedian = np.nanmedian(xasRawData.RowlandY[xasRawData.XOn])
     RowlandSTD = np.nanstd(xasRawData.RowlandY[xasRawData.XOn])
     RowlandFilter = np.abs(xasRawData.RowlandY - RowlandMedian) < RowlandSTD*RowlandSTDs
     
     
-    AllFilter = np.logical_and.reduce((IpmFilter, L3EFilter, CspadSumFilter, RowlandFilter, NanCheck))
+    DiodeSTDs = 5
+    DiodeMin = 0.2
+    DiodeMedian = np.nanmedian(xasRawData.Diode2[xasRawData.XOn])
+    DiodeSTD = np.nanstd(xasRawData.Diode2[xasRawData.XOn])
+    DiodeFilter = np.logical_and(np.abs(xasRawData.Diode2 - DiodeMedian) < DiodeSTD*DiodeSTDs, xasRawData.Diode2 > DiodeMin*DiodeMedian)
     
-    plt.xlabel('shot number')
+    
+    AllFilter = np.logical_and.reduce((IpmFilter, L3EFilter, CspadSumFilter, RowlandFilter, DiodeFilter, NanCheck))
+    
     if ploton:
         plt.figure()
         plt.plot(xasRawData.L3E)
         plt.plot(xasRawData.L3E[L3EFilter])
         plt.title('L3E')
+        plt.xlabel('shot number')
         
         plt.figure()
         plt.plot(xasRawData.Ipm2Sum)
@@ -68,21 +77,27 @@ def makeOneFilter(xasRawData, ploton):
         plt.plot(xasRawData.RowlandY[RowlandFilter])
         plt.title('RowlandY')
         plt.xlabel('shotnumber')
+        
+        plt.figure()
+        plt.plot(xasRawData.Diode2)
+        plt.plot(xasRawData.Diode2[RowlandFilter])
+        plt.title('Diode2')
+        plt.xlabel('shotnumber')
     
     
-    TTSTDs = 3
+    TTSTDs = 5
     TTMedian = np.median(xasRawData.TimeTool[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
     TTSTD = np.std(xasRawData.TimeTool[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
     TTValueFilter = np.abs(xasRawData.TimeTool - TTMedian) < TTSTDs*TTSTD
     
     
-    TTAmpSTDs = 2
+    TTAmpSTDs = 5
     TTAmpMedian = np.median(xasRawData.TTAmp[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
     TTAmpSTD = np.std(xasRawData.TTAmp[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
     TTAmpFilter = np.abs(xasRawData.TTAmp - TTAmpMedian) < TTAmpSTDs*TTAmpSTD
     
     
-    TTFWHMSTDs = 2
+    TTFWHMSTDs = 5
     TTFWHMMedian = np.median(xasRawData.TTFWHM[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
     TTFWHMSTD = np.std(xasRawData.TTFWHM[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
     TTFWHMFilter = np.abs(xasRawData.TTFWHM - TTFWHMMedian) < TTFWHMSTDs*TTFWHMSTD

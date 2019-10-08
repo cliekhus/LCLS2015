@@ -15,7 +15,7 @@ import os
 import pickle
 
 
-ReEnterData = True
+ReEnterData = False
 FPlots = False
 
 #Set up the scans and the number of time steps
@@ -33,7 +33,7 @@ if exists:
     with open(folder + "t0.pkl", "rb") as f:
         t0 = pickle.load(f)
     TDelay = [(x*1e-12 - 1.4e-12)*1e15 -t0 for x in TimeTool]
-    Times = np.linspace(-75, 125, num=4)
+    Times = np.linspace(-50, 50, num=2)
     print('read')
 else:
     TDelay = TimeTool
@@ -50,6 +50,11 @@ spectraOn, SpectraOff, UniqueAnglep = makeStaticXES(Angle, UniqueAngle, RowlandW
                                                     ScanNum, L3E, CspadSum, 10000, -10000, FPlots)
 LCLSEnergy, slope, x0 = makeConversion(UniqueAnglep, SpectraOff, False)
 LCLSEnergyp = [x for x in LCLSEnergy if x < maxEnergy and x > minEnergy]
+
+plt.figure()
+plt.plot(LCLSEnergyp, [x for x,z in zip(SpectraOff, LCLSEnergy) if z < maxEnergy and z > minEnergy])
+plt.xlabel('energy (eV)')
+
 
 CenterTime = []
 
@@ -82,9 +87,10 @@ for ii in range(len(Times)-1):
         #Matrix = np.concatenate((Matrix, np.array([savgol_filter(diff,5,2)])))
         Matrix = np.concatenate((Matrix, np.array([diff])))
     
-    plt.plot(LCLSEnergyp, diff, marker = 'o', label = str((MaxTime+MinTime)/2))
+    plt.plot(LCLSEnergyp, diff, marker = 'o', label = str(MinTime) + "fs to " + str(MaxTime) + "fs" )
 
 plt.legend()
+plt.xlabel('energy (eV)')
 
 #plt.figure()
 #plt.plot(LCLSEnergy, [x-y for x,y in zip(SpectraOnNorm, SpectraOffNorm)], marker = 'o')
