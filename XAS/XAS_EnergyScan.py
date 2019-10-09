@@ -24,7 +24,7 @@ ReLoadData = False
 SaveData = False
 folder = "D://LCLS_Data/LCLS_python_data/XAS/"
 
-DorH = True #True is diode, False is HERFD
+DorH = False #True is diode, False is HERFD
 
 
 
@@ -36,7 +36,7 @@ if ReEnterData:
     FileNums = list(range(372, 395+1))
     #FileNums = list(range(371,373+1))+list(range(375,377+1))+list(range(379,382+1))+list(range(384,391+1))+list(range(393,394+1))
     #FileNums = list(range(372, 374+1))
-    xasRawData = loadData(FileNums, True, 1)
+    xasRawData = loadData(FileNums, "XAS", 1)
 
 
 if ReLoadData:
@@ -128,7 +128,7 @@ plt.legend()
 
 
 
-xasProData_one = PDC.XASProcessedData(TTSteps = np.linspace(-50,100,1+1), TTDelay = 1000*xasRawData.TimeTool-t0, \
+xasProData_one = PDC.XASProcessedData(TTSteps = np.linspace(-25,25,1+1), TTDelay = 1000*xasRawData.TimeTool-t0, \
                               XEnergy = np.round((xasRawData.XEnergyRaw+EnergyShift/1000)*200,1)*5)
 uniXEnergy = np.unique(xasProData_one.XEnergy)
 xasProData_one.changeValue(UniXEnergy = uniXEnergy[np.logical_and(uniXEnergy >= 7110, uniXEnergy <= 7120)])

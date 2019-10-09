@@ -5,15 +5,18 @@ Created on Fri May  3 10:37:18 2019
 @author: chelsea
 """
 
-def loadData(FileNums, XAS, setting):
+def loadData(FileNums, fileSetting, offSetting):
     
     import h5py
     import numpy as np
     import RawDataClass as RDC
     import numpy.matlib
     
-    if XAS:
+    if fileSetting == "XAS":
         xasRawData = RDC.XASRawData()
+    elif fileSetting == "Peaks":
+        xasRawData = RDC.PeaksRawData()
+    
     
     #Initialize the necessary lists
     XOn = np.empty(0)
@@ -38,10 +41,12 @@ def loadData(FileNums, XAS, setting):
     #Fill the lists with data from the h5 file
     for filenum in FileNums:
         print(filenum)
-        if XAS:
+        if fileSetting == "XAS":
             ScanName = h5py.File('D:\LCLS_Data\XAS\ldat_xppj6715_Run' + str(filenum) + '.h5')
-        else:
+        elif fileSetting == "XES":
             ScanName = h5py.File('D:\LCLS_Data\XES\ldat_xppj6715_Run' + str(filenum) + '.h5')
+        elif fileSetting == "Peaks":
+            ScanName = h5py.File('D:\LCLS_Data\Peaks\ldat_xppj6715_Run' + str(filenum) + '.h5')
         
         xOn = np.array(ScanName['/lightStatus/xray'])
         XOn = np.append(XOn, xOn)
@@ -67,9 +72,9 @@ def loadData(FileNums, XAS, setting):
         
         RowlandY = np.append(RowlandY, np.sum(rowlandy, 1))
         
-        if setting == 1:
+        if offSetting == 1:
             Offset = np.append(Offset, (np.mean(rowlandy[:,0:50],1)+np.mean(rowlandy[:,100:150],1))/2*np.shape(rowlandy)[1])
-        elif setting == 2:
+        elif offSetting == 2:
             Offset = np.append(Offset, (np.mean(rowlandy[:,150:175],1))*np.shape(rowlandy)[1])
         
         L3E = np.append(L3E, ScanName['/ebeam/L3Energy'])
@@ -87,8 +92,11 @@ def loadData(FileNums, XAS, setting):
     XOn = XOn.astype(bool)    
     LOn = LOn.astype(bool)
         
-    if XAS:
+    if fileSetting == "XAS":
         xasRawData.changeValue(XOn = XOn, LOn = LOn, XEnergyRaw = Var0, Diode2 = Diode2, Ipm2Sum = Ipm2Sum, TimeTool = TimeTool, \
+                           TTAmp = TTAmp, TTFWHM = TTFWHM, ScanNum = ScanNum, RowlandY = RowlandY, Offset = Offset, L3E = L3E, CspadSum = CspadSum)
+    if fileSetting == "Peaks":
+        xasRawData.changeValue(XOn = XOn, LOn = LOn, StageDelay = Var0, Diode2 = Diode2, Ipm2Sum = Ipm2Sum, TimeTool = TimeTool, \
                            TTAmp = TTAmp, TTFWHM = TTFWHM, ScanNum = ScanNum, RowlandY = RowlandY, Offset = Offset, L3E = L3E, CspadSum = CspadSum)
     
     return xasRawData

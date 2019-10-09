@@ -3,21 +3,25 @@ Find t0
 
 """
 
-def find_t0_XAS(TTSteps, Peak, ploton):
+def find_t0_XAS(TTSteps, Peak, XAS, ploton):
     
     import numpy as np
     import matplotlib.pyplot as plt
     from scipy.signal import savgol_filter
     
-    minrange = -175
-    maxrange = -100
+    if XAS:
+        
+        minrange = -175
+        maxrange = -100
+    
+    else:
+        
+        minrange = 850
+        maxrange = 1050
     
     Filtered = savgol_filter(Peak, 5, 2)
     
-    Times = np.empty(0)
-    
-    for ii in range(len(TTSteps)-1):
-        Times = np.append(Times,(TTSteps[ii]+TTSteps[ii+1])/2)
+    Times = (TTSteps[1:]+TTSteps[:-1])/2
     
     cond = np.logical_and(Times >= minrange, Times <= maxrange) 
     

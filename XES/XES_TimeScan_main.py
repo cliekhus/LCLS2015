@@ -38,7 +38,7 @@ if ReEnterData:
     FileNums = list(range(155, 164+1))
     #FileNums = list(range(122,130+1))
     #FileNums = list(range(155, 155+1))
-    XOnp, LOnp, StageDelayp, Diode2p, Ipm2Sump, TimeToolp, TTAmpp, TTFWHMp, ScanNump, RowlandYp, RowOffsetp, L3Ep, CspadSump = loadData(FileNums, False, 1)
+    XOnp, LOnp, StageDelayp, Diode2p, Ipm2Sump, TimeToolp, TTAmpp, TTFWHMp, ScanNump, RowlandYp, RowOffsetp, L3Ep, CspadSump = loadData(FileNums, "XES", 1)
 
 RowlandWOffsetp = [x-y for x,y in zip(RowlandYp, RowOffsetp)]
 

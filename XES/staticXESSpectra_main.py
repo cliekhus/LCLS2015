@@ -24,7 +24,7 @@ FPlots = False
 if ReEnterData:
 
     FileNums = list(range(190,190+1))
-    XOn, LOn, Angle, Diode2, Ipm2Sum, TimeTool, TTAmp, TTFWHM, ScanNum, RowlandY, RowOffset, L3E, CspadSum = loadData(FileNums, False, 2)
+    XOn, LOn, Angle, Diode2, Ipm2Sum, TimeTool, TTAmp, TTFWHM, ScanNum, RowlandY, RowOffset, L3E, CspadSum = loadData(FileNums, "XES", 2)
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_conversion_info/"
 exists = os.path.isfile(folder+'t0.pkl')
