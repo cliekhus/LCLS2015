@@ -4,67 +4,49 @@ Created on Mon Jun 17 18:11:08 2019
 
 @author: chelsea
 """
-def makeStaticXES(Angle, UniqueAngle, RowlandWOffset, Diode2, Ipm2Sum, XOn, LOn, TimeTool, TTAmp, TTFWHM, ScanNum, L3E, CspadSum, MaxTime, MinTime, ploton):
+def makeStaticXES(xesRawData, xesProData, MaxTime, MinTime, ploton):
     
-    from itertools import compress
     from makeOneFilter import makeOneFilter
-
-    SpectraOn = []
-    SpectraOff = []
-    UniqueAnglep = []
-    
-    ii = 0
-    
-    FPlots = False
-    
-    for uangle in UniqueAngle:
-        
-        selectAngle = [x == uangle for x in Angle]
-        
-        ii = ii+1
-        if ploton:
-            if ii%6 == 1:
-                FPlots = True
-                
-                
-    
-        rowlandwoffset = list(compress(RowlandWOffset, selectAngle))
-        diode2 = list(compress(Diode2, selectAngle))
-        timetool = list(compress(TimeTool, selectAngle))
-        lon = list(compress(LOn, selectAngle))
-        xon = list(compress(XOn, selectAngle))
+    from scipy.stats import sem
+    from makeIntensityFilter import makeOneDiodeFilter
+    import numpy as np
 
 
-        Filter, Offset = makeOneFilter(diode2, list(compress(Ipm2Sum, selectAngle)), rowlandwoffset, xon, lon, \
-                                    timetool, list(compress(TTAmp, selectAngle)), list(compress(TTFWHM, selectAngle)), \
-                                    list(compress(L3E, selectAngle)), list(compress(CspadSum, selectAngle)), FPlots, 2)
-        
-        #print(Offset)
-        
-        
-        
-        #FilterOn = [x and y for x,y in zip(xon, lon)]
-        #FilterOff = [x and not y for x,y in zip(xon, lon)]
-
-        diode2 = [x-Offset for x in diode2]
-
-        FilterOn = [(w < MaxTime) and (w > MinTime) and x and y for w,x,y in zip(timetool, Filter, LOn)]
-        FilterOff = [x and not y for x,y in zip(Filter, LOn)]
-        
-        
-        #print(sum([int(x) for x in Filteron]))
-        #print(sum([int(x) for x in FilterOff]))
-        
-        if sum(list(compress(diode2, FilterOff))) > 0 and sum(list(compress(diode2, FilterOn))) > 0:
-            SpectraOn = SpectraOn + [sum(list(compress(rowlandwoffset, FilterOn)))/sum(list(compress(diode2, FilterOn)))]
-            SpectraOff = SpectraOff + [sum(list(compress(rowlandwoffset, FilterOff)))/sum(list(compress(diode2, FilterOff)))]
-            UniqueAnglep = UniqueAnglep + [uangle]
+    SpectraOn = np.empty(len(xesProData.UniAngle))
+    SpectraOff = np.empty(len(xesProData.UniAngle))
+    ErrorOn = np.empty(len(xesProData.UniAngle))
+    ErrorOff = np.empty(len(xesProData.UniAngle))
     
-        if ii%6 == 1:
-            FPlots = False
+    
+    Filter, TTFilter = makeOneFilter(xesRawData, ploton)
+    #AllFilter = np.logical_and(Filter, TTFilter)
+    SlopeFilter, Offset = makeOneDiodeFilter(xesRawData, np.logical_and(Filter, TTFilter), ploton)
+    AllFilter = np.logical_and.reduce((Filter, TTFilter, SlopeFilter))
+    
+    indices2delete = []
+    
+    for ii in range(len(xesProData.UniAngle)):
+
+        selectAngle = xesRawData.Angle == xesProData.UniAngle[ii]
+        selectTime = np.logical_and(xesProData.TTDelay <= MaxTime, xesProData.TTDelay >= MinTime)
+        
+        filteron = np.logical_and.reduce((AllFilter, selectAngle, selectTime, xesRawData.LOn, xesRawData.XOn))
+        filteroff = np.logical_and.reduce((AllFilter, selectAngle, np.logical_not(xesRawData.LOn), xesRawData.XOn))
+
+        if np.sum(filteron.astype('int')) > 0 and np.sum(filteroff.astype('int')):
+    
+            SpectraOn[ii] = np.sum(xesProData.RowWOffset[filteron])/np.sum(xesRawData.CspadSum[filteron])
+            SpectraOff[ii] = np.sum(xesProData.RowWOffset[filteroff])/np.sum(xesRawData.CspadSum[filteroff])
+            ErrorOn[ii] = sem(xesProData.RowWOffset[filteron]/xesRawData.CspadSum[filteron])
+            ErrorOff[ii] = sem(xesProData.RowWOffset[filteroff]/xesRawData.CspadSum[filteroff])
             
-            #plt.figure()
-            #plt.plot(list(compress(diode2, FilterOn)))
-            #plt.plot(list(compress(diode2, FilterOff)))
+        else:
             
-    return SpectraOn, SpectraOff, UniqueAnglep
+            indices2delete = indices2delete + [ii]
+
+    SpectraOn = np.delete(SpectraOn, indices2delete)
+    SpectraOff = np.delete(SpectraOff, indices2delete)
+    ErrorOn = np.delete(ErrorOn, indices2delete)
+    ErrorOff = np.delete(ErrorOff, indices2delete)
+
+    return SpectraOn, SpectraOff, ErrorOn, ErrorOff

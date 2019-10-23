@@ -23,14 +23,14 @@ ReLoadData = False
 SaveData = False
 folder = "D://LCLS_Data/LCLS_python_data/Peaks/"
 
-DorH = True #True is diode, False is HERFD
+DorH = False #True is diode, False is HERFD
 
 mintime = -200
 maxtime = 550
 
 NumTTStepsA = 25
 NumTTStepsC = 40
-NumTTStepsW = 40
+NumTTStepsW = 50
 
 if ReEnterData:
 

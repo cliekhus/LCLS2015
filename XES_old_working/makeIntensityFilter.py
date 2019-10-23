@@ -5,44 +5,55 @@ Created on Mon Apr 29 11:29:47 2019
 @author: chelsea
 """
 
-def makeOneDiodeFilter(xesRawData, selectedRuns, ploton):
+def makeOneDiodeFilter(cspadsum, diode2, xOn, ploton):
     
     import matplotlib.pyplot as plt
+    from itertools import compress
+    import math
     import numpy as np
+    import statistics as stat
+    
+    xonnan = [not math.isnan(x) and y and not math.isnan(z) for x,y,z in zip(cspadsum, xOn, diode2)]
     
     if ploton:
             
         plt.figure()
-        plt.scatter(xesRawData.CspadSum[selectedRuns], xesRawData.Diode2[selectedRuns],s=2)
+        plt.scatter(list(compress(diode2, xonnan)), list(compress(cspadsum, xonnan)),s=2)
     
-    if sum(selectedRuns.astype(int))>0:
-            
-        linfit = np.polyfit(xesRawData.CspadSum[selectedRuns], xesRawData.Diode2[selectedRuns], 1)
-        line = np.poly1d(linfit)
-        res = line(xesRawData.CspadSum)-xesRawData.Diode2
-        statstdev = np.std(res[selectedRuns])
+    meancspadsum = stat.mean(list(compress(cspadsum, xonnan)))
     
-        if ploton:
-            
-            plt.plot(xesRawData.CspadSum, line(xesRawData.CspadSum))
+    stdcspadsum = stat.stdev(list(compress(cspadsum, xonnan)))
+    
+    stdlimit = 2
+    
+    cspadfilter = [abs(x-meancspadsum)<stdlimit*stdcspadsum and y for x,y in zip(cspadsum, xonnan)]
+    
+    linfit = np.polyfit(list(compress(cspadsum, cspadfilter)), list(compress(diode2, cspadfilter)), 1)
+    line = np.poly1d(linfit)
+    rowlandres = [abs(x-y) for x,y in zip(list(line(cspadsum)),diode2)]
+    statstdev = stat.stdev(list(compress(rowlandres, cspadfilter)))
+    
+    
+    
+    
+    if ploton:
         
-        numstds = 2.5
-        slopefilter = np.abs(res) < numstds*statstdev
+        plt.plot(list(compress(diode2,rowlandres)), list(line(list(compress(diode2,rowlandres)))))
+    
+    numstds = 2
+    
+    slopefilter = [a < numstds*statstdev and b for a,b in zip(rowlandres, cspadfilter)]
+    
+    if ploton:
         
-        plotfilter = np.logical_and(np.abs(res) < numstds*statstdev, selectedRuns)
-        
-        if ploton:
-            
-            plt.scatter(xesRawData.CspadSum[plotfilter], xesRawData.Diode2[plotfilter], s=2, c='r')
-            plt.ylabel('diode2')
-            plt.xlabel('cspadsum')
-        
-        
-        return slopefilter, -linfit[1]/linfit[0]
+        plt.scatter(list(compress(cspadsum,slopefilter)),list(compress(diode2, slopefilter)),s=2,c='r')
+        plt.ylabel('diode2')
+        plt.xlabel('cspadsum')
+    
+    
+    return slopefilter, -linfit[1]/linfit[0]
 
-    else:
-        
-        return selectedRuns, float('NaN')
+
 
 
 

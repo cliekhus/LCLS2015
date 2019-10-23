@@ -5,10 +5,7 @@ Created on Tue May 21 09:55:23 2019
 @author: chelsea
 """
 
-def makeConversion(xesProData, ploton):
-    
-    UniqueAnglep = xesProData.UniAngle
-    SpectraOff = xesProData.XESOff_Norm
+def makeConversion(UniqueAnglep, SpectraOff, ploton):
     
     import numpy as np
     import h5py

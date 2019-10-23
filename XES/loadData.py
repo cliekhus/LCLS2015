@@ -5,83 +5,100 @@ Created on Fri May  3 10:37:18 2019
 @author: chelsea
 """
 
-def loadData(FileNums, XAS, setting):
+def loadData(FileNums, fileSetting, offSetting):
     
     import h5py
     import numpy as np
-    import math
+    import RawDataClass as RDC
+    import numpy.matlib
+    
+    if fileSetting == "XES":
+        xesRawData = RDC.XESRawData()
+    elif fileSetting == "Peaks":
+        xesRawData = RDC.PeaksRawData()
+
     
     
     #Initialize the necessary lists
-    XOn = []
-    LOn = []
-    Var0 = []
-    Diode2 = []
+    XOn = np.empty(0)
+    LOn = np.empty(0)
+    Var0 = np.empty(0)
+    Diode2 = np.empty(0)
     
-    Ipm2Sum = []
+    Ipm2Sum = np.empty(0)
     
-    TimeTool = []
-    TTAmp = []
-    TTFWHM = []
+    TimeTool = np.empty(0)
+    TTAmp = np.empty(0)
+    TTFWHM = np.empty(0)
     
-    ScanNum = []
+    ScanNum = np.empty(0)
     
-    RowlandY = []
-    Offset = []
+    RowlandY = np.empty(0)
+    Offset = np.empty(0)
     
-    L3E = []
-    CspadSum = []
+    L3E = np.empty(0)
+    CspadSum = np.empty(0)
     
     #Fill the lists with data from the h5 file
     for filenum in FileNums:
         print(filenum)
-        if XAS:
-            ScanName = h5py.File('D:\LCLS_Data\XAS\ldat_xppj6715_Run' + str(filenum) + '.h5')
-        else:
+        if fileSetting == "XES":
             ScanName = h5py.File('D:\LCLS_Data\XES\ldat_xppj6715_Run' + str(filenum) + '.h5')
+        elif fileSetting == "Peaks":
+            ScanName = h5py.File('D:\LCLS_Data\Peaks\ldat_xppj6715_Run' + str(filenum) + '.h5')
         
-        xOn = list(map(bool, ScanName['/lightStatus/xray']))
-        XOn = XOn + xOn
-        LOn = LOn + list(map(bool, ScanName['/lightStatus/laser']))
-        Var0 = Var0 + list(ScanName['/scan/var0'])
+        xOn = np.array(ScanName['/lightStatus/xray'])
+        XOn = np.append(XOn, xOn)
+        lOn = np.array(ScanName['/lightStatus/laser'])
+        LOn = np.append(LOn, lOn)
+        Var0 = np.append(Var0, np.array(ScanName['/scan/var0']))
     
-        diode = [x[2] for x in list(ScanName['/diodeU/channels'])]                  #Quad cell 2 from diode - this one has an output
-        Diode2 = Diode2 + diode
+        diode = ScanName['/diodeU/channels']                  #Quad cell 2 from diode - this one has an output
+        Diode2 = np.append(Diode2, np.array(diode[:,2]))
         
-        ipm2 = [float(x[1])+float(x[3]) for x in list(ScanName['/ipm2/channels'])]  #Intensity (and position) monitor #2.  Quad cells 1 and 3 had signal - use these
-        Ipm2Sum = Ipm2Sum + ipm2
+        ipm2 = ScanName['/ipm2/channels']  #Intensity (and position) monitor #2.  Quad cells 1 and 3 had signal - use these
+        Ipm2Sum = np.append(Ipm2Sum, np.array(ipm2[:,1])+np.array(ipm2[:,3]))
         
-        timetool = [float(x) for x in list(ScanName['/ttCorr/tt'])]
-        TimeTool = TimeTool + timetool
+        TimeTool = np.append(TimeTool, ScanName['/ttCorr/tt'])
         
-        timetoolamp = [float(x) for x in list(ScanName['/tt/XPP_TIMETOOL_AMPL'])]
-        TTAmp = TTAmp + timetoolamp
+        TTAmp = np.append(TTAmp, ScanName['/tt/XPP_TIMETOOL_AMPL'])
 
-        timetoolfwhm = [float(x) for x in list(ScanName['/tt/XPP_TIMETOOL_AMPL'])]
-        TTFWHM = TTFWHM + timetoolfwhm
+        TTFWHM = np.append(TTFWHM, ScanName['/tt/XPP_TIMETOOL_AMPL'])
         
-        ScanNum = ScanNum + [filenum for x in range(len(diode))]
+        ScanNum = np.append(ScanNum, np.matlib.repmat(filenum, np.shape(ipm2)[0], 1))
         
-        rowlandy = list(ScanName['/Rowland/ROI_proj_ythres'])
+        rowlandy = np.array(ScanName['/Rowland/ROI_proj_ythres'])
         
-        RowlandY = RowlandY + [sum(x) for x in rowlandy]
+        RowlandY = np.append(RowlandY, np.sum(rowlandy, 1))
         
-        if setting == 1:
-            Offset = Offset + [(np.mean(x[0:50])+np.mean(x[100:150]))/2*len(x) for x in rowlandy]
-        elif setting == 2:
-            Offset = Offset + [(sum(x[150:175]))/25*len(x) for x in rowlandy]
-            
-        L3E = L3E + list(ScanName['/ebeam/L3Energy'])
+        if offSetting == 1:
+            Offset = np.append(Offset, (np.mean(rowlandy[:,0:50],1)+np.mean(rowlandy[:,100:150],1))/2*np.shape(rowlandy)[1])
+        elif offSetting == 2:
+            Offset = np.append(Offset, (np.mean(rowlandy[:,150:175],1))*np.shape(rowlandy)[1])
+        
+        L3E = np.append(L3E, ScanName['/ebeam/L3Energy'])
         
         cspad = list(ScanName['cspad/azav'])
-        cspadsum = []
+        cspadsum = np.empty(len(cspad))
+        ii = 0
         for cs in cspad:
-            cspadsum = cspadsum + [sum([x for x in cs if not math.isnan(x)])]
-        CspadSum = CspadSum + cspadsum
+            cspadsum[ii] = np.nansum(cs)
+            
+            ii += 1
+            
+        CspadSum = np.append(CspadSum, cspadsum)
     
-    L3E = [float(x) for x in L3E]
+    XOn = XOn.astype(bool)    
+    LOn = LOn.astype(bool)
+        
+    if fileSetting == "XES":
+        xesRawData.changeValue(XOn = XOn, LOn = LOn, Angle = Var0, Diode2 = Diode2, Ipm2Sum = Ipm2Sum, TimeTool = TimeTool, \
+                           TTAmp = TTAmp, TTFWHM = TTFWHM, ScanNum = ScanNum, RowlandY = RowlandY, Offset = Offset, L3E = L3E, CspadSum = CspadSum)
+    if fileSetting == "Peaks":
+        xesRawData.changeValue(XOn = XOn, LOn = LOn, StageDelay = Var0, Diode2 = Diode2, Ipm2Sum = Ipm2Sum, TimeTool = TimeTool, \
+                           TTAmp = TTAmp, TTFWHM = TTFWHM, ScanNum = ScanNum, RowlandY = RowlandY, Offset = Offset, L3E = L3E, CspadSum = CspadSum)
     
-    return XOn, LOn, Var0, Diode2, Ipm2Sum, TimeTool, TTAmp, TTFWHM, ScanNum, RowlandY, Offset, L3E, CspadSum
+    return xesRawData
 
 
 

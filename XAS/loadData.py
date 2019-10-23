@@ -93,7 +93,7 @@ def loadData(FileNums, fileSetting, offSetting):
     LOn = LOn.astype(bool)
         
     if fileSetting == "XAS":
-        xasRawData.changeValue(XOn = XOn, LOn = LOn, XEnergyRaw = Var0, Diode2 = Diode2, Ipm2Sum = Ipm2Sum, TimeTool = TimeTool, \
+        xasRawData.changeValue(XOn = XOn, LOn = LOn, Angle = Var0, Diode2 = Diode2, Ipm2Sum = Ipm2Sum, TimeTool = TimeTool, \
                            TTAmp = TTAmp, TTFWHM = TTFWHM, ScanNum = ScanNum, RowlandY = RowlandY, Offset = Offset, L3E = L3E, CspadSum = CspadSum)
     if fileSetting == "Peaks":
         xasRawData.changeValue(XOn = XOn, LOn = LOn, StageDelay = Var0, Diode2 = Diode2, Ipm2Sum = Ipm2Sum, TimeTool = TimeTool, \

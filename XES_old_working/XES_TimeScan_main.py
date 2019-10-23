@@ -17,7 +17,7 @@ from APSXESCalibration import convertAngle2Energy
 import pickle
 from makeSpectralPlot import makeSpectralPlot
 
-ReEnterData = True
+ReEnterData = False
 FPlots = False
 
 NumTTSteps = 100
@@ -78,9 +78,9 @@ Energyplus = str(round(convertAngle2Energy(ScanNump[0])*1000,1))
 
 if ReEnterData:
 
-    FileNums = list(range(180,188+1))
+    #FileNums = list(range(180,188+1))
     #FileNums = list(range(180,180+1))
-    #FileNums = list(range(165, 178+1))
+    FileNums = list(range(165, 178+1))
     
     #FileNums = list(range(155, 158+1)) + list(range(160, 164+1))
     XOnm, LOnm, StageDelaym, Diode2m, Ipm2Summ, TimeToolm, TTAmpm, TTFWHMm, ScanNumm, RowlandYm, RowOffsetm, L3Em, CspadSumm = loadData(FileNums, False, 1)
@@ -88,7 +88,7 @@ if ReEnterData:
 RowlandWOffsetm = [x-y for x,y in zip(RowlandYm, RowOffsetm)]
 
 #FiltermOn, FiltermOff, DiodeOffsetm = makeFilter(Diode2m, Ipm2Summ, RowlandWOffsetm, XOnm, LOnm, DiodeIpmSlopem, TimeToolm, TTAmpm, TTFWHMm, False, ScanNumm, 2)
-Filterm, DiodeOffsetm = makeOneFilter(Diode2m, Ipm2Summ, RowlandWOffsetm, XOnm, LOnm, TimeToolm, TTAmpm, TTFWHMm, L3Em, CspadSumm, False, 2)
+Filterm, DiodeOffsetm = makeOneFilter(Diode2m, Ipm2Summ, RowlandWOffsetm, XOnm, LOnm, TimeToolm, TTAmpm, TTFWHMm, L3Em, CspadSumm, True, 2)
 
 #FilterpOn = [x and y for x,y in zip(XOnp, LOnp)]
 #FilterpOff = [x and not y for x,y in zip(XOnp, LOnp)]
@@ -99,7 +99,7 @@ DiodeWOffsetm = [x-DiodeOffsetm for x in Diode2m]
 
 TTDelaym = [(x*1e-12 + y)*1e15 for x,y in zip(TimeToolm,StageDelaym)]
 
-XESOn_Normm, XESOff_Normm, Num_Onm, Num_Offm, NormFactor_Offm, NormFactor_Onm = makeXES(NumTTSteps, DiodeWOffsetm, RowlandWOffsetm, Filterm, LOnm, XOnm, TTDelaym, TTSteps, FPlots)
+XESOn_Normm, XESOff_Normm, Num_Onm, Num_Offm, NormFactor_Offm, NormFactor_Onm = makeXES(NumTTSteps, DiodeWOffsetm, RowlandWOffsetm, Filterm, LOnm, XOnm, TTDelaym, TTSteps, True)
 
 TCenters = []
 for ii in range(len(TTSteps)-1):
@@ -114,7 +114,7 @@ Energyminus = str(round(convertAngle2Energy(ScanNumm[0])*1000,1))
 
 
 
-Fit1, Fit2, params, info = fitXES(TCenters, XESDiffplus, XESDiffminus, -1534, FPlots)
+Fit1, Fit2, params, info = fitXES(TCenters, XESDiffplus, XESDiffminus, -1534, True)
 
 t0 = params[6]
 print(t0)

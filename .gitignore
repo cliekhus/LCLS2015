@@ -6,3 +6,4 @@ $ cat .gitignore
 /Figures
 /Starting_Code
 /Object_Oriented_Code/__pycache__
+/Calculations
