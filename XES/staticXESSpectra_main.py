@@ -33,10 +33,11 @@ if ReLoadData:
 
 
 
-exists = os.path.isfile("D://LCLS_Data/LCLS_python_data/XES_conversion_info/t0.pkl")
+confolder = "D://LCLS_Data/LCLS_python_data/XES_conversion_info/"
+exists = os.path.isfile(confolder + "t0.pkl")
 
 if exists:
-    with open(folder + "t0.pkl", "rb") as f:
+    with open(confolder + "t0.pkl", "rb") as f:
         t0 = pickle.load(f)
         
     xesProData = PDC.XESProcessedData(TTDelay = 1000*xesRawData.TimeTool - 1400 - t0)

@@ -75,7 +75,7 @@ def makeConversion(xesProData, ploton):
 
 
 
-def convertAngle2Energy(ScanNum):
+def convertAngle2Energy(ScanNum, TorS):
     
     import pickle
     
@@ -98,7 +98,10 @@ def convertAngle2Energy(ScanNum):
         
         if runNum[ii] == ScanNum:
             
-            Angle = -theta[ii]
+            if TorS:
+                Angle = -(theta[ii]+0.05)
+            else:
+                Angle = -theta[ii]
     
     return Angle*slope+x0
     

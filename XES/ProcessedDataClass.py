@@ -27,10 +27,11 @@ class XESProcessedData:
         
     def energyConversion(self, FPlots):
         from APSXESCalibration import makeConversion
+        import numpy as np
         
         LCLSEnergy, slope, x0 = makeConversion(self, FPlots)
-        
-        self.__dict__.update(KaEnergy = LCLSEnergy)
+                
+        self.__dict__.update(KaEnergy = np.array(LCLSEnergy)*1000)
         
     def makeStaticPlot(self):
         from makeStaticPlot import makeStaticPlot

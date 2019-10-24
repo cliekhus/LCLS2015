@@ -13,7 +13,7 @@ def fitXES(TCentersplus, TCentersminus, XESDiffplus, XESDiffminus, startt0, plot
     from fittingfunctions import combinedconvolvedzero
     import numpy as np
     
-    starta = 7
+    starta = .02
     startrate = 60
     startsig = 7
     startoffsetp = 0
