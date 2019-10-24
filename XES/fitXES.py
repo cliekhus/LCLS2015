@@ -5,12 +5,13 @@ Created on Wed Jun 12 11:45:19 2019
 @author: chelsea
 """
 
-def fitXES(TCenters, XESDiffplus, XESDiffminus, startt0, ploton):
+def fitXES(TCentersplus, TCentersminus, XESDiffplus, XESDiffminus, startt0, ploton):
     
     import matplotlib.pyplot as plt
     from scipy.optimize import curve_fit
     from fittingfunctions import convolved
     from fittingfunctions import combinedconvolved
+    import numpy as np
     
     starta = 7
     startrate = 60
@@ -21,26 +22,26 @@ def fitXES(TCenters, XESDiffplus, XESDiffminus, startt0, ploton):
     if ploton:
             
         plt.figure()
-        plt.plot(TCenters, XESDiffplus, 'o')
-        plt.plot(TCenters, convolved(TCenters, starta, startrate, startoffsetp, startt0, startsig))
-        plt.plot(TCenters, XESDiffminus, 'o')
-        plt.plot(TCenters, convolved(TCenters, -starta, startrate, startoffsetm, startt0, startsig))
+        plt.plot(TCentersplus, XESDiffplus, 'o')
+        plt.plot(TCentersplus, convolved(TCentersplus, starta, startrate, startoffsetp, startt0, startsig))
+        plt.plot(TCentersminus, XESDiffminus, 'o')
+        plt.plot(TCentersminus, convolved(TCentersminus, -starta, startrate, startoffsetm, startt0, startsig))
         plt.title('start parameters')
         plt.xlabel('time (fs)')
     
 
-    params,cov = curve_fit(combinedconvolved, TCenters+TCenters, XESDiffplus+XESDiffminus, p0 = [starta, startrate, startoffsetp, -starta, startrate, startoffsetm, startt0, startsig])
+    params,cov = curve_fit(combinedconvolved, np.concatenate((TCentersplus,TCentersminus)), np.concatenate((XESDiffplus,XESDiffminus)), p0 = [starta, startrate, startoffsetp, -starta, startrate, startoffsetm, startt0, startsig])
     
-    Fitp = convolved(TCenters, params[0], params[1], params[2], params[6], params[7])
-    Fitm = convolved(TCenters, params[3], params[4], params[5], params[6], params[7])
+    Fitp = convolved(TCentersplus, params[0], params[1], params[2], params[6], params[7])
+    Fitm = convolved(TCentersminus, params[3], params[4], params[5], params[6], params[7])
     
     if ploton:
             
         plt.figure()
-        plt.plot(TCenters, XESDiffplus, 'o')
-        plt.plot(TCenters, Fitp)
-        plt.plot(TCenters, XESDiffminus, 'x')
-        plt.plot(TCenters, Fitm)
+        plt.plot(TCentersplus, XESDiffplus, 'o')
+        plt.plot(TCentersminus, Fitp)
+        plt.plot(TCentersplus, XESDiffminus, 'x')
+        plt.plot(TCentersminus, Fitm)
         plt.title('end parameters')
         plt.xlabel('time (fs)')
 

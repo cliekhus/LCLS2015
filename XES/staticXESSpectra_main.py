@@ -12,7 +12,7 @@ import pickle
 import ProcessedDataClass as PDC
 
 
-ReEnterData = True
+ReEnterData = False
 FPlots = False
 
 MinTime = -25

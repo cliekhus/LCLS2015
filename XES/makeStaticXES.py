@@ -8,7 +8,7 @@ def makeStaticXES(xesRawData, xesProData, MaxTime, MinTime, ploton):
     
     from makeOneFilter import makeOneFilter
     from scipy.stats import sem
-    from makeIntensityFilter import makeOneDiodeFilter
+    from makeIntensityFilter import makeLineFilter
     import numpy as np
 
 
@@ -19,8 +19,7 @@ def makeStaticXES(xesRawData, xesProData, MaxTime, MinTime, ploton):
     
     
     Filter, TTFilter = makeOneFilter(xesRawData, ploton)
-    #AllFilter = np.logical_and(Filter, TTFilter)
-    SlopeFilter, Offset = makeOneDiodeFilter(xesRawData, np.logical_and(Filter, TTFilter), ploton)
+    SlopeFilter, Offset = makeLineFilter(xesRawData.CspadSum, xesRawData.Diode2, np.logical_and(Filter, TTFilter), ploton)
     AllFilter = np.logical_and.reduce((Filter, TTFilter, SlopeFilter))
     
     indices2delete = []
@@ -31,9 +30,9 @@ def makeStaticXES(xesRawData, xesProData, MaxTime, MinTime, ploton):
         selectTime = np.logical_and(xesProData.TTDelay <= MaxTime, xesProData.TTDelay >= MinTime)
         
         filteron = np.logical_and.reduce((AllFilter, selectAngle, selectTime, xesRawData.LOn, xesRawData.XOn))
-        filteroff = np.logical_and.reduce((AllFilter, selectAngle, np.logical_not(xesRawData.LOn), xesRawData.XOn))
+        filteroff = np.logical_and.reduce((SlopeFilter, selectAngle, np.logical_not(xesRawData.LOn), xesRawData.XOn))
 
-        if np.sum(filteron.astype('int')) > 0 and np.sum(filteroff.astype('int')):
+        if np.sum(filteron.astype('int')) > 0 and np.sum(filteroff.astype('int')) > 0:
     
             SpectraOn[ii] = np.sum(xesProData.RowWOffset[filteron])/np.sum(xesRawData.CspadSum[filteron])
             SpectraOff[ii] = np.sum(xesProData.RowWOffset[filteroff])/np.sum(xesRawData.CspadSum[filteroff])

@@ -42,10 +42,7 @@ def loadData(FileNums, fileSetting, offSetting):
     #Fill the lists with data from the h5 file
     for filenum in FileNums:
         print(filenum)
-        if fileSetting == "XES":
-            ScanName = h5py.File('D:\LCLS_Data\XES\ldat_xppj6715_Run' + str(filenum) + '.h5')
-        elif fileSetting == "Peaks":
-            ScanName = h5py.File('D:\LCLS_Data\Peaks\ldat_xppj6715_Run' + str(filenum) + '.h5')
+        ScanName = h5py.File('D:\LCLS_Data\XES\ldat_xppj6715_Run' + str(filenum) + '.h5')
         
         xOn = np.array(ScanName['/lightStatus/xray'])
         XOn = np.append(XOn, xOn)

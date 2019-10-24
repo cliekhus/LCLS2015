@@ -18,10 +18,10 @@ class XESProcessedData:
     def changeValue(self, **kwargs):
         self.__dict__.update(kwargs)
         
-    def makeProXES(self, xasRawData, MaxTime, MinTime, FPlots):
+    def makeProXES(self, xesRawData, MaxTime, MinTime, FPlots):
         from makeStaticXES import makeStaticXES
         
-        XESOn_Norm, XESOff_Norm, Error_On, Error_Off = makeStaticXES(xasRawData, self, MaxTime, MinTime, FPlots)
+        XESOn_Norm, XESOff_Norm, Error_On, Error_Off = makeStaticXES(xesRawData, self, MaxTime, MinTime, FPlots)
         
         self.__dict__.update(XESOn_Norm = XESOn_Norm, XESOff_Norm = XESOff_Norm, Error_On = Error_On, Error_Off = Error_Off)
         
@@ -39,7 +39,7 @@ class XESProcessedData:
 
 class PeaksProcessedData:
     
-    _defaults = "Delay", "XASOn_Norm", "XASOff_Norm", "Num_On", "Num_Off", "TTSteps", "Error_On", "Error_Off"
+    _defaults = "Delay", "XESOn_Norm", "XESOff_Norm", "TTSteps", "Error_On", "Error_Off", "RowWOffset", "TimeSteps", "XESDiff", "EnergyLabel"
     _default_value = None
     
     def __init__(self, **kwargs):
@@ -50,9 +50,9 @@ class PeaksProcessedData:
     def changeValue(self, **kwargs):
         self.__dict__.update(kwargs)
         
-    def makeProPeaks(self, xasRawData, DorH, FPlots):
-        from makePeaks import makePeaks
+    def makeProPeaks(self, peaksRawData, NumTTSteps, MinTime, MaxTime, ploton):
+        from makeXES import makeXES
         
-        XASOn_Norm, XASOff_Norm, Num_On, Num_Off, Error_On, Error_Off = makePeaks(xasRawData, self, DorH, FPlots)
+        XESOn_Norm, XESOff_Norm, Error_On, Error_Off, TimeSteps = makeXES(self, peaksRawData, NumTTSteps, MinTime, MaxTime, ploton)
         
-        self.__dict__.update(XASOn_Norm = XASOn_Norm, XASOff_Norm = XASOff_Norm, Num_On = Num_On, Num_Off = Num_Off, Error_On = Error_On, Error_Off = Error_Off)
+        self.__dict__.update(XESOn_Norm = XESOn_Norm, XESOff_Norm = XESOff_Norm, Error_On = Error_On, Error_Off = Error_Off, TimeSteps = TimeSteps, XESDiff = (XESOn_Norm-XESOff_Norm)/XESOff_Norm)

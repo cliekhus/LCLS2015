@@ -5,59 +5,53 @@ Created on Mon May 13 17:34:21 2019
 @author: chelsea
 """
 
-def makeXES(NumTTSteps, Diode2, RowlandY, Filter, LOn, XOn, TTDelay, TTSteps, ploton):
+def makeXES(peaksProData, peaksRawData, NumTTSteps, MinTime, MaxTime, ploton):
     
-    from itertools import compress
-    import matplotlib.pyplot as plt
-    
-    XESOn = [0 for y in range(NumTTSteps)]
-    NormFactor_On = [0 for y in range(NumTTSteps)]
-    XESOn_Norm = [0 for y in range(NumTTSteps)]
-    Num_On = [0 for y in range(NumTTSteps)]
-    
-    #Normed = [x/y for x,y in zip(RowlandY, Diode2)]
+    from makeOneFilter import makeOneFilter
+    from scipy.stats import sem
+    from makeIntensityFilter import makeLineFilter
+    import numpy as np
 
-    off = [not a and b for a,b in zip(LOn, Filter)]
-    #off = FilterOff
-    XESOff = sum(list(compress(RowlandY, off)))
-    
-    NormFactor_Off = sum(list(compress(Diode2, off)))
-    Num_Off = sum([int(x) for x in off])
-    
-    if Num_Off == 0:
-        XESOff_Norm = 0
-    else:
-        XESOff_Norm = XESOff/NormFactor_Off
-        #XESOff_Norm = XESOff/Num_Off
-        #XESOff_Norm = sum(list(compress(Normed, off)))/Num_Off
-        
-    for ii in range(NumTTSteps):
-    
-        on = [bool(a) and bool(b) and bool(c >= TTSteps[ii]) and bool(c < TTSteps[ii+1]) and d for a,b,c,d in zip(LOn, Filter, TTDelay, XOn)]
-        XESOn[ii] = sum(list(compress(RowlandY, on)))
-        
-        NormFactor_On[ii] = sum(list(compress(Diode2, on)))
-        Num_On[ii] = sum([int(x) for x in on])
-    
-        if Num_On[ii] == 0:
-            XESOn_Norm[ii] = 0
-        else:
-            XESOn_Norm[ii] = XESOn[ii]/NormFactor_On[ii]
-            #XESOn_Norm[ii] = XESOn[ii]/Num_On[ii]
-            #XESOn_Norm[ii] = sum(list(compress(Normed, on)))/Num_On[ii]
 
-                
-    if ploton:
-        
-        plt.figure()
-        plt.plot(TTSteps[1:],XESOn_Norm)
-        plt.plot([TTSteps[1], TTSteps[-1]], [XESOff_Norm, XESOff_Norm])
-        plt.xlabel('time')
-        plt.ylabel('XES')
-        
-        plt.figure()
-        plt.plot(TTSteps[1:],NormFactor_On)
-        plt.xlabel('time')
-        plt.ylabel('norm factor')
+    SpectraOn = np.empty(NumTTSteps-1)
+    SpectraOff = np.empty(NumTTSteps-1)
+    ErrorOn = np.empty(NumTTSteps-1)
+    ErrorOff = np.empty(NumTTSteps-1)
+    TimeSteps = np.linspace(MinTime, MaxTime, NumTTSteps)
+    
+    
+    Filter, TTFilter = makeOneFilter(peaksRawData, ploton)
+    #SlopeFilter, Offset = makeLineFilter(peaksRawData.Diode2, peaksRawData.RowlandY, np.logical_and(Filter, TTFilter), ploton)
+    SlopeFilter, Offset = makeLineFilter(peaksRawData.CspadSum, peaksRawData.RowlandY, np.logical_and(Filter, TTFilter), ploton)
+    AllFilter = np.logical_and.reduce((Filter, TTFilter, SlopeFilter))
+    
+    filteroff = np.logical_and.reduce((SlopeFilter, np.logical_not(peaksRawData.LOn), peaksRawData.XOn))
+    #SpectraOff = np.sum(peaksProData.RowWOffset[filteroff])/np.sum(peaksRawData.Diode2[filteroff])
+    SpectraOff = np.sum(peaksProData.RowWOffset[filteroff])/np.sum(peaksRawData.CspadSum[filteroff])
+    ErrorOff = sem(peaksProData.RowWOffset[filteroff]/peaksRawData.CspadSum[filteroff])
             
-    return XESOn_Norm, XESOff_Norm, Num_On, Num_Off, NormFactor_Off, NormFactor_On
+    indices2delete = []
+    
+    for ii in range(len(TimeSteps)-1):
+
+        selectTime = np.logical_and(peaksProData.Delay < TimeSteps[ii+1], peaksProData.Delay >= TimeSteps[ii])
+        filteron = np.logical_and.reduce((AllFilter, selectTime, peaksRawData.LOn, peaksRawData.XOn))
+
+        if np.sum(filteron.astype('int')) > 0 and np.sum(filteroff.astype('int')) > 0:
+    
+            SpectraOn[ii] = np.sum(peaksProData.RowWOffset[filteron])/np.sum(peaksRawData.CspadSum[filteron])
+            #SpectraOn[ii] = np.sum(peaksProData.RowWOffset[filteron])/np.sum(peaksRawData.Diode2[filteron])
+            ErrorOn[ii] = sem(peaksProData.RowWOffset[filteron]/peaksRawData.CspadSum[filteron])
+
+        else:
+            
+            indices2delete = indices2delete + [ii]
+
+    SpectraOn = np.delete(SpectraOn, indices2delete)
+    SpectraOff = np.delete(SpectraOff, indices2delete)
+    ErrorOn = np.delete(ErrorOn, indices2delete)
+    ErrorOff = np.delete(ErrorOff, indices2delete)
+    TimeSteps = np.delete(TimeSteps, indices2delete)
+    
+            
+    return SpectraOn, SpectraOff, ErrorOn, ErrorOff, TimeSteps

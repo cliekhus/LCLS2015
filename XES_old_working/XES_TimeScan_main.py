@@ -17,7 +17,7 @@ from APSXESCalibration import convertAngle2Energy
 import pickle
 from makeSpectralPlot import makeSpectralPlot
 
-ReEnterData = False
+ReEnterData = True
 FPlots = False
 
 NumTTSteps = 100
