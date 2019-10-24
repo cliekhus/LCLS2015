@@ -22,12 +22,12 @@ def makeXES(peaksProData, peaksRawData, NumTTSteps, MinTime, MaxTime, ploton):
     
     Filter, TTFilter = makeOneFilter(peaksRawData, ploton)
     #SlopeFilter, Offset = makeLineFilter(peaksRawData.Diode2, peaksRawData.RowlandY, np.logical_and(Filter, TTFilter), ploton)
-    SlopeFilter, Offset = makeLineFilter(peaksRawData.CspadSum, peaksRawData.RowlandY, np.logical_and(Filter, TTFilter), ploton)
+    SlopeFilter, Offset = makeLineFilter(peaksRawData.CspadSum, peaksRawData.Diode2, np.logical_and(Filter, TTFilter), ploton)
     AllFilter = np.logical_and.reduce((Filter, TTFilter, SlopeFilter))
     
     filteroff = np.logical_and.reduce((SlopeFilter, np.logical_not(peaksRawData.LOn), peaksRawData.XOn))
-    #SpectraOff = np.sum(peaksProData.RowWOffset[filteroff])/np.sum(peaksRawData.Diode2[filteroff])
-    SpectraOff = np.sum(peaksProData.RowWOffset[filteroff])/np.sum(peaksRawData.CspadSum[filteroff])
+    SpectraOff = np.sum(peaksProData.RowWOffset[filteroff])/np.sum(peaksRawData.Diode2[filteroff])
+    #SpectraOff = np.sum(peaksProData.RowWOffset[filteroff])/np.sum(peaksRawData.CspadSum[filteroff])
     ErrorOff = sem(peaksProData.RowWOffset[filteroff]/peaksRawData.CspadSum[filteroff])
             
     indices2delete = []
@@ -39,8 +39,8 @@ def makeXES(peaksProData, peaksRawData, NumTTSteps, MinTime, MaxTime, ploton):
 
         if np.sum(filteron.astype('int')) > 0 and np.sum(filteroff.astype('int')) > 0:
     
-            SpectraOn[ii] = np.sum(peaksProData.RowWOffset[filteron])/np.sum(peaksRawData.CspadSum[filteron])
-            #SpectraOn[ii] = np.sum(peaksProData.RowWOffset[filteron])/np.sum(peaksRawData.Diode2[filteron])
+            #SpectraOn[ii] = np.sum(peaksProData.RowWOffset[filteron])/np.sum(peaksRawData.CspadSum[filteron])
+            SpectraOn[ii] = np.sum(peaksProData.RowWOffset[filteron])/np.sum(peaksRawData.Diode2[filteron])
             ErrorOn[ii] = sem(peaksProData.RowWOffset[filteron]/peaksRawData.CspadSum[filteron])
 
         else:

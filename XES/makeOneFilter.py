@@ -19,19 +19,19 @@ def makeOneFilter(xesRawData, ploton):
 
     NanCheck = np.logical_not(np.logical_or.reduce((np.isnan(xesRawData.Diode2), np.isnan(xesRawData.Ipm2Sum), np.isnan(xesRawData.CspadSum), np.isnan(xesRawData.L3E))))
 
-    IpmNumSTDs = 3
+    IpmNumSTDs = 1
     Ipm2Median = np.nanmedian(xesRawData.Ipm2Sum[xesRawData.XOn])
     Ipm2STD = np.nanstd(xesRawData.Ipm2Sum[xesRawData.XOn])
     IpmFilter = np.abs(xesRawData.Ipm2Sum - Ipm2Median) < Ipm2STD*IpmNumSTDs
                                
     
-    L3ENumSTDs = 3
+    L3ENumSTDs = 1
     L3EMedian = np.nanmedian(xesRawData.L3E[xesRawData.XOn])
     L3ESTD = np.nanstd(xesRawData.L3E[xesRawData.XOn])
     L3EFilter = np.abs(xesRawData.L3E - L3EMedian) < L3ESTD*L3ENumSTDs
     
     
-    CspadSumSTDs = 3
+    CspadSumSTDs = 1
     CspadSumMin = 0.1
     CspadSumMedian = np.nanmedian(xesRawData.CspadSum[xesRawData.XOn])
     CspadSumSTD = np.nanstd(xesRawData.CspadSum[xesRawData.XOn])
@@ -44,7 +44,7 @@ def makeOneFilter(xesRawData, ploton):
     RowlandFilter = np.abs(xesRawData.RowlandY - RowlandMedian) < RowlandSTD*RowlandSTDs
     
     
-    DiodeSTDs = 3
+    DiodeSTDs = 1
     DiodeMin = 0.1
     DiodeMedian = np.nanmedian(xesRawData.Diode2[xesRawData.XOn])
     DiodeSTD = np.nanstd(xesRawData.Diode2[xesRawData.XOn])
@@ -91,13 +91,13 @@ def makeOneFilter(xesRawData, ploton):
     TTValueFilter = np.abs(xesRawData.TimeTool - TTMedian) < TTSTDs*TTSTD
     
     
-    TTAmpSTDs = 2
+    TTAmpSTDs = 1
     TTAmpMedian = np.median(xesRawData.TTAmp[np.logical_and(xesRawData.XOn, xesRawData.LOn)])
     TTAmpSTD = np.std(xesRawData.TTAmp[np.logical_and(xesRawData.XOn, xesRawData.LOn)])
     TTAmpFilter = np.abs(xesRawData.TTAmp - TTAmpMedian) < TTAmpSTDs*TTAmpSTD
     
     
-    TTFWHMSTDs = 2
+    TTFWHMSTDs = 1
     TTFWHMMedian = np.median(xesRawData.TTFWHM[np.logical_and(xesRawData.XOn, xesRawData.LOn)])
     TTFWHMSTD = np.std(xesRawData.TTFWHM[np.logical_and(xesRawData.XOn, xesRawData.LOn)])
     TTFWHMFilter = np.abs(xesRawData.TTFWHM - TTFWHMMedian) < TTFWHMSTDs*TTFWHMSTD

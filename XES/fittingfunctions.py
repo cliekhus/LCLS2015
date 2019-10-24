@@ -37,10 +37,21 @@ def convolved(t,a,rate,offset,t0,sig):
 def combinedconvolved(t, a1, rate1, offset1, a2, rate2, offset2, t0, sig):
     
     tfirst = t[0:int(len(t)/2)]
-    out1 = convolved(tfirst, a1,rate1,offset1, t0,sig)
+    out1 = convolved(tfirst, a1,rate1, offset1, t0, sig)
     
     tsecond = t[int(len(t)/2):]
     out2 = convolved(tsecond, a2, rate2, offset2, t0, sig)
+    
+    return out1+out2
+
+
+def combinedconvolvedzero(t, a1, a2, rate, t0, sig):
+    
+    tfirst = t[0:int(len(t)/2)]
+    out1 = convolved(tfirst, a1, rate, 0, t0, sig)
+    
+    tsecond = t[int(len(t)/2):]
+    out2 = convolved(tsecond, a2, rate, 0, t0, sig)
     
     return out1+out2
 

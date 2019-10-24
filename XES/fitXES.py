@@ -10,14 +10,14 @@ def fitXES(TCentersplus, TCentersminus, XESDiffplus, XESDiffminus, startt0, plot
     import matplotlib.pyplot as plt
     from scipy.optimize import curve_fit
     from fittingfunctions import convolved
-    from fittingfunctions import combinedconvolved
+    from fittingfunctions import combinedconvolvedzero
     import numpy as np
     
     starta = 7
     startrate = 60
     startsig = 7
-    startoffsetp = 2
-    startoffsetm = -2
+    startoffsetp = 0
+    startoffsetm = 0
     
     if ploton:
             
@@ -30,10 +30,10 @@ def fitXES(TCentersplus, TCentersminus, XESDiffplus, XESDiffminus, startt0, plot
         plt.xlabel('time (fs)')
     
 
-    params,cov = curve_fit(combinedconvolved, np.concatenate((TCentersplus,TCentersminus)), np.concatenate((XESDiffplus,XESDiffminus)), p0 = [starta, startrate, startoffsetp, -starta, startrate, startoffsetm, startt0, startsig])
+    params,cov = curve_fit(combinedconvolvedzero, np.concatenate((TCentersplus,TCentersminus)), np.concatenate((XESDiffplus,XESDiffminus)), p0 = [starta, -starta, startrate, startt0, startsig])
     
-    Fitp = convolved(TCentersplus, params[0], params[1], params[2], params[6], params[7])
-    Fitm = convolved(TCentersminus, params[3], params[4], params[5], params[6], params[7])
+    Fitp = convolved(TCentersplus, params[0], params[2], 0, params[3], params[4])
+    Fitm = convolved(TCentersminus, params[1], params[2], 0, params[3], params[4])
     
     if ploton:
             

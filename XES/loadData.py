@@ -16,6 +16,8 @@ def loadData(FileNums, fileSetting, offSetting):
         xesRawData = RDC.XESRawData()
     elif fileSetting == "Peaks":
         xesRawData = RDC.PeaksRawData()
+    elif fileSetting == "XAS":
+        xasRawData = RDC.XASRawData()
 
     
     
@@ -42,7 +44,10 @@ def loadData(FileNums, fileSetting, offSetting):
     #Fill the lists with data from the h5 file
     for filenum in FileNums:
         print(filenum)
-        ScanName = h5py.File('D:\LCLS_Data\XES\ldat_xppj6715_Run' + str(filenum) + '.h5')
+        if fileSetting == "XES" or fileSetting == "Peaks":
+            ScanName = h5py.File('D:\LCLS_Data\XES\ldat_xppj6715_Run' + str(filenum) + '.h5')
+        elif fileSetting == "XAS":
+            ScanName = h5py.File('D:\LCLS_Data\XAS\ldat_xppj6715_Run' + str(filenum) + '.h5')
         
         xOn = np.array(ScanName['/lightStatus/xray'])
         XOn = np.append(XOn, xOn)
@@ -91,11 +96,19 @@ def loadData(FileNums, fileSetting, offSetting):
     if fileSetting == "XES":
         xesRawData.changeValue(XOn = XOn, LOn = LOn, Angle = Var0, Diode2 = Diode2, Ipm2Sum = Ipm2Sum, TimeTool = TimeTool, \
                            TTAmp = TTAmp, TTFWHM = TTFWHM, ScanNum = ScanNum, RowlandY = RowlandY, Offset = Offset, L3E = L3E, CspadSum = CspadSum)
+        return xesRawData
+    
     if fileSetting == "Peaks":
         xesRawData.changeValue(XOn = XOn, LOn = LOn, StageDelay = Var0, Diode2 = Diode2, Ipm2Sum = Ipm2Sum, TimeTool = TimeTool, \
                            TTAmp = TTAmp, TTFWHM = TTFWHM, ScanNum = ScanNum, RowlandY = RowlandY, Offset = Offset, L3E = L3E, CspadSum = CspadSum)
+        return xesRawData
     
-    return xesRawData
+    if fileSetting == "XAS":
+        xasRawData.changeValue(XOn = XOn, LOn = LOn, XEnergyRaw = Var0, Diode2 = Diode2, Ipm2Sum = Ipm2Sum, TimeTool = TimeTool, \
+                           TTAmp = TTAmp, TTFWHM = TTFWHM, ScanNum = ScanNum, RowlandY = RowlandY, Offset = Offset, L3E = L3E, CspadSum = CspadSum)
+        return xasRawData
+    
+    
 
 
 

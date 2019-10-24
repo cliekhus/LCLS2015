@@ -78,9 +78,9 @@ Energyplus = str(round(convertAngle2Energy(ScanNump[0])*1000,1))
 
 if ReEnterData:
 
-    #FileNums = list(range(180,188+1))
+    FileNums = list(range(180,188+1))
     #FileNums = list(range(180,180+1))
-    FileNums = list(range(165, 178+1))
+    #FileNums = list(range(165, 178+1))
     
     #FileNums = list(range(155, 158+1)) + list(range(160, 164+1))
     XOnm, LOnm, StageDelaym, Diode2m, Ipm2Summ, TimeToolm, TTAmpm, TTFWHMm, ScanNumm, RowlandYm, RowOffsetm, L3Em, CspadSumm = loadData(FileNums, False, 1)

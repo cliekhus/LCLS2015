@@ -26,7 +26,7 @@ def makeLineFilter(Cspad, Diode2, selectedRuns, ploton):
             
             plt.plot(Cspad, line(Cspad))
         
-        numstds = 2
+        numstds = 1
         slopefilter = np.abs(res) < numstds*statstdev
         
         plotfilter = np.logical_and(np.abs(res) < numstds*statstdev, selectedRuns)

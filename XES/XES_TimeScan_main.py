@@ -17,13 +17,13 @@ ReEnterData = False
 FPlots = False
 
 NumTTSteps = 100
-NumTTStepsPlots = 50
+NumTTStepsPlots = 100
 
 MinTime = -2000
 MaxTime = 0
 
 MinTimePlots = -250
-MaxTimePlots = 1500
+MaxTimePlots = 1400
 
 
 #plus data
@@ -63,8 +63,7 @@ TCentersP = (peaksProDataP.TimeSteps[:-1]+peaksProDataP.TimeSteps[1:])/2
 TCentersM = (peaksProDataM.TimeSteps[:-1]+peaksProDataM.TimeSteps[1:])/2
 Fit1, Fit2, params, info = fitXES(TCentersP, TCentersM, peaksProDataP.XESDiff, peaksProDataM.XESDiff, -1534, FPlots)
 
-t0 = params[6]
-print(t0)
+t0 = params[3]
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_conversion_info/"
 with open(folder + "t0.pkl", "wb") as f:

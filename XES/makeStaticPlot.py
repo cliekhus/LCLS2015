@@ -17,7 +17,7 @@ def makeStaticPlot(xesProData):
     xlimL = xesProData.KaEnergy[xesProData.XESOff_Norm.argmax()]-xlimspan
     xlimH = xesProData.KaEnergy[xesProData.XESOff_Norm.argmax()]+xlimspan
     
-    plt.figure(figsize = (4,4))
+    plt.figure(figsize = (4,5))
     
     gridspec.GridSpec(10,1)
 

@@ -43,8 +43,6 @@ def loadData(FileNums, fileSetting, offSetting):
         print(filenum)
         if fileSetting == "XAS":
             ScanName = h5py.File('D:\LCLS_Data\XAS\ldat_xppj6715_Run' + str(filenum) + '.h5')
-        elif fileSetting == "XES":
-            ScanName = h5py.File('D:\LCLS_Data\XES\ldat_xppj6715_Run' + str(filenum) + '.h5')
         elif fileSetting == "Peaks":
             ScanName = h5py.File('D:\LCLS_Data\Peaks\ldat_xppj6715_Run' + str(filenum) + '.h5')
         
@@ -93,7 +91,7 @@ def loadData(FileNums, fileSetting, offSetting):
     LOn = LOn.astype(bool)
         
     if fileSetting == "XAS":
-        xasRawData.changeValue(XOn = XOn, LOn = LOn, Angle = Var0, Diode2 = Diode2, Ipm2Sum = Ipm2Sum, TimeTool = TimeTool, \
+        xasRawData.changeValue(XOn = XOn, LOn = LOn, XEnergyRaw = Var0, Diode2 = Diode2, Ipm2Sum = Ipm2Sum, TimeTool = TimeTool, \
                            TTAmp = TTAmp, TTFWHM = TTFWHM, ScanNum = ScanNum, RowlandY = RowlandY, Offset = Offset, L3E = L3E, CspadSum = CspadSum)
     if fileSetting == "Peaks":
         xasRawData.changeValue(XOn = XOn, LOn = LOn, StageDelay = Var0, Diode2 = Diode2, Ipm2Sum = Ipm2Sum, TimeTool = TimeTool, \

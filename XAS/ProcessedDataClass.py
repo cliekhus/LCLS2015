@@ -7,7 +7,7 @@ Created on Mon Jun 24 17:19:10 2019
 
 class XASProcessedData:
     
-    _defaults = "TTDelay", "XEnergy", "UniXEnergy", "XASOn_Norm", "XASOff_Norm", "EnergyPlot", "Num_On", "Num_Off", "TTSteps", "Error_On", "Error_Off"
+    _defaults = "TTDelay", "XEnergy", "UniXEnergy", "XASOn_Norm", "XASOff_Norm", "EnergyPlot", "Num_On", "Num_Off", "Error_On", "Error_Off"
     _default_value = None
     
     def __init__(self, **kwargs):

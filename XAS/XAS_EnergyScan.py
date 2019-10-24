@@ -18,7 +18,7 @@ from APSXASCalibration import findEnergyShift
 import ProcessedDataClass as PDC
 import pickle
 
-ReEnterData = False
+ReEnterData = True
 FPlots = False
 ReLoadData = False
 SaveData = False
@@ -35,7 +35,7 @@ if ReEnterData:
 
     FileNums = list(range(372, 395+1))
     #FileNums = list(range(371,373+1))+list(range(375,377+1))+list(range(379,382+1))+list(range(384,391+1))+list(range(393,394+1))
-    #FileNums = list(range(372, 374+1))
+    #FileNums = list(range(372, 372+1))
     xasRawData = loadData(FileNums, "XAS", 1)
 
 
@@ -65,7 +65,7 @@ for ii in range(NumTTSteps):
     peakchoice = np.logical_and(xasProData.EnergyPlot >= np.float64(7114.5), xasProData.EnergyPlot <= np.float64(7117.5))
     Peak[ii] = sum(xasdiff[peakchoice])/sum(xasProData.XASOff_Norm[peakchoice])
 
-t0 = find_t0_XAS(xasProData.TTSteps, Peak, True)
+t0 = find_t0_XAS(xasProData.TTSteps, Peak, True, FPlots)
 EnergyShift = findEnergyShift(xasProData.XASOff_Norm, xasProData.UniXEnergy, True)
 EnergyShift = 1
 

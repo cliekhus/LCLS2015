@@ -19,7 +19,7 @@ class XESProcessedData:
         self.__dict__.update(kwargs)
         
     def makeProXES(self, xesRawData, MaxTime, MinTime, FPlots):
-        from makeStaticXES import makeStaticXES
+        from makeStatic import makeStaticXES
         
         XESOn_Norm, XESOff_Norm, Error_On, Error_Off = makeStaticXES(xesRawData, self, MaxTime, MinTime, FPlots)
         
@@ -36,6 +36,42 @@ class XESProcessedData:
         from makeStaticPlot import makeStaticPlot
         
         makeStaticPlot(self)
+        
+        
+        
+class XASProcessedData:
+    
+    _defaults = "TTDelay", "UniXEnergy", "XASOn_Norm", "XASOff_Norm", "Error_On", "Error_Off", "RowWOffset", "XEnergy"
+    _default_value = None
+    
+    def __init__(self, **kwargs):
+
+        self.__dict__.update(dict.fromkeys(self._defaults, self._default_value))
+        self.__dict__.update(kwargs)
+        
+    def changeValue(self, **kwargs):
+        self.__dict__.update(kwargs)
+        
+    def makeProXAS(self, xasRawData, MaxTime, MinTime, DorH, FPlots):
+        from makeStatic import makeStaticXAS
+        
+        XASOn_Norm, XASOff_Norm, Error_On, Error_Off = makeStaticXAS(xasRawData, self, MaxTime, MinTime, DorH, FPlots)
+        
+        self.__dict__.update(XASOn_Norm = XASOn_Norm, XASOff_Norm = XASOff_Norm, Error_On = Error_On, Error_Off = Error_Off)
+        
+    def energyConversion(self, FPlots):
+        from APSXESCalibration import makeConversion
+        
+        LCLSEnergy, slope, x0 = makeConversion(self, FPlots)
+        
+        self.__dict__.update(KaEnergy = LCLSEnergy)
+        
+    def makeStaticPlot(self):
+        from makeStaticPlot import makeStaticPlot
+        
+        makeStaticPlot(self)
+        
+        
 
 class PeaksProcessedData:
     
