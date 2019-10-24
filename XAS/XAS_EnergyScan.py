@@ -13,7 +13,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from find_t0 import find_t0_XAS
 from loadData import loadData
-from scipy.signal import savgol_filter
 from APSXASCalibration import findEnergyShift
 import ProcessedDataClass as PDC
 import pickle
@@ -22,7 +21,7 @@ ReEnterData = True
 FPlots = False
 ReLoadData = False
 SaveData = False
-folder = "D://LCLS_Data/LCLS_python_data/XAS/"
+folder = "D://LCLS_Data/LCLS_python_data/XAS_Spectra/"
 
 DorH = False #True is diode, False is HERFD
 

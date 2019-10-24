@@ -21,7 +21,7 @@ ReEnterData = False
 FPlots = False
 ReLoadData = False
 SaveData = False
-folder = "D://LCLS_Data/LCLS_python_data/Peaks/"
+folder = "D://LCLS_Data/LCLS_python_data/XAS_Peaks/"
 
 DorH = False #True is diode, False is HERFD
 

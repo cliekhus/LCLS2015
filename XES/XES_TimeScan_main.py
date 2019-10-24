@@ -13,8 +13,12 @@ import pickle
 import ProcessedDataClass as PDC
 from makeTimePlot import makeTimePlot
 
-ReEnterData = False
+
+folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
+ReEnterData = True
 FPlots = False
+ReLoadData = False
+SaveData = True
 
 NumTTSteps = 100
 NumTTStepsPlots = 100
@@ -33,11 +37,14 @@ if ReEnterData:
     FileNumsP = list(range(155, 164+1))
     #FileNumsP = list(range(155, 155+1))
     peaksRawDataP = loadData(FileNumsP, "Peaks", 1)
+    
+if ReLoadData:
+
+    with open(folder + "peaksRawDataP.pkl", "rb") as f:
+        peaksRawDataP = pickle.load(f)
 
 peaksProDataP = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP.TimeTool + peaksRawDataP.StageDelay*1e15, RowWOffset = peaksRawDataP.RowlandY - peaksRawDataP.Offset)
 peaksProDataP.makeProPeaks(peaksRawDataP, NumTTSteps, MinTime, MaxTime, FPlots)
-
-
 
 
 
@@ -51,6 +58,11 @@ if ReEnterData:
     #FileNumsM = list(range(180,180+1))
     #FileNumsM = list(range(165, 178+1))
     peaksRawDataM = loadData(FileNumsM, "Peaks", 1)
+    
+if ReLoadData:
+
+    with open(folder + "peaksRawDataM.pkl", "rb") as f:
+        peaksRawDataM = pickle.load(f)
 
 peaksProDataM = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataM.TimeTool + peaksRawDataM.StageDelay*1e15, RowWOffset = peaksRawDataM.RowlandY - peaksRawDataM.Offset)
 peaksProDataM.makeProPeaks(peaksRawDataM, NumTTSteps, MinTime, MaxTime, FPlots)
@@ -97,7 +109,19 @@ makeTimePlot(TCentersPF, TCentersMF, peaksProDataPF, peaksProDataMF, MinTimePlot
 
 
 
-
+if SaveData:
+        
+    with open(folder + "peaksRawDataP.pkl", "wb") as f:
+        pickle.dump(peaksRawDataP, f)
+        
+    with open(folder + "peaksRawDataM.pkl", "wb") as f:
+        pickle.dump(peaksRawDataM, f)
+            
+    with open(folder + "peaksProDataP.pkl", "wb") as f:
+        pickle.dump(peaksProDataP, f)
+        
+    with open(folder + "peaksProDataM.pkl", "wb") as f:
+        pickle.dump(peaksProDataM, f)
 
 
 
