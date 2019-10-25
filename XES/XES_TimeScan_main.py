@@ -15,19 +15,19 @@ from makeTimePlot import makeTimePlot
 
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
-ReEnterData = True
+ReEnterData = False
 FPlots = False
 ReLoadData = False
-SaveData = True
+SaveData = False
 
 NumTTSteps = 100
-NumTTStepsPlots = 50
+NumTTStepsPlots = 75
 
 MinTime = -2000
 MaxTime = 0
 
-MinTimePlots = -250
-MaxTimePlots = 1400
+MinTimePlots = -500
+MaxTimePlots = 1500
 
 
 #plus data
@@ -37,7 +37,7 @@ if ReEnterData:
     FileNumsP = list(range(143, 154+1))
     #FileNumsP = list(range(155, 164+1))
     #FileNumsP = list(range(155, 155+1))
-    #FileNumsP = list(range(122, 130+1))
+    #FileNumsP = list(range(122, 130+1))+list(range(143, 154+1))
     peaksRawDataP = loadData(FileNumsP, "Peaks", 1)
     
 if ReLoadData:

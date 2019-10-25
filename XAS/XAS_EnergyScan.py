@@ -17,7 +17,7 @@ from APSXASCalibration import findEnergyShift
 import ProcessedDataClass as PDC
 import pickle
 
-ReEnterData = True
+ReEnterData = False
 FPlots = False
 ReLoadData = False
 SaveData = False
@@ -44,7 +44,7 @@ if ReLoadData:
         xasRawData = pickle.load(f)
 
 xasProData = PDC.XASProcessedData(TTSteps = np.linspace(-200,100,NumTTSteps+1), TTDelay = 1000*xasRawData.TimeTool, \
-                              XEnergy = np.round(xasRawData.XEnergyRaw*500,1)*2)
+                              XEnergy = np.round(xasRawData.XEnergyRaw*1000,1)*1)
 uniXEnergy = np.unique(xasProData.XEnergy)
 xasProData.changeValue(UniXEnergy = uniXEnergy[np.logical_and(uniXEnergy >= 7108, uniXEnergy <= 7120)])
 xasProData.makeProXAS(xasRawData, DorH, FPlots)
@@ -83,9 +83,7 @@ xasProData_t0.makeProXAS(xasRawData, DorH, FPlots)
 
 XASDiffPlot = np.empty((NumTTStepsPlots, len(xasProData_t0.UniXEnergy)))
 XASDiffError = np.empty((NumTTStepsPlots, len(xasProData_t0.UniXEnergy)))
-PeakA = np.empty(NumTTStepsPlots)
-PeakB = np.empty(NumTTStepsPlots)
-PeakC = np.empty(NumTTStepsPlots)
+
 Times = np.empty(0)
 
 for ii in range(NumTTStepsPlots):
@@ -95,12 +93,6 @@ for ii in range(NumTTStepsPlots):
     xasdifferror = np.sqrt((np.square(xasProData_t0.Error_On[ii,:])+np.square(xasProData_t0.Error_Off))/np.square(xasProData_t0.XASOff_Norm)+np.square(xasProData_t0.Error_Off)*np.square(xasdiff)/np.square(np.square(xasProData_t0.XASOff_Norm)))
     XASDiffError[ii,:] = xasdifferror
     
-    peakchoiceA = np.logical_and(xasProData_t0.EnergyPlot >= np.float64(7111), xasProData_t0.EnergyPlot <= np.float64(7111.5))
-    PeakA[ii] = sum(xasdiff[peakchoiceA])/sum(xasProData_t0.XASOff_Norm[peakchoiceA])
-    peakchoiceB = np.logical_and(xasProData_t0.EnergyPlot >= np.float64(7113.5), xasProData_t0.EnergyPlot <= np.float64(7114.5))
-    PeakB[ii] = sum(xasdiff[peakchoiceB])/sum(xasProData_t0.XASOff_Norm[peakchoiceB])
-    peakchoiceC = np.logical_and(xasProData_t0.EnergyPlot >= np.float64(7116), xasProData_t0.EnergyPlot <= np.float64(7117.5))
-    PeakC[ii] = sum(xasdiff[peakchoiceC])/sum(xasProData_t0.XASOff_Norm[peakchoiceC])
     Times = np.append(Times,(xasProData_t0.TTSteps[ii]+xasProData_t0.TTSteps[ii+1])/2)
     
 XASDiffError[np.isnan(XASDiffError)] = 0
@@ -116,12 +108,6 @@ plt.xlabel('x-ray energy (eV)')
 plt.ylabel('change in x-ray absorption')
 plt.legend()
 
-fig = plt.figure()
-plt.plot(Times, PeakA, label = "Peak A, 7111 - 7111.5 eV")
-plt.plot(Times, PeakB, label = "Peak B, 7113.5 - 7114.5 eV")
-plt.plot(Times, PeakC, label = "Peak C, 7116 - 7117.5 eV")
-plt.xlabel('time delay (fs)')
-plt.legend()
 
 
 

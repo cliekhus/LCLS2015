@@ -13,17 +13,21 @@ def makeOneDiodeFilter(xasRawData, selectedRuns, ploton):
     if ploton:
             
         plt.figure()
+        #plt.scatter(xasRawData.Ipm2Sum[selectedRuns], xasRawData.Diode2[selectedRuns],s=2)
         plt.scatter(xasRawData.CspadSum[selectedRuns], xasRawData.Diode2[selectedRuns],s=2)
     
     if sum(selectedRuns.astype(int))>0:
             
+        #linfit = np.polyfit(xasRawData.Ipm2Sum[selectedRuns], xasRawData.Diode2[selectedRuns], 1)
         linfit = np.polyfit(xasRawData.CspadSum[selectedRuns], xasRawData.Diode2[selectedRuns], 1)
         line = np.poly1d(linfit)
+        #res = line(xasRawData.Ipm2Sum)-xasRawData.Diode2
         res = line(xasRawData.CspadSum)-xasRawData.Diode2
         statstdev = np.std(res[selectedRuns])
     
         if ploton:
             
+            #plt.plot(xasRawData.Ipm2Sum, line(xasRawData.Ipm2Sum))
             plt.plot(xasRawData.CspadSum, line(xasRawData.CspadSum))
         
         numstds = 3
@@ -33,6 +37,7 @@ def makeOneDiodeFilter(xasRawData, selectedRuns, ploton):
         
         if ploton:
             
+            #plt.scatter(xasRawData.Ipm2Sum[plotfilter], xasRawData.Diode2[plotfilter], s=2, c='r')
             plt.scatter(xasRawData.CspadSum[plotfilter], xasRawData.Diode2[plotfilter], s=2, c='r')
             plt.ylabel('diode2')
             plt.xlabel('cspadsum')

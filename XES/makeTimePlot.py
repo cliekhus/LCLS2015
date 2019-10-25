@@ -46,6 +46,37 @@ def makeTimePlot(TCentersP, TCentersM, peaksProDataP, peaksProDataM, minTime, ma
     plt.ylabel('residuals')
     plt.xlabel('time delay (fs)')
     plt.tight_layout()
+    
+    
+    
+    
+    ErrorM = np.sqrt((peaksProDataM.Error_On)**2 + (peaksProDataM.Error_Off)**2)/peaksProDataM.XESOn_Norm
+    ErrorP = np.sqrt((peaksProDataP.Error_On)**2 + (peaksProDataP.Error_Off)**2)/peaksProDataP.XESOn_Norm
+    
+    plt.figure(figsize = (4,5))
+    
+    gridspec.GridSpec(10,1)
+    
+    ax = plt.subplot2grid((10,1), (0,0), colspan = 1, rowspan = 7)
+    plt.errorbar(TCentersM, peaksProDataM.XESDiff, ErrorM, marker = 's', color = minuscolor, label = str(peaksProDataM.EnergyLabel) +' eV', markersize = 3)
+    plt.errorbar(TCentersP, peaksProDataP.XESDiff, ErrorP, marker = 'o', color = pluscolor, label = str(peaksProDataP.EnergyLabel) +' eV', markersize = 3)
+    plt.plot(tt, convolved(tt, params[1], params[2], 0, params[3], params[4]), '--', color = darkminuscolor, label = str(peaksProDataM.EnergyLabel) +' eV fit')
+    plt.plot(tt, convolved(tt, params[0], params[2], 0, params[3], params[4]), color = darkpluscolor, label = str(peaksProDataP.EnergyLabel) +' eV fit')
+    plt.ylabel('$\Delta$ emission')
+    plt.legend()
+    plt.tight_layout()
+    ax.set_xticklabels([])
+    
+    Residualp = peaksProDataP.XESDiff - Fitp
+    Residualm = peaksProDataM.XESDiff - Fitm
+    
+    ax = plt.subplot2grid((10,1), (7,0), colspan = 1, rowspan = 3)
+    plt.errorbar(TCentersM, Residualm, ErrorM, marker = 's', color = minuscolor, label = str(peaksProDataM.EnergyLabel) +' eV', markersize = 3)
+    plt.errorbar(TCentersP, Residualp, ErrorP, marker = 'o', color = pluscolor, label = str(peaksProDataP.EnergyLabel) +' eV', markersize = 3)
+    plt.ylabel('residuals')
+    plt.xlabel('time delay (fs)')
+    plt.tight_layout()
+    
 
     
     HammingWindowp = np.hamming(len(Residualp))

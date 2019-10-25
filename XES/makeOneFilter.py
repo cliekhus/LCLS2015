@@ -51,7 +51,7 @@ def makeOneFilter(xesRawData, ploton):
     DiodeFilter = np.logical_and(np.abs(xesRawData.Diode2 - DiodeMedian) < DiodeSTD*DiodeSTDs, xesRawData.Diode2 > DiodeMin*DiodeMedian)
     
     
-    AllFilter = np.logical_and.reduce((IpmFilter, L3EFilter, CspadSumFilter, RowlandFilter, DiodeFilter, NanCheck))
+    AllFilter = np.logical_and.reduce((IpmFilter, L3EFilter, CspadSumFilter, RowlandFilter, DiodeFilter, NanCheck. xesRawData.XOn))
     
     if ploton:
         plt.figure()
@@ -91,13 +91,13 @@ def makeOneFilter(xesRawData, ploton):
     TTValueFilter = np.abs(xesRawData.TimeTool - TTMedian) < TTSTDs*TTSTD
     
     
-    TTAmpSTDs = 1
+    TTAmpSTDs = 3
     TTAmpMedian = np.median(xesRawData.TTAmp[np.logical_and(xesRawData.XOn, xesRawData.LOn)])
     TTAmpSTD = np.std(xesRawData.TTAmp[np.logical_and(xesRawData.XOn, xesRawData.LOn)])
     TTAmpFilter = np.abs(xesRawData.TTAmp - TTAmpMedian) < TTAmpSTDs*TTAmpSTD
     
     
-    TTFWHMSTDs = 1
+    TTFWHMSTDs = 3
     TTFWHMMedian = np.median(xesRawData.TTFWHM[np.logical_and(xesRawData.XOn, xesRawData.LOn)])
     TTFWHMSTD = np.std(xesRawData.TTFWHM[np.logical_and(xesRawData.XOn, xesRawData.LOn)])
     TTFWHMFilter = np.abs(xesRawData.TTFWHM - TTFWHMMedian) < TTFWHMSTDs*TTFWHMSTD
