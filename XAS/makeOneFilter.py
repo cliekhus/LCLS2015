@@ -25,7 +25,7 @@ def makeOneFilter(xasRawData, ploton):
     IpmFilter = np.abs(xasRawData.Ipm2Sum - Ipm2Median) < Ipm2STD*IpmNumSTDs
                                
     
-    L3ENumSTDs = 1
+    L3ENumSTDs = 3
     L3EMedian = np.nanmedian(xasRawData.L3E[xasRawData.XOn])
     L3ESTD = np.nanstd(xasRawData.L3E[xasRawData.XOn])
     L3EFilter = np.abs(xasRawData.L3E - L3EMedian) < L3ESTD*L3ENumSTDs
@@ -85,19 +85,19 @@ def makeOneFilter(xasRawData, ploton):
         plt.xlabel('shotnumber')
     
     
-    TTSTDs = 3
+    TTSTDs = 5
     TTMedian = np.median(xasRawData.TimeTool[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
     TTSTD = np.std(xasRawData.TimeTool[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
     TTValueFilter = np.abs(xasRawData.TimeTool - TTMedian) < TTSTDs*TTSTD
     
     
-    TTAmpSTDs = 1
+    TTAmpSTDs = 3
     TTAmpMedian = np.median(xasRawData.TTAmp[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
     TTAmpSTD = np.std(xasRawData.TTAmp[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
     TTAmpFilter = np.abs(xasRawData.TTAmp - TTAmpMedian) < TTAmpSTDs*TTAmpSTD
     
     
-    TTFWHMSTDs = 1
+    TTFWHMSTDs = 3
     TTFWHMMedian = np.median(xasRawData.TTFWHM[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
     TTFWHMSTD = np.std(xasRawData.TTFWHM[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
     TTFWHMFilter = np.abs(xasRawData.TTFWHM - TTFWHMMedian) < TTFWHMSTDs*TTFWHMSTD

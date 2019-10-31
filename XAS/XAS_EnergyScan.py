@@ -16,22 +16,27 @@ from loadData import loadData
 from APSXASCalibration import findEnergyShift
 import ProcessedDataClass as PDC
 import pickle
+import scipy.signal as ss
+from fitXASDiff import fitXASDiff
+import matplotlib.gridspec as gridspec
 
 ReEnterData = False
 FPlots = False
-ReLoadData = False
+ReLoadData = True
 SaveData = False
 folder = "D://LCLS_Data/LCLS_python_data/XAS_Spectra/"
 
-DorH = False #True is diode, False is HERFD
+DorH = True #True is diode, False is HERFD
 
 
-
+  
 NumTTSteps = 40
-NumTTStepsPlots = 5
+MinTime = -15
+MaxTime = 15
 
 if ReEnterData:
-
+    
+    #FileNums = list(range(384, 395+1))
     FileNums = list(range(372, 395+1))
     #FileNums = list(range(371,373+1))+list(range(375,377+1))+list(range(379,382+1))+list(range(384,391+1))+list(range(393,394+1))
     #FileNums = list(range(372, 372+1))
@@ -65,7 +70,7 @@ for ii in range(NumTTSteps):
     Peak[ii] = sum(xasdiff[peakchoice])/sum(xasProData.XASOff_Norm[peakchoice])
 
 t0 = find_t0_XAS(xasProData.TTSteps, Peak, True, FPlots)
-EnergyShift = findEnergyShift(xasProData.XASOff_Norm, xasProData.UniXEnergy, True)
+EnergyShift = findEnergyShift(xasProData.XASOff_Norm, xasProData.UniXEnergy, FPlots)
 EnergyShift = 1
 
 
@@ -73,68 +78,19 @@ EnergyShift = 1
 
 
 
-
-xasProData_t0 = PDC.XASProcessedData(TTSteps = np.linspace(-150,100,NumTTStepsPlots+1), TTDelay = 1000*xasRawData.TimeTool-t0, \
-                              XEnergy = np.round((xasRawData.XEnergyRaw+EnergyShift/1000)*200,1)*5)
-uniXEnergy = np.unique(xasProData_t0.XEnergy)
-xasProData_t0.changeValue(UniXEnergy = uniXEnergy[np.logical_and(uniXEnergy >= 7110, uniXEnergy <= 7120)])
-xasProData_t0.makeProXAS(xasRawData, DorH, FPlots)
-
-
-XASDiffPlot = np.empty((NumTTStepsPlots, len(xasProData_t0.UniXEnergy)))
-XASDiffError = np.empty((NumTTStepsPlots, len(xasProData_t0.UniXEnergy)))
-
-Times = np.empty(0)
-
-for ii in range(NumTTStepsPlots):
-    
-    xasdiff = xasProData_t0.XASOn_Norm[ii] - xasProData_t0.XASOff_Norm
-    XASDiffPlot[ii,:] = xasdiff
-    xasdifferror = np.sqrt((np.square(xasProData_t0.Error_On[ii,:])+np.square(xasProData_t0.Error_Off))/np.square(xasProData_t0.XASOff_Norm)+np.square(xasProData_t0.Error_Off)*np.square(xasdiff)/np.square(np.square(xasProData_t0.XASOff_Norm)))
-    XASDiffError[ii,:] = xasdifferror
-    
-    Times = np.append(Times,(xasProData_t0.TTSteps[ii]+xasProData_t0.TTSteps[ii+1])/2)
-    
-XASDiffError[np.isnan(XASDiffError)] = 0
-
-
-fig = plt.figure()
-
-for ii in range(NumTTStepsPlots):
-    
-    plt.plot(xasProData_t0.EnergyPlot, XASDiffPlot[ii]/xasProData_t0.XASOff_Norm, marker='.', label = str(round(xasProData_t0.TTSteps[ii],0)) + ' to ' + str(round(xasProData_t0.TTSteps[ii+1])) + ' fs delay')
-
-plt.xlabel('x-ray energy (eV)')
-plt.ylabel('change in x-ray absorption')
-plt.legend()
-
-
-
-
-
-
-xasProData_one = PDC.XASProcessedData(TTSteps = np.linspace(-25,25,1+1), TTDelay = 1000*xasRawData.TimeTool-t0, \
+xasProData_one = PDC.XASProcessedData(TTSteps = np.linspace(MinTime,MaxTime,2), TTDelay = 1000*xasRawData.TimeTool-t0, \
                               XEnergy = np.round((xasRawData.XEnergyRaw+EnergyShift/1000)*200,1)*5)
 uniXEnergy = np.unique(xasProData_one.XEnergy)
 xasProData_one.changeValue(UniXEnergy = uniXEnergy[np.logical_and(uniXEnergy >= 7110, uniXEnergy <= 7120)])
 xasProData_one.makeProXAS(xasRawData, DorH, FPlots)
 
-XASDiffPlot = np.empty((NumTTStepsPlots, len(xasProData_one.UniXEnergy)))
-XASDiffError = np.empty((NumTTStepsPlots, len(xasProData_one.UniXEnergy)))
+XASDiffPlot = xasProData_one.XASOn_Norm[0,:] - xasProData_one.XASOff_Norm
+XASDiffError = np.sqrt(np.square(xasProData_one.Error_On[0,:])+np.square(xasProData_one.Error_Off))/xasProData_one.XASOff_Norm
 
-for ii in range(1):
-    
-    xasdiff = xasProData_one.XASOn_Norm[ii] - xasProData_one.XASOff_Norm
-    XASDiffPlot[ii,:] = xasdiff
-    xasdifferror = np.sqrt((np.square(xasProData_one.Error_On[ii,:])+np.square(xasProData_one.Error_Off))/np.square(xasProData_one.XASOff_Norm)+np.square(xasProData_one.Error_Off)*np.square(xasdiff)/np.square(np.square(xasProData_one.XASOff_Norm)))
-    XASDiffError[ii,:] = xasdifferror
-    
-XASDiffError[np.isnan(XASDiffError)] = 0
-
-
+                       
 fig = plt.figure()
 
-plt.plot(xasProData_one.EnergyPlot, xasProData_one.XASOn_Norm[0], marker='.', label = str(round(xasProData_one.TTSteps[ii],0)) + ' to ' + str(round(xasProData_one.TTSteps[ii+1])) + ' fs delay')
+plt.plot(xasProData_one.EnergyPlot, xasProData_one.XASOn_Norm[0,:], marker='.', label = str(MinTime) + ' to ' + str(MaxTime) + ' fs delay')
 
 plt.plot(xasProData_one.EnergyPlot, xasProData_one.XASOff_Norm, marker='.', label = 'laser off')
 plt.xlabel('x-ray energy (eV)')
@@ -142,18 +98,30 @@ plt.ylabel('x-ray absorption')
 plt.legend()
 
 
-LegendLabel = []
-fig = plt.figure()
 
-#    plt.errorbar(xasProData_one.EnergyPlot, savgol_filter(XASDiffPlot[ii]/xasProData_one.XASOff_Norm,5,2), XASDiffError[ii], \
-#                 marker='.', label = str(round(xasProData_one.TTSteps[ii],0)) + ' to ' + str(round(xasProData_one.TTSteps[ii+1])) + ' fs delay')
 
-plt.errorbar(xasProData_one.EnergyPlot, XASDiffPlot[ii]/xasProData_one.XASOff_Norm, XASDiffError[ii], \
-             marker='.', label = str(round(xasProData_one.TTSteps[ii],0)) + ' to ' + str(round(xasProData_one.TTSteps[ii+1])) + ' fs delay')
 
+plt.figure(figsize = (4,5))
+
+gridspec.GridSpec(10,1)
+
+ax = plt.subplot2grid((10,1), (0,0), colspan = 1, rowspan = 3)
+plt.errorbar(xasProData_one.EnergyPlot, xasProData_one.XASOff_Norm, xasProData_one.Error_Off, color = 'k')
+plt.ylabel('$I_{off}$')
+ax.set_xticklabels([])
+plt.tight_layout()
+
+ax = plt.subplot2grid((10,1), (3,0), colspan = 1, rowspan = 7)
+plt.errorbar(xasProData_one.EnergyPlot, XASDiffPlot/xasProData_one.XASOff_Norm, XASDiffError, \
+             marker='.', label = str(MinTime) + ' to ' + str(MaxTime) + ' fs delay')
 plt.xlabel('x-ray energy (eV)')
-plt.ylabel('change in x-ray absorption')
+plt.ylabel('$(I_{on}-I_{off})/I_{off}$')
 plt.legend()
+plt.tight_layout()
+    
+
+Fit, Params, note = fitXASDiff(xasProData_one.EnergyPlot,XASDiffPlot, xasProData_one.XASOff_Norm, True)
+
 
 
 

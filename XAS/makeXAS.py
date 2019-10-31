@@ -42,38 +42,42 @@ def makeXAS(xasRawData, xasProData, DorH, ploton):
         
         off = np.logical_and.reduce((np.logical_not(xasRawData.LOn), selectedRuns, DiodeFilterOff))
         
-        NormFactor_Off[jj] = sum(xasRawData.CspadSum[off])
-        #NormFactor_Off[jj] = sum(xasRawData.Ipm2Sum[off])
+        #NormFactor_Off[jj] = sum(xasRawData.CspadSum[off])
+        NormFactor_Off[jj] = sum(xasRawData.Ipm2Sum[off])
         Num_Off[jj] = sum(off.astype(int))
         
         if DorH:
             
             XASOff[jj] = sum(xasRawData.Diode2[off])
             Error_Off[jj] = np.nanstd(xasRawData.Diode2[off]/xasRawData.Ipm2Sum[off])/np.sqrt(Num_Off[jj])
+            #Error_Off[jj] = np.nanstd(xasRawData.Diode2[off]/xasRawData.CspadSum[off])/np.sqrt(Num_Off[jj])
 
         else:
             
             XASOff[jj] = sum(xasRawData.RowlandY[off])
             Error_Off[jj] = np.nanstd(xasRawData.RowlandY[off]/xasRawData.Ipm2Sum[off])/np.sqrt(Num_Off[jj])
+            #Error_Off[jj] = np.nanstd(xasRawData.RowlandY[off]/xasRawData.CspadSum[off])/np.sqrt(Num_Off[jj])
         
         for ii in range(NumTTSteps):
             
             on = np.logical_and.reduce((xasRawData.LOn, selectedRuns, TTFilter, DiodeFilterOn, \
                       (xasProData.TTDelay > xasProData.TTSteps[ii]), (xasProData.TTDelay <= xasProData.TTSteps[ii+1])))
 
-            #NormFactor_On[ii,jj] = sum(xasRawData.Ipm2Sum[on])
-            NormFactor_On[ii,jj] = sum(xasRawData.CspadSum[on])
+            NormFactor_On[ii,jj] = sum(xasRawData.Ipm2Sum[on])
+            #NormFactor_On[ii,jj] = sum(xasRawData.CspadSum[on])
             Num_On[ii,jj] = sum(on.astype(int))
             
             if DorH:
                     
                 XASOn[ii,jj] = sum(xasRawData.Diode2[on])
                 Error_On[ii,jj] = np.nanstd(xasRawData.Diode2[on]/xasRawData.Ipm2Sum[on])/np.sqrt(Num_On[ii,jj])
+                #Error_On[ii,jj] = np.nanstd(xasRawData.Diode2[on]/xasRawData.CspadSum[on])/np.sqrt(Num_On[ii,jj])
                 
             else:
 
                 XASOn[ii,jj] = sum(xasRawData.RowlandY[on])
                 Error_On[ii,jj] = np.nanstd(xasRawData.RowlandY[on]/xasRawData.Ipm2Sum[on])/np.sqrt(Num_On[ii,jj])
+                #Error_On[ii,jj] = np.nanstd(xasRawData.RowlandY[on]/xasRawData.CspadSum[on])/np.sqrt(Num_On[ii,jj])
 
     XASOff_Norm = XASOff/NormFactor_Off
     XASOn_Norm = XASOn/NormFactor_On

@@ -17,7 +17,7 @@ from makeTimePlot import makeTimePlot
 folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
 ReEnterData = False
 FPlots = False
-ReLoadData = False
+ReLoadData = True
 SaveData = False
 
 NumTTSteps = 100
@@ -59,8 +59,8 @@ peaksProDataP.makeProPeaks(peaksRawDataP, NumTTSteps, MinTime, MaxTime, FPlots)
 
 if ReEnterData:
 
-    FileNumsM = list(range(180,188+1))
-    #FileNumsM = list(range(180,180+1))
+    #FileNumsM = list(range(180,188+1))
+    FileNumsM = list(range(180,180+1))
     
     peaksRawDataM = loadData(FileNumsM, "Peaks", 1)
     
