@@ -21,7 +21,7 @@ ReLoadData = True
 SaveData = False
 
 NumTTSteps = 100
-NumTTStepsPlots = 75
+NumTTStepsPlots = 65
 
 MinTime = -2000
 MaxTime = 0

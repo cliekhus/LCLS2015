@@ -8,7 +8,6 @@ Created on Wed Oct 23 14:21:20 2019
 def makeTimePlot(TCentersP, TCentersM, peaksProDataP, peaksProDataM, minTime, maxTime, ploton):
         
     import matplotlib.pyplot as plt
-    from fitXES import fitXESwsine
     from fitXES import fitXES
     import numpy as np
     from fittingfunctions import convolved
@@ -40,13 +39,12 @@ def makeTimePlot(TCentersP, TCentersM, peaksProDataP, peaksProDataM, minTime, ma
     plt.plot(tt, convolved(tt, params[1], params[2], 0, params[3], params[4]), '--', color = darkminuscolor, label = str(peaksProDataM.EnergyLabel) +' eV fit')
     plt.plot(tt, convolved(tt, params[0], params[2], 0, params[3], params[4]), color = darkpluscolor, label = str(peaksProDataP.EnergyLabel) +' eV fit')
     plt.annotate('BET = ' + str(round(params[2]*math.log(2),0)) + ' (fs)', (500, -0.01))
-    plt.annotate('IRF = ' + str(round(params[4],0)) + '(fs)', (500, -0.015))
+    plt.annotate('IRF = ' + str(round(params[4]*math.sqrt(2*math.log(2)),0)) + ' (fs)', (500, -0.015))
     plt.ylabel('$\Delta$ emission')
     plt.legend()
     plt.tight_layout()
     ax.set_xticklabels([])
-    print(params[2])
-    print(params[4])
+
     Residualp = peaksProDataP.XESDiff - Fitp
     Residualm = peaksProDataM.XESDiff - Fitm
     
@@ -76,6 +74,7 @@ def makeTimePlot(TCentersP, TCentersM, peaksProDataP, peaksProDataM, minTime, ma
     plt.plot(Freq, np.abs(FTp), color = pluscolor, label = str(peaksProDataP.EnergyLabel) +' eV')
     plt.ylabel('fourier amplitude')
     plt.xlabel('cm$^{-1}$')
+    plt.xlim([0,500])
     plt.legend()
     plt.tight_layout()
     

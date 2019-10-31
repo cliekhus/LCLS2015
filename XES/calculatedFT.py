@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy import loadtxt
 from makeSpectralPlot import makeSpectralPlot
+import matplotlib.gridspec as gridspec
 
 #plt.close('all')
 
@@ -90,7 +91,25 @@ makeSpectralPlot(calc[:,5], calc[:,0], 50, 500, True)
 
 
 
+plt.figure(figsize = (4,5))
 
+#gridspec.GridSpec(10,1)
+
+#ax = plt.subplot2grid((10,1), (0,0), colspan = 1, rowspan = 7)
+plt.plot(Freq, abs(FT), color='k', label='calculation')
+plt.ylim([0,60])
+plt.xlim([0,500])
+plt.xlabel('frequency (cm$^{-1}$)')
+plt.ylabel('fourier amplitude')
+plt.legend()
+#plt.tight_layout()
+
+
+#ax = plt.subplot2grid((10,1), (7,0), colspan = 1, rowspan = 3)
+#plt.plot(calc[:,0], (calc[:,5]-np.mean(calc[:,5]))/np.max(calc[:,5]-np.mean(calc[:,5])))
+#plt.xlabel('time (fs)')
+#plt.ylabel('1s-2p $\Delta$ energy')
+#plt.tight_layout()
 
 
 

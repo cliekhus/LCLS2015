@@ -38,7 +38,7 @@ def makeOneFilter(xesRawData, ploton):
     CspadSumFilter = np.logical_and(np.abs(xesRawData.CspadSum - CspadSumMedian) < CspadSumSTD*CspadSumSTDs, xesRawData.CspadSum > CspadSumMin*CspadSumMedian)
 
     
-    RowlandSTDs = 3
+    RowlandSTDs = 1
     RowlandMedian = np.nanmedian(xesRawData.RowlandY[xesRawData.XOn])
     RowlandSTD = np.nanstd(xesRawData.RowlandY[xesRawData.XOn])
     RowlandFilter = np.abs(xesRawData.RowlandY - RowlandMedian) < RowlandSTD*RowlandSTDs
