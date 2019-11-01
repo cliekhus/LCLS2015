@@ -23,6 +23,8 @@ def makeTimePlot(TCentersP, TCentersM, peaksProDataP, peaksProDataM, minTime, ma
     
     Fitp, Fitm, params, info = fitXES(TCentersP, TCentersM, peaksProDataP.XESDiff, peaksProDataM.XESDiff, 0, True)
     
+    cov= np.sqrt(np.diag(info))
+    
     Fitp = np.array(convolved(TCentersP, params[0], params[2], 0, params[3], params[4]))
     Fitm = np.array(convolved(TCentersM, params[1], params[2], 0, params[3], params[4]))
 
@@ -38,9 +40,9 @@ def makeTimePlot(TCentersP, TCentersM, peaksProDataP, peaksProDataM, minTime, ma
     plt.plot(TCentersP, peaksProDataP.XESDiff, 'o', color = pluscolor, label = str(peaksProDataP.EnergyLabel) +' eV', markersize = 3)
     plt.plot(tt, convolved(tt, params[1], params[2], 0, params[3], params[4]), '--', color = darkminuscolor, label = str(peaksProDataM.EnergyLabel) +' eV fit')
     plt.plot(tt, convolved(tt, params[0], params[2], 0, params[3], params[4]), color = darkpluscolor, label = str(peaksProDataP.EnergyLabel) +' eV fit')
-    plt.annotate('BET = ' + str(round(params[2]*math.log(2),0)) + ' (fs)', (500, -0.01))
-    plt.annotate('IRF = ' + str(round(params[4]*math.sqrt(2*math.log(2)),0)) + ' (fs)', (500, -0.015))
-    plt.ylabel('$\Delta$ emission')
+    plt.annotate('BET = ' + str(round(params[2]*math.log(2),0)) + ' $\pm $ ' + str(round(cov[2]*math.log(2),0)) + ' (fs)', (300, -0.01))
+    plt.annotate('IRF = ' + str(round(params[4]*math.sqrt(2*math.log(2)),0)) + ' $\pm $ ' + str(round(cov[4]*math.log(2),0)) + ' (fs)', (300, -0.015))
+    plt.ylabel('rel. $\Delta$ emission')
     plt.legend()
     plt.tight_layout()
     ax.set_xticklabels([])

@@ -45,7 +45,7 @@ def fitXES(TCentersplus, TCentersminus, XESDiffplus, XESDiffminus, startt0, plot
         plt.title('end parameters')
         plt.xlabel('time (fs)')
 
-    return Fitp, Fitm, params, 'amplitude1, rate1, amplitude2, rate2, t0, instrument response'
+    return Fitp, Fitm, params, cov
 
 
 
@@ -95,7 +95,7 @@ def fitXESwsine(TCentersplus, TCentersminus, XESDiffplus, XESDiffminus, startt0,
         plt.title('end parameters')
         plt.xlabel('time (fs)')
 
-    return Fitp, Fitm, params, 'amplitude1, rate1, amplitude2, rate2, t0, instrument response'
+    return Fitp, Fitm, params, cov
 
 
 
@@ -146,7 +146,7 @@ def fitXEStwo(TCentersplus, TCentersminus, XESDiffplus, XESDiffminus, startt0, p
         plt.title('end parameters')
         plt.xlabel('time (fs)')
 
-    return Fitp, Fitm, params, 'amplitude1, rate1, amplitude2, rate2, t0, instrument response'
+    return Fitp, Fitm, params, cov
 
 
 

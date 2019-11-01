@@ -3,12 +3,13 @@ def lor(x,sig,x0,a):
     return a/(1+(2*(x-x0)/sig)**2)
 
 
-def xasdiff(x, Amp, sigA,x0Ap, sigB,x0B,x0Bp, sigC,x0C,x0Cp):
+def xasdiff(x, A,sigA,x0Ap, B,Bp,sigB,sigBp,x0B,x0Bp, C,Cp,sigC,sigCp,x0C,x0Cp):
     
-    return Amp*.1/(1+(2*(x-x0Ap)/sigA)**2) + Amp*.49/(1+(2*(x-x0Bp)/sigB)**2) - Amp*.49/(1+(2*(x-x0B)/sigB)**2) + Amp*1.4/(1+(2*(x-x0Cp)/sigC)**2) - Amp*1.4/(1+(2*(x-x0C)/sigC)**2)
+    return (abs(A)/(1+(2*(x-x0Ap)/sigA)**2) + Bp/(1+(2*(x-x0Bp)/sigBp)**2) - B/(1+(2*(x-x0B)/sigB)**2) + Cp/(1+(2*(x-x0Cp)/sigCp)**2) - C/(1+(2*(x-x0C)/sigC)**2))/(B/(1+(2*(x-x0B)/sigB)**2)+C/(1+(2*(x-x0C)/sigC)**2))
 
 
-def xasoff(x, sigB,aB,x0B, sigC,aC,x0C, offset, slope, expamp):
+def xasoff(x, sigB,aB,x0B, sigC,aC,x0C, offset, erfamp, erfslope, peak):
     import numpy as np
+    import math
     
-    return aB/(1+(2*(x-x0B)/sigB)**2) + aC/(1+(2*(x-x0C)/sigC)**2) + offset + expamp*np.exp((x-7110)*slope)
+    return aB/(1+(2*(x-x0B)/sigB)**2) + aC/(1+(2*(x-x0C)/sigC)**2) + offset + erfamp*np.array([math.erf((xx-peak)/erfslope) for xx in x])
