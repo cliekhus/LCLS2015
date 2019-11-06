@@ -19,7 +19,7 @@ def makeOneFilter(xesRawData, ploton):
 
     NanCheck = np.logical_not(np.logical_or.reduce((np.isnan(xesRawData.Diode2), np.isnan(xesRawData.Ipm2Sum), np.isnan(xesRawData.CspadSum), np.isnan(xesRawData.L3E))))
 
-    IpmNumSTDs = 1
+    IpmNumSTDs = 3
     Ipm2Median = np.nanmedian(xesRawData.Ipm2Sum[xesRawData.XOn])
     Ipm2STD = np.nanstd(xesRawData.Ipm2Sum[xesRawData.XOn])
     IpmFilter = np.abs(xesRawData.Ipm2Sum - Ipm2Median) < Ipm2STD*IpmNumSTDs
@@ -31,7 +31,7 @@ def makeOneFilter(xesRawData, ploton):
     L3EFilter = np.abs(xesRawData.L3E - L3EMedian) < L3ESTD*L3ENumSTDs
     
     
-    CspadSumSTDs = 1
+    CspadSumSTDs = 2
     CspadSumMin = 0.1
     CspadSumMedian = np.nanmedian(xesRawData.CspadSum[xesRawData.XOn])
     CspadSumSTD = np.nanstd(xesRawData.CspadSum[xesRawData.XOn])
@@ -49,7 +49,7 @@ def makeOneFilter(xesRawData, ploton):
     DiodeMedian = np.nanmedian(xesRawData.Diode2[xesRawData.XOn])
     DiodeSTD = np.nanstd(xesRawData.Diode2[xesRawData.XOn])
     DiodeFilter = np.logical_and(np.abs(xesRawData.Diode2 - DiodeMedian) < DiodeSTD*DiodeSTDs, xesRawData.Diode2 > DiodeMin*DiodeMedian)
-    
+
     
     AllFilter = np.logical_and.reduce((IpmFilter, L3EFilter, CspadSumFilter, RowlandFilter, DiodeFilter, NanCheck, xesRawData.XOn))
     
@@ -80,12 +80,12 @@ def makeOneFilter(xesRawData, ploton):
         
         plt.figure()
         plt.plot(xesRawData.Diode2)
-        plt.plot(xesRawData.Diode2[RowlandFilter])
+        plt.plot(xesRawData.Diode2[DiodeFilter])
         plt.title('Diode2')
         plt.xlabel('shotnumber')
     
     
-    TTSTDs = 5
+    TTSTDs = 3
     TTMedian = np.median(xesRawData.TimeTool[np.logical_and(xesRawData.XOn, xesRawData.LOn)])
     TTSTD = np.std(xesRawData.TimeTool[np.logical_and(xesRawData.XOn, xesRawData.LOn)])
     TTValueFilter = np.abs(xesRawData.TimeTool - TTMedian) < TTSTDs*TTSTD

@@ -7,23 +7,25 @@ Created on Mon May 20 10:34:43 2019
 
 
 from loadData import loadData
-from fitXES import fitXES
+#from fitXES import fitXES
+from fitXES import fitXESthree
 from APSXESCalibration import convertAngle2Energy
 import pickle
 import ProcessedDataClass as PDC
-from makeTimePlot import makeTimePlot
+#from makeTimePlot import makeTimePlot
+from makeTimePlot import makeTimePlotThree
 
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
 ReEnterData = False
 FPlots = False
-ReLoadData = True
+ReLoadData = False
 SaveData = False
 
 NumTTSteps = 100
 NumTTStepsPlots = 65
 
-MinTime = -2000
+MinTime = -2000 
 MaxTime = 0
 
 MinTimePlots = -500
@@ -34,10 +36,7 @@ MaxTimePlots = 1500
 
 if ReEnterData:
 
-    FileNumsP = list(range(143, 154+1))
-    #FileNumsP = list(range(155, 164+1))
-    #FileNumsP = list(range(155, 155+1))
-    #FileNumsP = list(range(122, 130+1))+list(range(143, 154+1))
+    FileNumsP = list(range(144, 154+1))
     peaksRawDataP = loadData(FileNumsP, "Peaks", 1)
     
 if ReLoadData:
@@ -54,14 +53,32 @@ peaksProDataP.makeProPeaks(peaksRawDataP, NumTTSteps, MinTime, MaxTime, FPlots)
 
 
 
+#plus2 data
+
+if ReEnterData:
+
+    FileNumsP2 = list(range(123, 130+1))
+    peaksRawDataP2 = loadData(FileNumsP2, "Peaks", 1)
+    
+if ReLoadData:
+
+    with open(folder + "peaksRawDataP.pkl", "rb") as f:
+        peaksRawDataP2 = pickle.load(f)
+        
+    with open(folder + "FileNumsP.pkl", "rb") as f:
+        FileNumsP2 = pickle.load(f)
+
+peaksProDataP2 = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP2.TimeTool + peaksRawDataP2.StageDelay*1e15, RowWOffset = peaksRawDataP2.RowlandY - peaksRawDataP2.Offset)
+peaksProDataP2.makeProPeaks(peaksRawDataP2, NumTTSteps, MinTime, MaxTime, FPlots)
+
+
+
 #minus data
 
 
 if ReEnterData:
 
-    #FileNumsM = list(range(180,188+1))
-    FileNumsM = list(range(180,180+1))
-    
+    FileNumsM = list(range(180,188+1))    
     peaksRawDataM = loadData(FileNumsM, "Peaks", 1)
     
 if ReLoadData:
@@ -80,8 +97,10 @@ peaksProDataM.makeProPeaks(peaksRawDataM, NumTTSteps, MinTime, MaxTime, FPlots)
 
 
 TCentersP = (peaksProDataP.TimeSteps[:-1]+peaksProDataP.TimeSteps[1:])/2
+TCentersP2 = (peaksProDataP2.TimeSteps[:-1]+peaksProDataP2.TimeSteps[1:])/2
 TCentersM = (peaksProDataM.TimeSteps[:-1]+peaksProDataM.TimeSteps[1:])/2
-Fit1, Fit2, params, info = fitXES(TCentersP, TCentersM, peaksProDataP.XESDiff, peaksProDataM.XESDiff, -1534, FPlots)
+#Fit1, Fit2, params, info = fitXES(TCentersP, TCentersM, peaksProDataP.XESDiff, peaksProDataM.XESDiff, -1534, True)
+Fit1, Fit2, params, info = fitXESthree(TCentersP, TCentersM, TCentersP2, peaksProDataP.XESDiff, peaksProDataM.XESDiff, peaksProDataP2.XESDiff, -1534, FPlots)
 
 t0 = params[3]
 
@@ -93,13 +112,17 @@ with open(folder_con + "t0.pkl", "wb") as f:
 
 
 
-
 peaksProDataPF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP.TimeTool + peaksRawDataP.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP.RowlandY - peaksRawDataP.Offset)
 peaksProDataPF.makeProPeaks(peaksRawDataP, NumTTStepsPlots, MinTimePlots, MaxTimePlots, FPlots)
-peaksProDataPF.changeValue(EnergyLabel = round(convertAngle2Energy(FileNumsP[0], True)*1000,1))
+peaksProDataPF.changeValue(EnergyLabel = round(convertAngle2Energy(FileNumsP2[0], True)*1000,1))
 TCentersPF = (peaksProDataPF.TimeSteps[:-1]+peaksProDataPF.TimeSteps[1:])/2
 
 
+
+peaksProDataP2F = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP2.TimeTool + peaksRawDataP2.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP2.RowlandY - peaksRawDataP2.Offset)
+peaksProDataP2F.makeProPeaks(peaksRawDataP2, NumTTStepsPlots, MinTimePlots, MaxTimePlots, FPlots)
+peaksProDataP2F.changeValue(EnergyLabel = round(convertAngle2Energy(FileNumsP[0], True)*1000,1))
+TCentersP2F = (peaksProDataP2F.TimeSteps[:-1]+peaksProDataP2F.TimeSteps[1:])/2
 
 
 
@@ -111,7 +134,8 @@ TCentersMF = (peaksProDataMF.TimeSteps[:-1]+peaksProDataMF.TimeSteps[1:])/2
 
 
 
-makeTimePlot(TCentersPF, TCentersMF, peaksProDataPF, peaksProDataMF, MinTimePlots, MaxTimePlots, FPlots)
+#makeTimePlot(TCentersPF, TCentersMF, peaksProDataPF, peaksProDataMF, MinTimePlots, MaxTimePlots, FPlots)
+makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF, peaksProDataP2F, peaksProDataMF, MinTimePlots, MaxTimePlots, FPlots)
 
 
 

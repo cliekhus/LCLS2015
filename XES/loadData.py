@@ -58,11 +58,11 @@ def loadData(FileNums, fileSetting, offSetting):
         ipm2 = ScanName['/ipm2/channels']  #Intensity (and position) monitor #2.  Quad cells 1 and 3 had signal - use these
         Ipm2Sum = np.append(Ipm2Sum, np.array(ipm2[:,1])+np.array(ipm2[:,3]))
         
-        TimeTool = np.append(TimeTool, ScanName['/ttCorr/tt'])
+        TimeTool = np.append(TimeTool, np.array(ScanName['/ttCorr/tt']))
         
-        TTAmp = np.append(TTAmp, ScanName['/tt/XPP_TIMETOOL_AMPL'])
+        TTAmp = np.append(TTAmp, np.array(ScanName['/tt/XPP_TIMETOOL_AMPL']))
 
-        TTFWHM = np.append(TTFWHM, ScanName['/tt/XPP_TIMETOOL_AMPL'])
+        TTFWHM = np.append(TTFWHM, np.array(ScanName['/tt/XPP_TIMETOOL_AMPL']))
         
         ScanNum = np.append(ScanNum, np.matlib.repmat(filenum, np.shape(ipm2)[0], 1))
         
@@ -75,7 +75,7 @@ def loadData(FileNums, fileSetting, offSetting):
         elif offSetting == 2:
             Offset = np.append(Offset, (np.mean(rowlandy[:,150:175],1))*np.shape(rowlandy)[1])
         
-        L3E = np.append(L3E, ScanName['/ebeam/L3Energy'])
+        L3E = np.append(L3E, np.array(ScanName['/ebeam/L3Energy']))
         
         cspad = list(ScanName['cspad/azav'])
         cspadsum = np.empty(len(cspad))
@@ -85,7 +85,7 @@ def loadData(FileNums, fileSetting, offSetting):
             
             ii += 1
             
-        CspadSum = np.append(CspadSum, cspadsum)
+        CspadSum = np.append(CspadSum, np.array(cspadsum))
     
     XOn = XOn.astype(bool)    
     LOn = LOn.astype(bool)
