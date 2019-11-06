@@ -46,8 +46,10 @@ sig = .5
 x00 = np.array(calc00[:,0])+Eoff
 Broots00 = np.array(roots00[:,0])
 Bamp00 = np.array(roots00[:,1])
-Bamp00 = Bamp00[np.logical_and(Broots00+Eoff<7116, Broots00+Eoff>7112)]
-Broots00 = Broots00[np.logical_and(Broots00+Eoff<7116, Broots00+Eoff>7112)]
+Bamp00 = Bamp00[Broots00+Eoff<7116]
+Bamp00 = np.delete(Bamp00, [0])
+Broots00 = Broots00[Broots00+Eoff<7116]
+Broots00 = np.delete(Broots00, [0])
 Bshape00 = np.zeros(np.shape(x00))
 for root,amp in zip(Broots00,Bamp00):
     print('hi')
@@ -73,8 +75,10 @@ plt.plot(calc40[peaks40,0]+Eoff, calc40[peaks40,1], 'o', color='b')
 x40 = np.array(calc40[:,0])+Eoff
 Broots40 = np.array(roots40[:,0])
 Bamp40 = np.array(roots55[:,1])
-Bamp40 = Bamp40[np.logical_and(Broots40+Eoff<7116, Broots40+Eoff>7112)]
-Broots40 = Broots40[np.logical_and(Broots40+Eoff<7116, Broots40+Eoff>7112)]
+Bamp40 = Bamp40[Broots40+Eoff<7116]
+Bamp40 = np.delete(Bamp40, [0])
+Broots40 = Broots40[Broots40+Eoff<7116]
+Broots40 = np.delete(Broots40, [0])
 Bshape40 = np.zeros(np.shape(x40))
 for root,amp in zip(Broots40,Bamp40):
     print('hi')
@@ -93,8 +97,10 @@ plt.plot(calc55[peaks55,0]+Eoff, calc55[peaks55,1], 'o', color='g')
 x55 = np.array(calc55[:,0])+Eoff
 Broots55 = np.array(roots55[:,0])
 Bamp55 = np.array(roots55[:,1])
-Bamp55 = Bamp55[np.logical_and(Broots55+Eoff<7116, Broots55+Eoff>7112)]
-Broots55 = Broots55[np.logical_and(Broots55+Eoff<7116, Broots55+Eoff>7112)]
+Bamp55 = Bamp55[Broots55+Eoff<7116]
+Bamp55 = np.delete(Bamp55, [0])
+Broots55 = Broots55[Broots55+Eoff<7116]
+Broots55 = np.delete(Broots55, [0])
 Bshape55 = np.zeros(np.shape(x55))
 for root,amp in zip(Broots55,Bamp55):
     print('hi')
@@ -115,8 +121,10 @@ plt.plot(calc77[peaks77,0]+Eoff, calc77[peaks77,1], 'o', color='r')
 x77 = np.array(calc77[:,0])+Eoff
 Broots77 = np.array(roots77[:,0])
 Bamp77 = np.array(roots77[:,1])
-Bamp77 = Bamp77[np.logical_and(Broots77+Eoff<7116, Broots77+Eoff>7112)]
-Broots77 = Broots77[np.logical_and(Broots77+Eoff<7116, Broots77+Eoff>7112)]
+Bamp77 = Bamp77[Broots77+Eoff<7116]
+Bamp77 = np.delete(Bamp77, [0])
+Broots77 = Broots77[Broots77+Eoff<7116]
+Broots77 = np.delete(Broots77, [0])
 Bshape77 = np.zeros(np.shape(x77))
 for root,amp in zip(Broots77,Bamp77):
     print('hi')
@@ -136,8 +144,10 @@ plt.plot(calc86[peaks86,0]+Eoff, calc86[peaks86,1], 'o', color='m')
 x86 = np.array(calc86[:,0])+Eoff
 Broots86 = np.array(roots86[:,0])
 Bamp86 = np.array(roots86[:,1])
-Bamp86 = Bamp86[np.logical_and(Broots86+Eoff<7116, Broots86+Eoff>7112)]
-Broots86 = Broots86[np.logical_and(Broots86+Eoff<7116, Broots86+Eoff>7112)]
+Bamp86 = Bamp86[Broots86+Eoff<7116]
+Bamp86 = np.delete(Bamp86, [0])
+Broots86 = Broots86[Broots86+Eoff<7116]
+Broots86 = np.delete(Broots86, [0])
 Bshape86 = np.zeros(np.shape(x86))
 for root,amp in zip(Broots86,Bamp86):
     print('hi')
@@ -156,8 +166,10 @@ plt.plot(calc100[peaks100,0]+Eoff, calc100[peaks100,1], 'o', color='c')
 x100 = np.array(calc100[:,0])+Eoff
 Broots100 = np.array(roots100[:,0])
 Bamp100 = np.array(roots100[:,1])
-Bamp100 = Bamp100[np.logical_and(Broots100+Eoff<7116, Broots100+Eoff>7112)]
-Broots100 = Broots100[np.logical_and(Broots100+Eoff<7116, Broots100+Eoff>7112)]
+Bamp100 = Bamp100[Broots100+Eoff<7116]
+Bamp100 = np.delete(Bamp100,[0])
+Broots100 = Broots100[Broots100+Eoff<7116]
+Broots100 = np.delete(Broots100,[0])
 Bshape100 = np.zeros(np.shape(x100))
 for root,amp in zip(Broots100,Bamp100):
     print('hi')
@@ -170,7 +182,7 @@ plt.plot(x100, Bshape100, color = 'c')
 plt.figure(figsize = (4,5))
 plt.plot([calc40[peaks40[0],0]-Apeak40,calc55[peaks55[0],0]-Apeak55,calc72[peaks72[0],0]\
           -Apeak72,calc77[peaks77[0],0]-Apeak77,calc86[peaks86[0],0]-Apeak86,calc100[peaks100[0],0]-Apeak100]\
-            ,[.4,.55,.72,.77,.86,1], 'o')
+            ,[.4,55,.72,.77,.86,1], 'o')
 plt.xlabel('A - B peak energy difference')
 plt.ylabel('Fe hole density')
 plt.ylim([0,1.2])

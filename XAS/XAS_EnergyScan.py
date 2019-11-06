@@ -120,7 +120,7 @@ plt.legend()
 plt.tight_layout()
     
 
-Fit, params, paramsp, paramsdiff, cov, note = fitXASDiff(xasProData_one.EnergyPlot,XASDiffPlot, xasProData_one.XASOff_Norm, xasProData_one.XASOn_Norm, True)
+Fit,Params,ParamsP,ParamsDiff,cov,info = fitXASDiff(xasProData_one.EnergyPlot, XASDiffPlot/xasProData_one.XASOff_Norm, xasProData_one.XASOff_Norm, xasProData_one.XASOn_Norm, True)
 
 
 
