@@ -18,27 +18,27 @@ def makeOneDiodeFilter(xasRawData, selectedRuns, ploton):
     
     if sum(selectedRuns.astype(int))>0:
             
-        linfit = np.polyfit(xasRawData.Ipm2Sum[selectedRuns], xasRawData.Diode2[selectedRuns], 1)
-        #linfit = np.polyfit(xasRawData.CspadSum[selectedRuns], xasRawData.Diode2[selectedRuns], 1)
+        #linfit = np.polyfit(xasRawData.Ipm2Sum[selectedRuns], xasRawData.Diode2[selectedRuns], 1)
+        linfit = np.polyfit(xasRawData.CspadSum[selectedRuns], xasRawData.Diode2[selectedRuns], 1)
         line = np.poly1d(linfit)
-        res = line(xasRawData.Ipm2Sum)-xasRawData.Diode2
-        #res = line(xasRawData.CspadSum)-xasRawData.Diode2
+        #res = line(xasRawData.Ipm2Sum)-xasRawData.Diode2
+        res = line(xasRawData.CspadSum)-xasRawData.Diode2
         statstdev = np.std(res[selectedRuns])
     
         if ploton:
             
-            plt.plot(xasRawData.Ipm2Sum, line(xasRawData.Ipm2Sum))
-            #plt.plot(xasRawData.CspadSum, line(xasRawData.CspadSum))
+            #plt.plot(xasRawData.Ipm2Sum, line(xasRawData.Ipm2Sum))
+            plt.plot(xasRawData.CspadSum, line(xasRawData.CspadSum))
         
-        numstds = 3
+        numstds = 2.5
         slopefilter = np.abs(res) < numstds*statstdev
         
         plotfilter = np.logical_and(np.abs(res) < numstds*statstdev, selectedRuns)
         
         if ploton:
             
-            plt.scatter(xasRawData.Ipm2Sum[plotfilter], xasRawData.Diode2[plotfilter], s=2, c='r')
-            #plt.scatter(xasRawData.CspadSum[plotfilter], xasRawData.Diode2[plotfilter], s=2, c='r')
+            #plt.scatter(xasRawData.Ipm2Sum[plotfilter], xasRawData.Diode2[plotfilter], s=2, c='r')
+            plt.scatter(xasRawData.CspadSum[plotfilter], xasRawData.Diode2[plotfilter], s=2, c='r')
             plt.ylabel('diode2')
             plt.xlabel('cspadsum')
         

@@ -85,7 +85,7 @@ def makeOneFilter(xasRawData, ploton):
         plt.xlabel('shotnumber')
     
     
-    TTSTDs = 5
+    TTSTDs = 1
     TTMedian = np.median(xasRawData.TimeTool[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
     TTSTD = np.std(xasRawData.TimeTool[np.logical_and(xasRawData.XOn, xasRawData.LOn)])
     TTValueFilter = np.abs(xasRawData.TimeTool - TTMedian) < TTSTDs*TTSTD
