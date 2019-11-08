@@ -24,6 +24,13 @@ class XASProcessedData:
         XASOn_Norm, XASOff_Norm, EnergyPlot, Num_On, Num_Off, Error_On, Error_Off = makeXAS(xasRawData, self, DorH, FPlots)
         
         self.__dict__.update(XASOn_Norm = XASOn_Norm, XASOff_Norm = XASOff_Norm, EnergyPlot = EnergyPlot, Num_On = Num_On, Num_Off = Num_Off, Error_On = Error_On, Error_Off = Error_Off)
+        
+    def makeBootXAS(self, xasRawData, DorH, TF, FPlots):
+        from makeXAS import makeBootXAS
+        
+        XASOn_Norm, XASOff_Norm, EnergyPlot, Num_On, Num_Off, Error_On, Error_Off = makeBootXAS(xasRawData, self, DorH, TF, FPlots)
+        
+        self.__dict__.update(XASOn_Norm = XASOn_Norm, XASOff_Norm = XASOff_Norm, EnergyPlot = EnergyPlot, Num_On = Num_On, Num_Off = Num_Off, Error_On = Error_On, Error_Off = Error_Off)
 
 class PeaksProcessedData:
     

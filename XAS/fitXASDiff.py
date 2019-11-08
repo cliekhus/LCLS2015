@@ -13,25 +13,47 @@ def fitXASDiff(XEnergy, XASDiff, XASOff, XASOn, ploton):
     from fittingfunctions import xasoff
     from fittingfunctions import lor
     
-    sigAS = 10
-    AS = 0.001
-    x0ApS = 7112.3
-    sigBS = 1.7
-    sigBpS = 1.6
-    BS = 0.017
-    BpS = 0.016
-    x0BS = 7114.22
-    x0BpS = 7114.22
-    sigCS = 3
-    sigCpS = 3
-    CS = 0.04
-    CpS = 0.04
-    x0CS = 7118.3
-    x0CpS = 7117.02
-    erfslopeS = 2.5
-    offsetS = 0.07
-    erfampS = 0.04
-    peakS = 7118.3
+    if False:
+        sigAS = 10
+        AS = 0.001
+        x0ApS = 7112.3
+        sigBS = 1.7
+        sigBpS = 1.6
+        BS = 0.017
+        BpS = 0.016
+        x0BS = 7114.22
+        x0BpS = 7114.22
+        sigCS = 3
+        sigCpS = 3
+        CS = 0.04
+        CpS = 0.04
+        x0CS = 7116
+        x0CpS = 7116.02
+        erfslopeS = 2.5
+        offsetS = 0.07
+        erfampS = 0.04
+        peakS = 7118.3
+    
+    else:
+        sigAS = .5
+        AS = 100
+        x0ApS = 7111.2
+        sigBS = .5
+        sigBpS = .5
+        BS = 389
+        BpS = 389
+        x0BS = 7113
+        x0BpS = 7114.5
+        sigCS = 2
+        sigCpS = 2
+        CS = 1012
+        CpS = 1012
+        x0CS = 7115.6
+        x0CpS = 7115.7
+        erfslopeS = 3
+        offsetS = 1342
+        erfampS = 849
+        peakS = 7117.4
     
     if ploton:
             
@@ -47,6 +69,8 @@ def fitXASDiff(XEnergy, XASDiff, XASOff, XASOn, ploton):
 
     params,cov = curve_fit(xasoff, XEnergy, XASOff, p0 = [sigBS,BS,x0BS, sigCS,CS,x0CS, offsetS,erfampS,erfslopeS,peakS])
     
+    print(params)
+    
     Fit = xasoff(XEnergy, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9])
     
     if ploton:
@@ -54,6 +78,8 @@ def fitXASDiff(XEnergy, XASDiff, XASOff, XASOn, ploton):
         plt.figure()
         plt.plot(XEnergy, XASOff, 'o')
         plt.plot(XEnergy, Fit)
+        plt.plot(XEnergy, lor(XEnergy,params[0],params[2],params[1]))
+        plt.plot(XEnergy, lor(XEnergy,params[3],params[5],params[4]))
         plt.title('end parameters')
         plt.xlabel('energy (eV)')
         
@@ -110,10 +136,13 @@ def fitXASDiff(XEnergy, XASDiff, XASOff, XASOn, ploton):
                   params[4],paramsdiff[6],params[3],paramsdiff[7],params[5],paramsdiff[8])
     """
     if ploton:
-            
+
         plt.figure()
         plt.plot(XEnergy, XASDiff, 'o')
         plt.plot(XEnergy, Fit)
+        plt.plot(XEnergy, lor(XEnergy,paramsdiff[1],paramsdiff[2],abs(paramsdiff[0])))
+        plt.plot(XEnergy, lor(XEnergy,paramsdiff[4],paramsdiff[5],abs(paramsdiff[3])))
+        plt.plot(XEnergy, lor(XEnergy,paramsdiff[7],paramsdiff[8],abs(paramsdiff[6])))
         plt.title('end parameters')
         plt.xlabel('energy (eV)')
     
