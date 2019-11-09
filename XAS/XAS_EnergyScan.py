@@ -21,6 +21,7 @@ import matplotlib.gridspec as gridspec
 from scipy import signal
 import scipy.stats as ss
 from fittingfunctions import lorwoff
+import random
 
 ReEnterData = True
 FPlots = False
@@ -179,9 +180,14 @@ if Boot:
     
     XASDiffBoot = np.empty((np.shape(xasProData_one.EnergyPlot)[0],numBoot))
     
+    TT = np.matlib.repmat(True,1,int((np.shape(xasRawData.XOn)[0])/2))
+    FF = np.matlib.repmat(False,1,int((np.shape(xasRawData.XOn)[0])/2))
+    TF = np.concatenate((TT,FF))
+
+    TF = TF.flatten()    
     for ii in range(numBoot):
 
-        TF = np.random.choice(a=[False, True], size=(np.shape(xasRawData.XOn)))  
+        random.shuffle(TF)  
         
         xasProData_boot.makeBootXAS(xasRawData, DorH, TF, FPlots)
         
