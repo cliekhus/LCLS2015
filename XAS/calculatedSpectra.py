@@ -44,7 +44,7 @@ def makeABpeak(Eoff, calc, roots, ploton, cc, lc):
         Bshape = Bshape + amp/50*np.exp(-(x-(root+Eoff))**2/sig**2)
     
     Bpeak = x[np.argmax(Bshape)]
-    #Bpeak = Broots[np.argmax(Bamp)]
+    Bpeak = Broots[np.argmax(Bamp)]+Eoff
 
     Croots = np.array(roots[:,0])
     Camp = np.array(roots[:,1])

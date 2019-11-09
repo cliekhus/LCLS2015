@@ -22,13 +22,13 @@ from scipy import signal
 import scipy.stats as ss
 from fittingfunctions import lorwoff
 
-ReEnterData = True
+ReEnterData = False
 FPlots = False
-ReLoadData = False
+ReLoadData = True
 SaveData = False
 Redot0 = False
-Boot = True
-numBoot = 1000
+Boot = False
+numBoot = 10
 folder = "D://LCLS_Data/LCLS_python_data/XAS_Spectra/"
 
 DorH = False #True is diode, False is HERFD
@@ -42,8 +42,8 @@ MaxTime = 30
 if ReEnterData:
     
     #FileNums = list(range(384, 395+1))
-    FileNums = list(range(372, 395+1))
-    #FileNums = list(range(371,373+1))+list(range(375,377+1))+list(range(379,382+1))+list(range(384,391+1))+list(range(393,394+1))
+    #FileNums = list(range(372, 395+1))
+    FileNums = list(range(371,373+1))+list(range(375,377+1))+list(range(379,382+1))+list(range(384,391+1))+list(range(393,394+1))
     #FileNums = list(range(372, 372+1))
     xasRawData = loadData(FileNums, "XAS", 1)
 
@@ -106,7 +106,7 @@ EnergyShift = findEnergyShift(xasProData.XASOff_Norm, xasProData.UniXEnergy, Tru
 xasProData_one = PDC.XASProcessedData(TTSteps = np.linspace(MinTime,MaxTime,2), TTDelay = 1000*xasRawData.TimeTool-t0, \
                               XEnergy = np.round((xasRawData.XEnergyRaw+EnergyShift/1000)*500,1)*2)
 uniXEnergy = np.unique(xasProData_one.XEnergy)
-xasProData_one.changeValue(UniXEnergy = uniXEnergy[np.logical_and(uniXEnergy >= 7110, uniXEnergy <= 7120)])
+xasProData_one.changeValue(UniXEnergy = uniXEnergy[np.logical_and(uniXEnergy >= 7109, uniXEnergy <= 7120)])
 xasProData_one.makeProXAS(xasRawData, DorH, FPlots)
 
 XASDiffPlot = xasProData_one.XASOn_Norm[0,:] - xasProData_one.XASOff_Norm
@@ -196,7 +196,7 @@ if Boot:
         plt.plot(xasProData_one.EnergyPlot, XASDiffBoot)
         
     plt.figure()
-    plt.errorbar(xasProData_one.EnergyPlot, XASDiffBootF, XASDiffBootE)
+    plt.errorbar(xasProData_one.EnergyPlot, XASDiffBootF, XASDiffError)
     
     Fit,Params,ParamsA,ParamsB,cov,info = \
         fitXASPiecewiseLor(xasProData_one.EnergyPlot, XASDiffBootF/xasProData_one.XASOff_Norm, xasProData_one.XASOff_Norm, xasProData_one.XASOn_Norm, True)
@@ -229,7 +229,7 @@ xA = np.linspace(7110.5, 7113, 1000)
 xB = np.linspace(7112.5, 7115, 1000)
 
 ax = plt.subplot2grid((10,1), (3,0), colspan = 1, rowspan = 7)
-plt.errorbar(xasProData_one.EnergyPlot, XASDiffBootF/xasProData_one.XASOff_Norm, XASDiffBootE/xasProData_one.XASOff_Norm, \
+plt.errorbar(xasProData_one.EnergyPlot, XASDiffBootF/xasProData_one.XASOff_Norm, XASDiffBootE, \
              marker='.', label = str(MinTime) + ' to ' + str(MaxTime) + ' fs delay')
 plt.plot(xA, lorwoff(xA,ParamsA[0],ParamsA[1],ParamsA[2],ParamsA[3]), label = 'A peak fit, ' + str(round(ParamsA[1],1)))
 plt.plot(xB, lorwoff(xB,ParamsB[0],ParamsB[1],ParamsB[2],ParamsB[3]), label = 'B peak fit, ' + str(round(ParamsB[1],1)))

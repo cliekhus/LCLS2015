@@ -3,9 +3,18 @@ def lor(x,sig,x0,a):
     return a/(1+(2*(x-x0)/sig)**2)
 
 
+def lorwoff(x,sig,x0,a,off):
+    
+    return abs(a)/(1+(2*(x-x0)/sig)**2)+off
+
+
 def xasdiff(x, A,sigA,x0Ap, B,Bp,sigB,sigBp,x0B,x0Bp, C,Cp,sigC,sigCp,x0C,x0Cp):
     
     return (abs(A)/(1+(2*(x-x0Ap)/sigA)**2) + abs(Bp)/(1+(2*(x-x0Bp)/sigBp)**2) - abs(B)/(1+(2*(x-x0B)/sigB)**2) + abs(Cp)/(1+(2*(x-x0Cp)/sigCp)**2) - abs(C)/(1+(2*(x-x0C)/sigC)**2))
+
+def xas2diff(x,B,Bp,sigB,sigBp,x0B,x0Bp,off):
+    
+    return (abs(Bp)/(1+(2*(x-x0Bp)/sigBp)**2) - abs(B)/(1+(2*(x-x0B)/sigB)**2) + off)
 
 
 def xasoff(x, sigB,aB,x0B, sigC,aC,x0C, offset, erfamp, erfslope, peak):

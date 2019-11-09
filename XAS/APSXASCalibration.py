@@ -43,12 +43,12 @@ def findEnergyShift(XASOff, UniXEnergy, ploton):
         plt.legend()
     
     Fitted = ALSXASNorm - poly(incident_axis)
-    Fitted[np.logical_or(incident_axis > 7118, incident_axis < 7112)] = 0
-    pos, pro = scisig.find_peaks(Fitted.flatten(), threshold = 0.028)
+    Fitted[np.logical_or(incident_axis > 7118, incident_axis < 7111.5)] = 0
+    pos, pro = scisig.find_peaks(Fitted.flatten(), threshold = 0)
     
     FittedData = XASOff_Norm - polyData(UniXEnergy)
-    FittedData[np.logical_or(UniXEnergy > 7118, UniXEnergy < 7112)] = 0
-    posData, pro = scisig.find_peaks(FittedData, threshold = 0.045)
+    FittedData[np.logical_or(UniXEnergy > 7118, UniXEnergy < 7111.5)] = 0
+    posData, pro = scisig.find_peaks(FittedData, threshold = 0)
     
     APSEnergies = list(incident_axis[pos])
     LCLSEnergies = list(UniXEnergy[posData])
