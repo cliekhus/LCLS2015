@@ -25,8 +25,8 @@ from fittingfunctions import lorwoff
 ReEnterData = True
 FPlots = False
 ReLoadData = False
-SaveData = False
-Redot0 = False
+SaveData = True
+Redot0 = True
 Boot = True
 numBoot = 1000
 folder = "D://LCLS_Data/LCLS_python_data/XAS_Spectra/"

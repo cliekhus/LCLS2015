@@ -30,7 +30,7 @@ def makeOneDiodeFilter(xasRawData, selectedRuns, ploton):
             plt.plot(xasRawData.Ipm2Sum, line(xasRawData.Ipm2Sum))
             #plt.plot(xasRawData.CspadSum, line(xasRawData.CspadSum))
         
-        numstds = 3
+        numstds = 1
         slopefilter = np.abs(res) < numstds*statstdev
         
         plotfilter = np.logical_and(np.abs(res) < numstds*statstdev, selectedRuns)
