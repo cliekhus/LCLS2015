@@ -1,9 +1,9 @@
 $ cat .gitignore
-/Data
 *.h5
 *.png
 /__pycache__
 /Figures
 /Starting_Code
-/Object_Oriented_Code/__pycache__
+/XAS/__pycache__
+/XES/__pycache__
 /Calculations
