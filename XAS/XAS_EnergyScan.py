@@ -250,5 +250,5 @@ if SaveData:
     with open(folder + "xasRawData.pkl", "wb") as f:
         pickle.dump(xasRawData, f)
             
-    with open(folder + "xasProData.pkl", "wb") as f:
-        pickle.dump(xasProData, f)
+    with open(folder + "xasProData_one.pkl", "wb") as f:
+        pickle.dump(xasProData_one, f)
