@@ -17,18 +17,20 @@ import pickle
 from fitXASDiff import fitXASDiff
 from fitXASDiff import fitXASPiecewiseDiff
 from fitXASDiff import fitXASPiecewiseLor
+from fitXASDiff import fitXASPiecewiseGauss
+from fittingfunctions import lorwslope
 import matplotlib.gridspec as gridspec
 from scipy import signal
 import scipy.stats as ss
 from fittingfunctions import lorwoff
 import random
 
-ReEnterData = True
+ReEnterData = False
 FPlots = False
 ReLoadData = False
-SaveData = True
-Redot0 = True
-Boot = True
+SaveData = False
+Redot0 = False
+Boot = False
 numBoot = 1000
 folder = "D://LCLS_Data/LCLS_python_data/XAS_Spectra/"
 
@@ -88,6 +90,9 @@ else:
 
     with open(folder + "xasProData.pkl", "rb") as f:
         xasProData = pickle.load(f)
+        
+    with open(folder + "xasProData_one.pkl", "rb") as f:
+        xasProData_one = pickle.load(f)
         
     with open(folder + "t0.pkl", "rb") as f:
         t0 = pickle.load(f)
@@ -205,7 +210,7 @@ if Boot:
     plt.errorbar(xasProData_one.EnergyPlot, XASDiffBootF, XASDiffBootE)
     
     Fit,Params,ParamsA,ParamsB,cov,info = \
-        fitXASPiecewiseLor(xasProData_one.EnergyPlot, XASDiffBootF/xasProData_one.XASOff_Norm, xasProData_one.XASOff_Norm, xasProData_one.XASOn_Norm, True)
+        fitXASPiecewiseLor(xasProData_one.EnergyPlot, XASDiffBootF, xasProData_one.XASOff_Norm, xasProData_one.XASOn_Norm, True)
 
     with open(folder + "XASDiffBootF.pkl", "wb") as f:
         pickle.dump(XASDiffBootF, f)
@@ -220,13 +225,20 @@ else:
         
     with open(folder + "XASDiffBootE.pkl", "rb") as f:
         XASDiffBootE = pickle.load(f)
+        
+    Fit,Params,ParamsA,ParamsB,covA,covB = \
+        fitXASPiecewiseGauss(xasProData_one.EnergyPlot, XASDiffBootF, xasProData_one.XASOff_Norm, xasProData_one.XASOn_Norm, True)
+
+pluscolor = '#009E73'
+minuscolor = '#0072b2'
+pluscolor2 = '#e69f00'
 
 plt.figure(figsize = (4,5))
 
 gridspec.GridSpec(10,1)
 
 ax = plt.subplot2grid((10,1), (0,0), colspan = 1, rowspan = 3)
-plt.errorbar(xasProData_one.EnergyPlot, xasProData_one.XASOff_Norm, xasProData_one.Error_Off, color = 'k')
+plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(xasProData_one.XASOff_Norm,-4), np.delete(xasProData_one.Error_Off,-4), color = 'k')
 plt.ylabel('$I_{off}$')
 ax.set_xticklabels([])
 plt.tight_layout()
@@ -235,15 +247,21 @@ xA = np.linspace(7110.5, 7113, 1000)
 xB = np.linspace(7112.5, 7115, 1000)
 
 ax = plt.subplot2grid((10,1), (3,0), colspan = 1, rowspan = 7)
-plt.errorbar(xasProData_one.EnergyPlot, XASDiffBootF/xasProData_one.XASOff_Norm, XASDiffBootE/xasProData_one.XASOff_Norm, \
-             marker='.', label = str(MinTime) + ' to ' + str(MaxTime) + ' fs delay')
-plt.plot(xA, lorwoff(xA,ParamsA[0],ParamsA[1],ParamsA[2],ParamsA[3]), label = 'A peak fit, ' + str(round(ParamsA[1],1)))
-plt.plot(xB, lorwoff(xB,ParamsB[0],ParamsB[1],ParamsB[2],ParamsB[3]), label = 'B peak fit, ' + str(round(ParamsB[1],1)))
+plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(XASDiffBootF,-4), np.delete(XASDiffBootE,-4), \
+             marker='.', label = str(MinTime) + ' to ' + str(MaxTime) + ' fs delay', color = 'k')
+plt.plot(xA, lorwslope(xA,ParamsA[0],ParamsA[1],ParamsA[2],ParamsA[3],ParamsA[4]), label = 'A peak fit, ' + str(round(ParamsA[1],1)), linewidth = 5, color = pluscolor2)
+plt.plot(xB, lorwslope(xB,ParamsB[0],ParamsB[1],ParamsB[2],ParamsB[3],ParamsB[4]), label = 'B peak fit, ' + str(round(ParamsB[1],1)), linewidth = 5, color = minuscolor)
 plt.xlabel('x-ray energy (eV)')
 plt.ylabel('$(I_{on}-I_{off})/I_{off}$')
+plt.ylim([-300,200])
 plt.legend()
 plt.tight_layout()
 
+with open(folder + "BmA.pkl", "wb") as f:
+    pickle.dump(ParamsB[1]-ParamsA[1], f)
+with open(folder + "uncertainty.pkl", "wb") as f:
+    pickle.dump(np.sqrt(np.diag(covA)+np.diag(covB)), f)
+        
 
 if SaveData:
         

@@ -7,6 +7,13 @@ def lorwoff(x,sig,x0,a,off):
     
     return abs(a)/(1+(2*(x-x0)/sig)**2)+off
 
+def lorwslope(x,sig,x0,a,off,slope):
+    
+    return abs(a)/(1+(2*(x-x0)/sig)**2)+off+slope*x
+
+def gauswslope(x,sig,x0,a,off,slope):
+    import numpy as np
+    return abs(a)*np.exp(-((x-x0)/sig)**2)+off+slope*x
 
 def xasdiff(x, A,sigA,x0Ap, B,Bp,sigB,sigBp,x0B,x0Bp, C,Cp,sigC,sigCp,x0C,x0Cp):
     
