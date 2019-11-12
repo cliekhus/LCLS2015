@@ -23,7 +23,7 @@ ReLoadData = False
 SaveData = False
 
 NumTTSteps = 100
-NumTTStepsPlots = 65
+NumTTStepsPlots = 60
 
 MinTime = -2000 
 MaxTime = 0
@@ -36,7 +36,8 @@ MaxTimePlots = 1500
 
 if ReEnterData:
 
-    FileNumsP = list(range(144, 154+1))
+    #FileNumsP = list(range(144, 154+1))
+    FileNumsP = list(range(155,164+1))
     peaksRawDataP = loadData(FileNumsP, "Peaks", 1)
     
 if ReLoadData:

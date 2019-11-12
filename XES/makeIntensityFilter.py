@@ -7,6 +7,7 @@ Created on Mon Apr 29 11:29:47 2019
 
 def makeLineFilter(Cspad, Diode2, selectedRuns, ploton):
     
+    ploton = True
     import matplotlib.pyplot as plt
     import numpy as np
     
@@ -26,7 +27,7 @@ def makeLineFilter(Cspad, Diode2, selectedRuns, ploton):
             
             plt.plot(Cspad, line(Cspad))
         
-        numstds = 2
+        numstds = 1.5
         slopefilter = np.abs(res) < numstds*statstdev
         
         plotfilter = np.logical_and(np.abs(res) < numstds*statstdev, selectedRuns)
@@ -34,11 +35,13 @@ def makeLineFilter(Cspad, Diode2, selectedRuns, ploton):
         if ploton:
             
             plt.scatter(Cspad[plotfilter], Diode2[plotfilter], s=2, c='r')
+            plt.title(-linfit[1]/linfit[0])
             plt.xlabel('Cspad')
             plt.ylabel('Diode')
+            print(linfit[1])
         
         
-        return slopefilter, -linfit[1]/linfit[0]
+        return slopefilter, linfit[1]
 
     else:
         
