@@ -7,7 +7,7 @@ Created on Mon Apr 29 11:29:47 2019
 
 def makeLineFilter(Cspad, Diode2, selectedRuns, ploton):
     
-    ploton = True
+
     import matplotlib.pyplot as plt
     import numpy as np
     

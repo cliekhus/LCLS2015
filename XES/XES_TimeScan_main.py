@@ -12,18 +12,23 @@ from fitXES import fitXESthree
 from APSXESCalibration import convertAngle2Energy
 import pickle
 import ProcessedDataClass as PDC
-#from makeTimePlot import makeTimePlot
+from makeTimePlot import makeTimePlot
 from makeTimePlot import makeTimePlotThree
+from makeTimePlot import makeBootFT
+import numpy as np
+import random
 
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
-ReEnterData = False
+ReEnterData = True
 FPlots = False
 ReLoadData = False
 SaveData = False
+Boot = True
+numBoot = 1
 
 NumTTSteps = 100
-NumTTStepsPlots = 60
+NumTTStepsPlots = 65
 
 MinTime = -2000 
 MaxTime = 0
@@ -31,13 +36,18 @@ MaxTime = 0
 MinTimePlots = -500
 MaxTimePlots = 1500
 
+removenum = 9
 
 #plus data
 
 if ReEnterData:
 
     #FileNumsP = list(range(144, 154+1))
-    FileNumsP = list(range(155,164+1))
+    #FileNumsP = list(range(131, 140+1))
+    FileNumsP = list(range(165, 178+1))
+    #FileNumsP = list(range(123, 130+1))
+    #FileNumsP = list(range(155,164+1))
+    #FileNumsP.remove(FileNumsP[removenum])
     peaksRawDataP = loadData(FileNumsP, "Peaks", 1)
     
 if ReLoadData:
@@ -59,6 +69,7 @@ peaksProDataP.makeProPeaks(peaksRawDataP, NumTTSteps, MinTime, MaxTime, FPlots)
 if ReEnterData:
 
     FileNumsP2 = list(range(123, 130+1))
+    #FileNumsP2.remove(FileNumsP2[removenum])
     peaksRawDataP2 = loadData(FileNumsP2, "Peaks", 1)
     
 if ReLoadData:
@@ -79,7 +90,9 @@ peaksProDataP2.makeProPeaks(peaksRawDataP2, NumTTSteps, MinTime, MaxTime, FPlots
 
 if ReEnterData:
 
-    FileNumsM = list(range(180,188+1))    
+    FileNumsM = list(range(180,188+1))
+    #FileNumsM = list(range(131, 140+1))
+    #FileNumsM.remove(FileNumsM[removenum])
     peaksRawDataM = loadData(FileNumsM, "Peaks", 1)
     
 if ReLoadData:
@@ -135,8 +148,81 @@ TCentersMF = (peaksProDataMF.TimeSteps[:-1]+peaksProDataMF.TimeSteps[1:])/2
 
 
 
-#makeTimePlot(TCentersPF, TCentersMF, peaksProDataPF, peaksProDataMF, MinTimePlots, MaxTimePlots, FPlots)
-makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF, peaksProDataP2F, peaksProDataMF, MinTimePlots, MaxTimePlots, FPlots)
+
+
+
+makeTimePlot(TCentersPF, TCentersMF, peaksProDataPF, peaksProDataMF, MinTimePlots, MaxTimePlots, FPlots)
+#makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF, peaksProDataP2F, peaksProDataMF, MinTimePlots, MaxTimePlots, 0, FPlots)
+
+
+
+
+
+
+
+
+
+if Boot:
+    
+    peaksProDataPF_boot = peaksProDataPF
+    
+    PeaksBoot = np.empty((np.shape(TCentersPF)[0],numBoot))
+    
+    TT = np.matlib.repmat(True,1,int((np.shape(peaksRawDataP.XOn)[0])/2))
+    FF = np.matlib.repmat(False,1,int((np.shape(peaksRawDataP.XOn)[0])/2))
+    TF = np.concatenate((TT,FF))
+
+    TF = TF.flatten()    
+    
+    FTp, FTm, Freq = makeBootFT(TCentersPF, TCentersMF, peaksProDataPF_boot.XESDiff, peaksProDataMF.XESDiff, MinTimePlots, MaxTimePlots, FPlots)
+    FTBoot = np.empty((np.shape(Freq)[0],numBoot))
+    
+    for ii in range(numBoot):
+
+        random.shuffle(TF)  
+        
+        peaksProDataPF_boot.makeBootPeaks(peaksRawDataP, NumTTStepsPlots, MinTimePlots, MaxTimePlots, TF, FPlots)
+        
+        PeaksBoot[:,ii] = peaksProDataPF_boot.XESDiff
+        
+        FTp, FTm, Freq = makeBootFT(TCentersPF, TCentersMF, peaksProDataPF_boot.XESDiff, peaksProDataMF.XESDiff, MinTimePlots, MaxTimePlots, FPlots)
+        
+        FTBoot[:,ii] = abs(FTp)
+    
+    PeaksBootF = np.mean(PeaksBoot,1)
+    PeaksBootE = np.std(PeaksBoot,1)
+    FTBootF = np.mean(FTBoot,1)
+    FTBootE = np.std(FTBoot,1)
+"""        
+    if True:
+        
+        plt.figure()
+        plt.plot(xasProData_one.EnergyPlot, XASDiffBoot)
+        
+    plt.figure()
+    plt.errorbar(xasProData_one.EnergyPlot, XASDiffBootF, XASDiffBootE)
+    
+    Fit,Params,ParamsA,ParamsB,cov,info = \
+        fitXASPiecewiseLor(xasProData_one.EnergyPlot, XASDiffBootF, xasProData_one.XASOff_Norm, xasProData_one.XASOn_Norm, True)
+
+    with open(folder + "XASDiffBootF.pkl", "wb") as f:
+        pickle.dump(XASDiffBootF, f)
+        
+    with open(folder + "XASDiffBootE.pkl", "wb") as f:
+        pickle.dump(XASDiffBootE, f)
+
+else:
+    
+    with open(folder + "XASDiffBootF.pkl", "rb") as f:
+        XASDiffBootF = pickle.load(f)
+        
+    with open(folder + "XASDiffBootE.pkl", "rb") as f:
+        XASDiffBootE = pickle.load(f)
+        
+    Fit,Params,ParamsA,ParamsB,covA,covB = \
+        fitXASPiecewiseGauss(xasProData_one.EnergyPlot, XASDiffBootF, xasProData_one.XASOff_Norm, xasProData_one.XASOn_Norm, True)
+
+"""
 
 
 

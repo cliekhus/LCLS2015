@@ -60,3 +60,18 @@ class PeaksProcessedData:
         XESOn_Norm, XESOff_Norm, Error_On, Error_Off, TimeSteps = makeXES(self, peaksRawData, NumTTSteps, MinTime, MaxTime, ploton)
         
         self.__dict__.update(XESOn_Norm = XESOn_Norm, XESOff_Norm = XESOff_Norm, Error_On = Error_On, Error_Off = Error_Off, TimeSteps = TimeSteps, XESDiff = (XESOn_Norm-XESOff_Norm)/XESOff_Norm)
+        
+    def makeBootPeaks(self, peaksRawData, NumTTSteps, MinTime, MaxTime, TF, ploton):
+        from makeXES import makeBootXES
+        
+        XESOn_Norm, XESOff_Norm, Error_On, Error_Off, TimeSteps = makeBootXES(self, peaksRawData, NumTTSteps, MinTime, MaxTime, TF, ploton)
+        
+        self.__dict__.update(XESOn_Norm = XESOn_Norm, XESOff_Norm = XESOff_Norm, Error_On = Error_On, Error_Off = Error_Off, TimeSteps = TimeSteps, XESDiff = (XESOn_Norm-XESOff_Norm)/XESOff_Norm)
+        
+        
+        
+        
+        
+        
+        
+        

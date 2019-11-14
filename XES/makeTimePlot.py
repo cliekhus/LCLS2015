@@ -103,7 +103,7 @@ def makeTimePlot(TCentersP, TCentersM, peaksProDataP, peaksProDataM, minTime, ma
     
     
     
-def makeTimePlotThree(TCentersP, TCentersP2, TCentersM, peaksProDataP, peaksProDataP2, peaksProDataM, minTime, maxTime, ploton):
+def makeTimePlotThree(TCentersP, TCentersP2, TCentersM, peaksProDataP, peaksProDataP2, peaksProDataM, minTime, maxTime, numzeros, ploton):
         
     import matplotlib.pyplot as plt
     from fitXES import fitXESthree
@@ -169,8 +169,15 @@ def makeTimePlotThree(TCentersP, TCentersP2, TCentersM, peaksProDataP, peaksProD
     
     
     
+    Residualp = np.concatenate((Residualp,np.zeros((numzeros))))
+    Residualm = np.concatenate((Residualm,np.zeros((numzeros))))
+    Residualp2 = np.concatenate((Residualp2,np.zeros((numzeros))))
     
-        
+    TCentersP = np.concatenate((TCentersP,np.linspace(TCentersP[-1]+TCentersP[1]-TCentersP[0], TCentersP[-1]+(TCentersP[1]-TCentersP[0])*numzeros, num=numzeros)))
+    TCentersM = np.concatenate((TCentersM,np.linspace(TCentersM[-1]+TCentersM[1]-TCentersM[0], TCentersM[-1]+(TCentersM[1]-TCentersM[0])*numzeros, num=numzeros)))
+    TCentersP2 = np.concatenate((TCentersP2,np.linspace(TCentersP2[-1]+TCentersP2[1]-TCentersP2[0], TCentersP2[-1]+(TCentersP2[1]-TCentersP2[0])*numzeros, num=numzeros)))
+
+    
     bartlettWindowp = np.bartlett(len(Residualp[TCentersP>0]))
     bartlettWindowm = np.bartlett(len(Residualm[TCentersM>0]))
     bartlettWindowp2 = np.bartlett(len(Residualp2[TCentersP2>0]))
@@ -182,6 +189,9 @@ def makeTimePlotThree(TCentersP, TCentersP2, TCentersM, peaksProDataP, peaksProD
     Freq = np.fft.rfftfreq(len(Residualp[TCentersP>0]), d=(TCentersP[0]-TCentersP[1])*1e-15)
     
     Freq = [-x*1e-12*33.356 for x in Freq]
+    
+    print('length of freq')
+    print(len(Freq))
     
     plt.figure(figsize = (4,5))
     plt.plot(Freq, np.abs(FTm), color = minuscolor, linewidth = 2, linestyle = '--')
@@ -223,3 +233,90 @@ def makeTimePlotThree(TCentersP, TCentersP2, TCentersM, peaksProDataP, peaksProD
     plt.xlim([0,500])
     plt.ylim([0,0.037])
     plt.tight_layout()
+    
+
+
+
+
+
+
+
+
+
+
+
+
+def makeBootFT(TCentersP, TCentersM, XESDiffP, XESDiffM, minTime, maxTime, ploton):
+        
+    from fitXES import fitXES
+    import numpy as np
+    from fittingfunctions import convolved
+  
+    
+    Fitp, Fitm, params, info = fitXES(TCentersP, TCentersM, XESDiffP, XESDiffM, 0, ploton)
+    
+    
+    Fitp = np.array(convolved(TCentersP, params[0], params[2], 0, params[3], params[4]))
+    Fitm = np.array(convolved(TCentersM, params[1], params[2], 0, params[3], params[4]))
+
+
+    Residualp = XESDiffP - Fitp
+    Residualm = XESDiffM - Fitm
+    
+    
+    
+    
+        
+    bartlettWindowp = np.bartlett(len(Residualp[TCentersP>0]))
+    bartlettWindowm = np.bartlett(len(Residualm[TCentersM>0]))
+    
+    FTp = np.fft.rfft([x*y for x,y in zip(Residualp[TCentersP>0], bartlettWindowp)])
+    FTm = np.fft.rfft([x*y for x,y in zip(Residualm[TCentersM>0], bartlettWindowm)])
+    
+    Freq = np.fft.rfftfreq(len(Residualp[TCentersP>0]), d=(TCentersP[0]-TCentersP[1])*1e-15)
+    
+    Freq = [-x*1e-12*33.356 for x in Freq]
+    
+    
+    
+    
+    return FTp, FTm, Freq
+
+
+
+
+def makeOneBootFT(TCenters, XESDiff, minTime, maxTime, ploton):
+        
+    from fitXES import fitXES
+    import numpy as np
+    from fittingfunctions import convolved
+  
+    
+    Fitp, Fitm, params, info = fitXES(TCentersP, TCentersM, XESDiffP, XESDiffM, 0, ploton)
+    
+    
+    Fitp = np.array(convolved(TCentersP, params[0], params[2], 0, params[3], params[4]))
+    Fitm = np.array(convolved(TCentersM, params[1], params[2], 0, params[3], params[4]))
+
+
+    Residualp = XESDiffP - Fitp
+    Residualm = XESDiffM - Fitm
+    
+    
+    
+    
+        
+    bartlettWindowp = np.bartlett(len(Residualp[TCentersP>0]))
+    bartlettWindowm = np.bartlett(len(Residualm[TCentersM>0]))
+    
+    FTp = np.fft.rfft([x*y for x,y in zip(Residualp[TCentersP>0], bartlettWindowp)])
+    FTm = np.fft.rfft([x*y for x,y in zip(Residualm[TCentersM>0], bartlettWindowm)])
+    
+    Freq = np.fft.rfftfreq(len(Residualp[TCentersP>0]), d=(TCentersP[0]-TCentersP[1])*1e-15)
+    
+    Freq = [-x*1e-12*33.356 for x in Freq]
+    
+    
+    
+    
+    return FTp, FTm, Freq

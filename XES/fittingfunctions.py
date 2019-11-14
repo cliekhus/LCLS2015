@@ -34,6 +34,15 @@ def convolved(t,a,rate,offset,t0,sig):
     return out
 
 
+def convolvedzero(t,a,rate,t0,sig):
+    
+    import math
+    
+    out = [a*(1-math.erf(1/math.sqrt(2)*(sig/rate-(tt-t0)/sig)))*math.exp(-(tt-t0)/rate) for tt in t]
+    
+    return out
+
+
 
 def combinedconvolved(t, a1, rate1, offset1, a2, rate2, offset2, t0, sig):
     
