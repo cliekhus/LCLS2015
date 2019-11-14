@@ -14,9 +14,11 @@ import pickle
 import ProcessedDataClass as PDC
 from makeTimePlot import makeTimePlot
 from makeTimePlot import makeTimePlotThree
-from makeTimePlot import makeBootFT
+from makeTimePlot import makeOneBootFT
+from fitXES import fitOneXES
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
@@ -25,7 +27,7 @@ FPlots = False
 ReLoadData = False
 SaveData = False
 Boot = True
-numBoot = 1
+numBoot = 100
 
 NumTTSteps = 100
 NumTTStepsPlots = 65
@@ -41,13 +43,18 @@ removenum = 9
 #plus data
 
 
-FileNums = [list(range(144, 154+1))]
+FileNums = [list(range(123, 130+1))]
+FileNums.append(list(range(144, 154+1)))
+FileNums.append(list(range(180,188+1)))
 FileNums.append(list(range(131,140+1)))
-FileNums.append(list(range(165,178+1)))
-FileNums.append(list(range(123,130+1)))
+#FileNums.append(list(range(165,178+1)))
 FileNums.append(list(range(155,164+1)))
 
-for ii in range(FileNums):
+starta = [0.02, 0.009, -0.02, -0.02, 0.02]
+startrate = [59, 60, 60, 60, 60]
+startsig = [6, 6, 8, 6, 6]
+
+for ii in range(len(FileNums)):
         
     if ReEnterData:
     
@@ -61,14 +68,29 @@ for ii in range(FileNums):
         with open(folder + "FileNumsP.pkl", "rb") as f:
             FileNumsP = pickle.load(f)
     
-    peaksProData = PDC.PeaksProcessedData(Delay = 1000*peaksRawData.TimeTool + peaksRawData.StageDelay*1e15, RowWOffset = peaksRawData.RowlandY - peaksRawData.Offset)
-    peaksProData.makeProPeaks(peaksRawData, NumTTSteps, MinTime, MaxTime, FPlots)
     
     
     
-    
-    
+           
+    if ii == 0:
+
+        peaksProData = PDC.PeaksProcessedData(Delay = 1000*peaksRawData.TimeTool + peaksRawData.StageDelay*1e15, RowWOffset = peaksRawData.RowlandY - peaksRawData.Offset)
+        peaksProData.makeProPeaks(peaksRawData, NumTTSteps, MinTime, MaxTime, FPlots)
+        TCenters = (peaksProData.TimeSteps[:-1]+peaksProData.TimeSteps[1:])/2
+        Fit, params, info = fitOneXES(TCenters, peaksProData.XESDiff, -1534, starta[0], startrate[0], startsig[0], True)
+        t0 = params[2]
+        
+    peaksProData = PDC.PeaksProcessedData(Delay = 1000*peaksRawData.TimeTool + peaksRawData.StageDelay*1e15 - t0, RowWOffset = peaksRawData.RowlandY - peaksRawData.Offset)
+    peaksProData.makeProPeaks(peaksRawData, NumTTStepsPlots, MinTimePlots, MaxTimePlots,  FPlots)
     TCenters = (peaksProData.TimeSteps[:-1]+peaksProData.TimeSteps[1:])/2
+    peaksProData.changeValue(EnergyLabel = round(convertAngle2Energy(FileNums[ii][0], True)*1000,1))
+        
+    
+    
+    
+    
+    
+
     
     if Boot:
         
@@ -82,26 +104,60 @@ for ii in range(FileNums):
     
         TF = TF.flatten()    
         
-        FT, Freq = makeBootFT(TCenters, peaksProData_boot.XESDiff, MinTimePlots, MaxTimePlots, FPlots)
+        try:
+            FT, Freq = makeOneBootFT(TCenters, peaksProData_boot.XESDiff, MinTimePlots, MaxTimePlots, starta[ii], startrate[ii], startsig[ii], True)
+        except:
+            FT, Freq = makeOneBootFT(TCenters, peaksProData_boot.XESDiff, MinTimePlots, MaxTimePlots, starta[ii]*.9, startrate[ii]*.9, startsig[ii]*.9, True)
+            
         FTBoot = np.empty((np.shape(Freq)[0],numBoot))
         
-        for ii in range(numBoot):
+        for jj in range(numBoot):
     
             random.shuffle(TF)  
             
-            peaksProDataPF_boot.makeBootPeaks(peaksRawDataP, NumTTStepsPlots, MinTimePlots, MaxTimePlots, TF, FPlots)
+            peaksProData_boot.makeBootPeaks(peaksRawData, NumTTStepsPlots, MinTimePlots, MaxTimePlots, TF, FPlots)
             
-            PeaksBoot[:,ii] = peaksProDataPF_boot.XESDiff
+            PeaksBoot[:,jj] = peaksProData_boot.XESDiff
             
-            FTp, FTm, Freq = makeBootFT(TCentersPF, TCentersMF, peaksProDataPF_boot.XESDiff, peaksProDataMF.XESDiff, MinTimePlots, MaxTimePlots, FPlots)
+            try:
+                FT, Freq = makeOneBootFT(TCenters, peaksProData_boot.XESDiff, MinTimePlots, MaxTimePlots, starta[ii], startrate[ii], startsig[ii], FPlots)
+            except:
+                FT, Freq = makeOneBootFT(TCenters, peaksProData_boot.XESDiff, MinTimePlots, MaxTimePlots, starta[ii]*.9, startrate[ii]*.9, startsig[ii]*.9, True)
             
-            FTBoot[:,ii] = abs(FTp)
+            FTBoot[:,jj] = abs(FT)
         
         PeaksBootF = np.mean(PeaksBoot,1)
         PeaksBootE = np.std(PeaksBoot,1)
         FTBootF = np.mean(FTBoot,1)
         FTBootE = np.std(FTBoot,1)
-    """        
+        
+        if ii == 0:
+            
+            XESMat = np.empty((np.shape(PeaksBootF)[0],len(FileNums)))
+            XESEMat = np.empty((np.shape(PeaksBootE)[0],len(FileNums)))
+            FTMat = np.empty((np.shape(FTBootF)[0],len(FileNums)))
+            FTEMat = np.empty((np.shape(FTBootE)[0],len(FileNums)))
+            EnergyMat = np.empty(len(FileNums))
+            
+            FreqMat = Freq
+            
+        XESMat[:,ii] = PeaksBootF
+        XESEMat[:,ii] = PeaksBootE
+        FTMat[:,ii] = FTBootF
+        FTEMat[:,ii] = FTBootE
+        EnergyMat[ii] = peaksProData.EnergyLabel
+        
+        
+index = np.argsort(EnergyMat)
+EnergyMat = EnergyMat[index]
+XESMat = XESMat[:,index]
+XESEMat = XESEMat[:,index]
+FTMat = FTMat[:,index]
+FTEMat = FTEMat[:,index]
+
+
+            
+"""        
         if True:
             
             plt.figure()
@@ -130,11 +186,11 @@ for ii in range(FileNums):
         Fit,Params,ParamsA,ParamsB,covA,covB = \
             fitXASPiecewiseGauss(xasProData_one.EnergyPlot, XASDiffBootF, xasProData_one.XASOff_Norm, xasProData_one.XASOn_Norm, True)
     
-    """
+"""
 
 
 
-
+"""
 
 if SaveData:
         
@@ -156,7 +212,7 @@ if SaveData:
     with open(folder + "FileNumsP.pkl", "wb") as f:
         pickle.dump(FileNumsP, f)
 
-
+"""
 
 
 

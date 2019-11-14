@@ -44,8 +44,8 @@ if ReEnterData:
 
     #FileNumsP = list(range(144, 154+1))
     #FileNumsP = list(range(131, 140+1))
-    FileNumsP = list(range(165, 178+1))
-    #FileNumsP = list(range(123, 130+1))
+    #FileNumsP = list(range(165, 178+1))
+    FileNumsP = list(range(123, 130+1))
     #FileNumsP = list(range(155,164+1))
     #FileNumsP.remove(FileNumsP[removenum])
     peaksRawDataP = loadData(FileNumsP, "Peaks", 1)

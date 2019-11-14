@@ -51,7 +51,7 @@ def fitXES(TCentersplus, TCentersminus, XESDiffplus, XESDiffminus, startt0, plot
 
 
 
-def fitOneXES(TCenters, XESDiff, startt0, ploton):
+def fitOneXES(TCenters, XESDiff, startt0, starta, startrate, startsig, ploton):
     
     import matplotlib.pyplot as plt
     from scipy.optimize import curve_fit
@@ -59,23 +59,19 @@ def fitOneXES(TCenters, XESDiff, startt0, ploton):
     from fittingfunctions import convolvedzero
     import numpy as np
     
-    starta = .02
-    startrate = 60
-    startsig = 7
-    startoffset = 0
     
     if ploton:
             
         plt.figure()
         plt.plot(TCenters, XESDiff, 'o')
-        plt.plot(TCenters, convolved(TCenters, starta, startrate, startoffset, startt0, startsig))
+        plt.plot(TCenters, convolvedzero(TCenters, starta, startrate, startt0, startsig))
         plt.title('start parameters')
         plt.xlabel('time (fs)')
     
 
     params,cov = curve_fit(convolvedzero, TCenters, XESDiff, p0 = [starta, startrate, startt0, startsig])
     
-    Fit = convolved(TCenters, params[0], params[2], 0, params[3], params[4])
+    Fit = convolved(TCenters, params[0], params[1], 0, params[2], params[3])
     
     if ploton:
             

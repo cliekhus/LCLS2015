@@ -101,9 +101,16 @@ def makeOneFilter(xesRawData, ploton):
     TTFWHMMedian = np.median(xesRawData.TTFWHM[np.logical_and(xesRawData.XOn, xesRawData.LOn)])
     TTFWHMSTD = np.std(xesRawData.TTFWHM[np.logical_and(xesRawData.XOn, xesRawData.LOn)])
     TTFWHMFilter = np.abs(xesRawData.TTFWHM - TTFWHMMedian) < TTFWHMSTDs*TTFWHMSTD
-
     
-    TTFilter = np.logical_and.reduce((TTValueFilter, TTAmpFilter, TTFWHMFilter))
+    TTFPMax = 600
+    TTFPMin = 200
+    TTFPFilter = np.logical_and(xesRawData.TTFP <= TTFPMax, xesRawData.TTFP >= TTFPMin)
+    TTFPFilter[np.logical_not(np.logical_or(TTFPFilter==False, TTFPFilter==True))] = False
+    print(np.shape(TTFPFilter))
+    print(sum(TTFPFilter.astype('int')))
+    print(sum(np.logical_not(TTFPFilter).astype('int')))
+    
+    TTFilter = np.logical_and.reduce((TTValueFilter, TTAmpFilter, TTFWHMFilter, TTFPFilter))
     
     if ploton:
             

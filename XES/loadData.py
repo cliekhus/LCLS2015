@@ -30,6 +30,7 @@ def loadData(FileNums, fileSetting, offSetting):
     TimeTool = np.empty(0)
     TTAmp = np.empty(0)
     TTFWHM = np.empty(0)
+    TTFP = np.empty(0)
     
     ScanNum = np.empty(0)
     
@@ -64,6 +65,8 @@ def loadData(FileNums, fileSetting, offSetting):
 
         TTFWHM = np.append(TTFWHM, np.array(ScanName['/tt/XPP_TIMETOOL_AMPL']))
         
+        TTFP = np.append(TTFWHM, np.array(ScanName['/tt/XPP_TIMETOOL_FLTPOS']))
+        
         ScanNum = np.append(ScanNum, np.matlib.repmat(filenum, np.shape(ipm2)[0], 1))
         
         rowlandy = np.array(ScanName['/Rowland/ROI_proj_ythres'])
@@ -92,11 +95,11 @@ def loadData(FileNums, fileSetting, offSetting):
         
     if fileSetting == "XES":
         xesRawData.changeValue(XOn = XOn, LOn = LOn, Angle = Var0, Diode2 = Diode2, Ipm2Sum = Ipm2Sum, TimeTool = TimeTool, \
-                           TTAmp = TTAmp, TTFWHM = TTFWHM, ScanNum = ScanNum, RowlandY = RowlandY, Offset = Offset, L3E = L3E, CspadSum = CspadSum)
+                           TTAmp = TTAmp, TTFWHM = TTFWHM, ScanNum = ScanNum, RowlandY = RowlandY, Offset = Offset, L3E = L3E, CspadSum = CspadSum, TTFP = TTFP)
     
     if fileSetting == "Peaks":
         xesRawData.changeValue(XOn = XOn, LOn = LOn, StageDelay = Var0, Diode2 = Diode2, Ipm2Sum = Ipm2Sum, TimeTool = TimeTool, \
-                           TTAmp = TTAmp, TTFWHM = TTFWHM, ScanNum = ScanNum, RowlandY = RowlandY, Offset = Offset, L3E = L3E, CspadSum = CspadSum)
+                           TTAmp = TTAmp, TTFWHM = TTFWHM, ScanNum = ScanNum, RowlandY = RowlandY, Offset = Offset, L3E = L3E, CspadSum = CspadSum, TTFP = TTFP)
     
 
     return xesRawData

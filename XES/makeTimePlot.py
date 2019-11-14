@@ -285,38 +285,33 @@ def makeBootFT(TCentersP, TCentersM, XESDiffP, XESDiffM, minTime, maxTime, ploto
 
 
 
-def makeOneBootFT(TCenters, XESDiff, minTime, maxTime, ploton):
+def makeOneBootFT(TCenters, XESDiff, minTime, maxTime, starta, startrate, startsig, ploton):
         
-    from fitXES import fitXES
+    from fitXES import fitOneXES
     import numpy as np
     from fittingfunctions import convolved
-  
+
+    Fit, params, info = fitOneXES(TCenters, XESDiff, 0, starta, startrate, startsig, ploton)
     
-    Fitp, Fitm, params, info = fitXES(TCentersP, TCentersM, XESDiffP, XESDiffM, 0, ploton)
     
-    
-    Fitp = np.array(convolved(TCentersP, params[0], params[2], 0, params[3], params[4]))
-    Fitm = np.array(convolved(TCentersM, params[1], params[2], 0, params[3], params[4]))
+    Fit = np.array(convolved(TCenters, params[0], params[1], 0, params[2], params[3]))
 
 
-    Residualp = XESDiffP - Fitp
-    Residualm = XESDiffM - Fitm
+    Residual = XESDiff - Fit
     
     
     
     
         
-    bartlettWindowp = np.bartlett(len(Residualp[TCentersP>0]))
-    bartlettWindowm = np.bartlett(len(Residualm[TCentersM>0]))
+    bartlettWindow = np.bartlett(len(Residual[TCenters>0]))
     
-    FTp = np.fft.rfft([x*y for x,y in zip(Residualp[TCentersP>0], bartlettWindowp)])
-    FTm = np.fft.rfft([x*y for x,y in zip(Residualm[TCentersM>0], bartlettWindowm)])
+    FT = np.fft.rfft([x*y for x,y in zip(Residual[TCenters>0], bartlettWindow)])
     
-    Freq = np.fft.rfftfreq(len(Residualp[TCentersP>0]), d=(TCentersP[0]-TCentersP[1])*1e-15)
+    Freq = np.fft.rfftfreq(len(Residual[TCenters>0]), d=(TCenters[0]-TCenters[1])*1e-15)
     
     Freq = [-x*1e-12*33.356 for x in Freq]
     
     
     
     
-    return FTp, FTm, Freq
+    return FT, Freq

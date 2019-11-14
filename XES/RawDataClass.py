@@ -7,7 +7,7 @@ Created on Tue Oct 22 13:49:49 2019
 
 class XESRawData:
 
-    _defaults = "XOn", "LOn", "Angle", "Diode2", "Ipm2Sum", "TimeTool", "TTAmp", "TTFWHM", "ScanNum", "RowlandY", "Offset", "L3E", "CspadSum"
+    _defaults = "XOn", "LOn", "Angle", "Diode2", "Ipm2Sum", "TimeTool", "TTAmp", "TTFWHM", "ScanNum", "RowlandY", "Offset", "L3E", "CspadSum", "TTFP"
     _default_value = None
     
     def __init__(self, **kwargs):
@@ -20,7 +20,7 @@ class XESRawData:
         
 class PeaksRawData:
     
-    _defaults = "XOn", "LOn", "StageDelay", "Diode2", "Ipm2Sum", "TimeTool", "TTAmp", "TTFWHM", "ScanNum", "RowlandY", "Offset", "L3E", "CspadSum"
+    _defaults = "XOn", "LOn", "StageDelay", "Diode2", "Ipm2Sum", "TimeTool", "TTAmp", "TTFWHM", "ScanNum", "RowlandY", "Offset", "L3E", "CspadSum", "TTFP"
     _default_value = None
     
     def __init__(self, **kwargs):

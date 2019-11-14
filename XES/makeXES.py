@@ -28,10 +28,6 @@ def makeXES(peaksProData, peaksRawData, NumTTSteps, MinTime, MaxTime, ploton):
     SpectraOff = np.sum(peaksProData.RowWOffset[filteroff]-ROffset)/np.sum(peaksRawData.Diode2[filteroff])
     #SpectraOff = np.sum(peaksProData.RowWOffset[filteroff])/np.sum(peaksRawData.Ipm2Sum[filteroff])
     ErrorOff = sem(peaksProData.RowWOffset[filteroff]/peaksRawData.Diode2[filteroff])
-
-    print('off')
-    print(np.sum(filteroff.astype('int')))
-    print(np.sum(np.isnan(peaksRawData.Ipm2Sum[filteroff]).astype('int')))
             
     indices2delete = []
     
@@ -88,9 +84,6 @@ def makeBootXES(peaksProData, peaksRawData, NumTTSteps, MinTime, MaxTime, TF, pl
     #SpectraOff = np.sum(peaksProData.RowWOffset[filteroff])/np.sum(peaksRawData.Ipm2Sum[filteroff])
     ErrorOff = sem(peaksProData.RowWOffset[filteroff]/peaksRawData.Diode2[filteroff])
 
-    print('off')
-    print(np.sum(filteroff.astype('int')))
-    print(np.sum(np.isnan(peaksRawData.Ipm2Sum[filteroff]).astype('int')))
             
     indices2delete = []
     
