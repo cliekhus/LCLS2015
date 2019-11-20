@@ -19,25 +19,36 @@ def makeStaticXES(xesRawData, xesProData, MaxTime, MinTime, ploton):
     
     
     Filter, TTFilter = makeOneFilter(xesRawData, ploton)
-    SlopeFilter, Offset = makeLineFilter(xesRawData.CspadSum, xesRawData.Diode2, np.logical_and(Filter, TTFilter), ploton)
-    AllFilter = np.logical_and.reduce((Filter, TTFilter, SlopeFilter))
-    
     indices2delete = []
     
     for ii in range(len(xesProData.UniAngle)):
 
         selectAngle = xesRawData.Angle == xesProData.UniAngle[ii]
         selectTime = np.logical_and(xesProData.TTDelay <= MaxTime, xesProData.TTDelay >= MinTime)
+
+        SlopeFilter, Offset = makeLineFilter(xesRawData.Ipm2Sum, xesRawData.Diode2, np.logical_and.reduce((Filter, TTFilter, )), ploton)
+        AllFilter = np.logical_and.reduce((Filter, TTFilter, SlopeFilter))
         
         filteron = np.logical_and.reduce((AllFilter, selectAngle, selectTime, xesRawData.LOn, xesRawData.XOn))
         filteroff = np.logical_and.reduce((SlopeFilter, selectAngle, np.logical_not(xesRawData.LOn), xesRawData.XOn))
+        print('filters')
+        print(np.sum(AllFilter.astype('int')))
+        print(np.sum(selectAngle.astype('int')))
+        print(np.sum(selectTime.astype('int')))
+        print(np.sum(xesRawData.LOn.astype('int')))
+        print(np.sum(xesRawData.LOn.astype('int')))
+        print(np.sum(xesRawData.XOn.astype('int')))
+        print(np.sum(SlopeFilter.astype('int')))
+        print(np.sum(filteron.astype('int')))
+        print(np.sum(filteroff.astype('int')))
+
 
         if np.sum(filteron.astype('int')) > 0 and np.sum(filteroff.astype('int')) > 0:
     
-            SpectraOn[ii] = np.sum(xesProData.RowWOffset[filteron])/np.sum(xesRawData.CspadSum[filteron])
-            SpectraOff[ii] = np.sum(xesProData.RowWOffset[filteroff])/np.sum(xesRawData.CspadSum[filteroff])
-            ErrorOn[ii] = sem(xesProData.RowWOffset[filteron]/xesRawData.CspadSum[filteron])
-            ErrorOff[ii] = sem(xesProData.RowWOffset[filteroff]/xesRawData.CspadSum[filteroff])
+            SpectraOn[ii] = np.sum(xesProData.RowWOffset[filteron])/np.sum(xesRawData.Ipm2Sum[filteron])
+            SpectraOff[ii] = np.sum(xesProData.RowWOffset[filteroff])/np.sum(xesRawData.Ipm2Sum[filteroff])
+            ErrorOn[ii] = sem(xesProData.RowWOffset[filteron]/xesRawData.Ipm2Sum[filteron])
+            ErrorOff[ii] = sem(xesProData.RowWOffset[filteroff]/xesRawData.Ipm2Sum[filteroff])
             
         else:
             
@@ -47,7 +58,8 @@ def makeStaticXES(xesRawData, xesProData, MaxTime, MinTime, ploton):
     SpectraOff = np.delete(SpectraOff, indices2delete)
     ErrorOn = np.delete(ErrorOn, indices2delete)
     ErrorOff = np.delete(ErrorOff, indices2delete)
+    UniAngle = np.delete(xesProData.UniAngle, indices2delete)
 
-    return SpectraOn, SpectraOff, ErrorOn, ErrorOff
+    return SpectraOn, SpectraOff, ErrorOn, ErrorOff, UniAngle
 
 

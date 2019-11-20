@@ -62,7 +62,7 @@ def loadData(FileNums, fileSetting, offSetting):
         
         TTAmp = np.append(TTAmp, ScanName['/tt/XPP_TIMETOOL_AMPL'])
 
-        TTFWHM = np.append(TTFWHM, ScanName['/tt/XPP_TIMETOOL_AMPL'])
+        TTFWHM = np.append(TTFWHM, ScanName['/tt/XPP_TIMETOOL_FLTPOSFWHM'])
         
         ScanNum = np.append(ScanNum, np.matlib.repmat(filenum, np.shape(ipm2)[0], 1))
         

@@ -22,6 +22,9 @@ indexhigh = 500
 
 with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataPF.pkl", "rb") as f:
     peaksProDataP = pickle.load(f)
+    
+with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataP2F.pkl", "rb") as f:
+    peaksProDataP = pickle.load(f)
 
 
 with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataMF.pkl", "rb") as f:
@@ -65,6 +68,7 @@ ax = plt.subplot2grid((10,1), (3,0), colspan = 1, rowspan = 7)
 plt.plot(FeIIIEnergy*1000, (FeIIISignal-FeIISignal)/FeIISignal, color = 'k')
 ax.annotate('', xy=(peaksProDataP.EnergyLabel,0.13), xytext=(peaksProDataP.EnergyLabel,-0.13), arrowprops={'arrowstyle': '->', 'ec': pluscolor, 'lw': 3})
 ax.annotate('', xy=(peaksProDataM.EnergyLabel,-0.13), xytext=(peaksProDataM.EnergyLabel,0.13), arrowprops={'arrowstyle': '->', 'ec': minuscolor, 'lw': 3})
+ax.annotate('', xy=(peaksProDataP.EnergyLabel,0.13), xytext=(peaksProDataP.EnergyLabel,-0.13), arrowprops={'arrowstyle': '->', 'ec': pluscolor, 'lw': 3})
 plt.xlabel('energy (eV)')
 plt.ylabel('rel. $\Delta$ emission')
 #plt.ylim([-4, 4])

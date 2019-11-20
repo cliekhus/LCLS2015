@@ -13,8 +13,8 @@ import ProcessedDataClass as PDC
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_Spectra/"
 ReEnterData = False
-FPlots = False
-ReLoadData = True
+FPlots = True
+ReLoadData = False
 SaveData = False
 
 MinTime = -25

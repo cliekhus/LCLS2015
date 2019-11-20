@@ -167,20 +167,25 @@ def makeTimePlotThree(TCentersP, TCentersP2, TCentersM, peaksProDataP, peaksProD
     plt.xlim([-500, 1500])
     plt.ylim([-1.2, 1.2])
     
-    
+    bartlettWindowp = np.bartlett(len(Residualp[TCentersP>0]))
+    bartlettWindowm = np.bartlett(len(Residualm[TCentersM>0]))
+    bartlettWindowp2 = np.bartlett(len(Residualp2[TCentersP2>0]))    
     
     Residualp = np.concatenate((Residualp,np.zeros((numzeros))))
     Residualm = np.concatenate((Residualm,np.zeros((numzeros))))
     Residualp2 = np.concatenate((Residualp2,np.zeros((numzeros))))
+    
+    
+    bartlettWindowp = np.concatenate((bartlettWindowp,np.zeros((numzeros))))
+    bartlettWindowm = np.concatenate((bartlettWindowm,np.zeros((numzeros))))
+    bartlettWindowp2 = np.concatenate((bartlettWindowp2,np.zeros((numzeros))))
     
     TCentersP = np.concatenate((TCentersP,np.linspace(TCentersP[-1]+TCentersP[1]-TCentersP[0], TCentersP[-1]+(TCentersP[1]-TCentersP[0])*numzeros, num=numzeros)))
     TCentersM = np.concatenate((TCentersM,np.linspace(TCentersM[-1]+TCentersM[1]-TCentersM[0], TCentersM[-1]+(TCentersM[1]-TCentersM[0])*numzeros, num=numzeros)))
     TCentersP2 = np.concatenate((TCentersP2,np.linspace(TCentersP2[-1]+TCentersP2[1]-TCentersP2[0], TCentersP2[-1]+(TCentersP2[1]-TCentersP2[0])*numzeros, num=numzeros)))
 
     
-    bartlettWindowp = np.bartlett(len(Residualp[TCentersP>0]))
-    bartlettWindowm = np.bartlett(len(Residualm[TCentersM>0]))
-    bartlettWindowp2 = np.bartlett(len(Residualp2[TCentersP2>0]))
+
     
     FTp = np.fft.rfft([x*y for x,y in zip(Residualp[TCentersP>0], bartlettWindowp)])
     FTm = np.fft.rfft([x*y for x,y in zip(Residualm[TCentersM>0], bartlettWindowm)])
@@ -231,7 +236,7 @@ def makeTimePlotThree(TCentersP, TCentersP2, TCentersM, peaksProDataP, peaksProD
     plt.ylabel('fourier amplitude')
     plt.xlabel('cm$^{-1}$')
     plt.xlim([0,500])
-    plt.ylim([0,0.037])
+    plt.ylim([0,0.031])
     plt.tight_layout()
     
 

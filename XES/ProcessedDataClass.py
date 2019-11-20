@@ -21,9 +21,9 @@ class XESProcessedData:
     def makeProXES(self, xesRawData, MaxTime, MinTime, FPlots):
         from makeStatic import makeStaticXES
         
-        XESOn_Norm, XESOff_Norm, Error_On, Error_Off = makeStaticXES(xesRawData, self, MaxTime, MinTime, FPlots)
+        XESOn_Norm, XESOff_Norm, Error_On, Error_Off, UniAngle = makeStaticXES(xesRawData, self, MaxTime, MinTime, FPlots)
         
-        self.__dict__.update(XESOn_Norm = XESOn_Norm, XESOff_Norm = XESOff_Norm, Error_On = Error_On, Error_Off = Error_Off)
+        self.__dict__.update(XESOn_Norm = XESOn_Norm, XESOff_Norm = XESOff_Norm, Error_On = Error_On, Error_Off = Error_Off, UniAngle = UniAngle)
         
     def energyConversion(self, FPlots):
         from APSXESCalibration import makeConversion

@@ -156,7 +156,24 @@ FTMat = FTMat[:,index]
 FTEMat = FTEMat[:,index]
 
 
-            
+
+
+with open(folder + "EnergyMat.pkl", "wb") as f:
+    pickle.dump(EnergyMat, f)
+    
+with open(folder + "XESMat.pkl", "wb") as f:
+    pickle.dump(XESMat, f)
+    
+with open(folder + "XESEMat.pkl", "wb") as f:
+    pickle.dump(XESEMat, f)
+    
+with open(folder + "FTMat.pkl", "wb") as f:
+    pickle.dump(FTMat, f)
+    
+with open(folder + "FTEMat.pkl", "wb") as f:
+    pickle.dump(FTEMat, f)
+
+
 """        
         if True:
             

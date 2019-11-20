@@ -79,7 +79,7 @@ if Redot0:
         peakchoice = np.logical_and(xasProData.EnergyPlot >= np.float64(7114.5), xasProData.EnergyPlot <= np.float64(7117.5))
         Peak[ii] = sum(xasdiff[peakchoice])/sum(xasProData.XASOff_Norm[peakchoice])
     
-    t0 = find_t0_XAS(xasProData.TTSteps, Peak, True, True)
+    t0 = find_t0_XAS(xasProData.TTSteps, Peak, True, FPlots)
     
     with open(folder + "t0.pkl", "wb") as f:
         pickle.dump(t0, f)
@@ -102,7 +102,7 @@ else:
 
 
 
-EnergyShift = findEnergyShift(xasProData.XASOff_Norm, xasProData.UniXEnergy, True)
+EnergyShift = findEnergyShift(xasProData.XASOff_Norm, xasProData.UniXEnergy, FPlots)
 
 
 

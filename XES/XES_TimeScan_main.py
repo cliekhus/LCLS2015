@@ -23,9 +23,9 @@ folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
 ReEnterData = True
 FPlots = False
 ReLoadData = False
-SaveData = False
-Boot = True
-numBoot = 1
+SaveData = True
+Boot = False
+numBoot = 1000
 
 NumTTSteps = 100
 NumTTStepsPlots = 65
@@ -59,7 +59,7 @@ if ReLoadData:
         FileNumsP = pickle.load(f)
 
 peaksProDataP = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP.TimeTool + peaksRawDataP.StageDelay*1e15, RowWOffset = peaksRawDataP.RowlandY - peaksRawDataP.Offset)
-peaksProDataP.makeProPeaks(peaksRawDataP, NumTTSteps, MinTime, MaxTime, FPlots)
+peaksProDataP.makeProPeaks(peaksRawDataP, NumTTSteps, MinTime, MaxTime, True)
 
 
 
@@ -68,7 +68,8 @@ peaksProDataP.makeProPeaks(peaksRawDataP, NumTTSteps, MinTime, MaxTime, FPlots)
 
 if ReEnterData:
 
-    FileNumsP2 = list(range(123, 130+1))
+    #FileNumsP2 = list(range(123, 130+1))
+    FileNumsP2 = list(range(155,164+1))
     #FileNumsP2.remove(FileNumsP2[removenum])
     peaksRawDataP2 = loadData(FileNumsP2, "Peaks", 1)
     
@@ -126,21 +127,24 @@ with open(folder_con + "t0.pkl", "wb") as f:
 
 
 
-peaksProDataPF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP.TimeTool + peaksRawDataP.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP.RowlandY - peaksRawDataP.Offset)
+#peaksProDataPF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP.TimeTool + peaksRawDataP.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP.RowlandY - peaksRawDataP.Offset)
+peaksProDataPF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP.TimeTool + peaksRawDataP.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP.RowlandY)
 peaksProDataPF.makeProPeaks(peaksRawDataP, NumTTStepsPlots, MinTimePlots, MaxTimePlots, FPlots)
 peaksProDataPF.changeValue(EnergyLabel = round(convertAngle2Energy(FileNumsP2[0], True)*1000,1))
 TCentersPF = (peaksProDataPF.TimeSteps[:-1]+peaksProDataPF.TimeSteps[1:])/2
 
 
 
-peaksProDataP2F = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP2.TimeTool + peaksRawDataP2.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP2.RowlandY - peaksRawDataP2.Offset)
+#peaksProDataP2F = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP2.TimeTool + peaksRawDataP2.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP2.RowlandY - peaksRawDataP2.Offset)
+peaksProDataP2F = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP2.TimeTool + peaksRawDataP2.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP2.RowlandY)
 peaksProDataP2F.makeProPeaks(peaksRawDataP2, NumTTStepsPlots, MinTimePlots, MaxTimePlots, FPlots)
 peaksProDataP2F.changeValue(EnergyLabel = round(convertAngle2Energy(FileNumsP[0], True)*1000,1))
 TCentersP2F = (peaksProDataP2F.TimeSteps[:-1]+peaksProDataP2F.TimeSteps[1:])/2
 
 
 
-peaksProDataMF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataM.TimeTool + peaksRawDataM.StageDelay*1e15 - t0, RowWOffset = peaksRawDataM.RowlandY - peaksRawDataM.Offset)
+#peaksProDataMF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataM.TimeTool + peaksRawDataM.StageDelay*1e15 - t0, RowWOffset = peaksRawDataM.RowlandY - peaksRawDataM.Offset)
+peaksProDataMF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataM.TimeTool + peaksRawDataM.StageDelay*1e15 - t0, RowWOffset = peaksRawDataM.RowlandY)
 peaksProDataMF.makeProPeaks(peaksRawDataM, NumTTStepsPlots, MinTimePlots, MaxTimePlots, FPlots)
 peaksProDataMF.changeValue(EnergyLabel = round(convertAngle2Energy(FileNumsM[0], True)*1000,1))
 TCentersMF = (peaksProDataMF.TimeSteps[:-1]+peaksProDataMF.TimeSteps[1:])/2
@@ -151,8 +155,8 @@ TCentersMF = (peaksProDataMF.TimeSteps[:-1]+peaksProDataMF.TimeSteps[1:])/2
 
 
 
-makeTimePlot(TCentersPF, TCentersMF, peaksProDataPF, peaksProDataMF, MinTimePlots, MaxTimePlots, FPlots)
-#makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF, peaksProDataP2F, peaksProDataMF, MinTimePlots, MaxTimePlots, 0, FPlots)
+#makeTimePlot(TCentersPF, TCentersMF, peaksProDataPF, peaksProDataMF, MinTimePlots, MaxTimePlots, FPlots)
+makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF, peaksProDataP2F, peaksProDataMF, MinTimePlots, MaxTimePlots, 30, FPlots)
 
 
 
@@ -205,11 +209,17 @@ if Boot:
     Fit,Params,ParamsA,ParamsB,cov,info = \
         fitXASPiecewiseLor(xasProData_one.EnergyPlot, XASDiffBootF, xasProData_one.XASOff_Norm, xasProData_one.XASOn_Norm, True)
 
-    with open(folder + "XASDiffBootF.pkl", "wb") as f:
-        pickle.dump(XASDiffBootF, f)
+    with open(folder + "PeaksBootF.pkl", "wb") as f:
+        pickle.dump(PeaksBootF, f)
         
-    with open(folder + "XASDiffBootE.pkl", "wb") as f:
-        pickle.dump(XASDiffBootE, f)
+    with open(folder + "PeaksBootE.pkl", "wb") as f:
+        pickle.dump(PeaksBootE, f)
+        
+    with open(folder + "FTBootF.pkl", "wb") as f:
+        pickle.dump(FTBootF, f)
+        
+    with open(folder + "FTBootE.pkl", "wb") as f:
+        pickle.dump(FTBootE, f)
 
 else:
     
@@ -246,6 +256,15 @@ if SaveData:
         pickle.dump(FileNumsM, f)
         
     with open(folder + "FileNumsP.pkl", "wb") as f:
+        pickle.dump(FileNumsP, f)
+        
+    with open(folder + "peaksRawDataP1.pkl", "wb") as f:
+        pickle.dump(peaksRawDataP, f)
+            
+    with open(folder + "peaksProDataP2F.pkl", "wb") as f:
+        pickle.dump(peaksProDataPF, f)
+
+    with open(folder + "FileNumsP2.pkl", "wb") as f:
         pickle.dump(FileNumsP, f)
 
 

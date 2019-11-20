@@ -14,22 +14,24 @@ import pickle
 
 Eoff = 143.6
 
-ploton = True
+ploton = False
 
 file = os.getcwd()+'\\simulation\\feru-series-2-'
 
 holedensity = [.10, .21, .36, .50, .60, .75, .84]
-colorchoice = ['k', 'r', 'b', 'c', 'm', 'y', 'g']
+colorchoice = ['k', 'c', 'g', 'r', 'm', 'y', 'b']
+linestyle = ['-', '--', '--', '--', ':', ':', ':']
 
 
 if ploton:
     plt.figure()
 
-def makeABpeak(Eoff, calc, roots, ploton, cc, lc):
+def makeABpeak(Eoff, calc, roots, ploton, cc, lc, ls):
     
-    sig = .5
+    sig = .6
     
     Apeak = np.min(roots[:,0])+Eoff
+    Aamp = roots[0,1]
     
     print('Apeak')
     print(Apeak)
@@ -45,7 +47,7 @@ def makeABpeak(Eoff, calc, roots, ploton, cc, lc):
     Broots = np.delete(Broots, [0])
     Bshape = np.zeros(np.shape(x))
     for root,amp in zip(Broots,Bamp):
-        Bshape = Bshape + amp/50*np.exp(-(x-(root+Eoff))**2/sig**2)
+        Bshape = Bshape + amp*np.exp(-(x-(root+Eoff))**2/sig**2)
     
     #Bpeak = x[np.argmax(Bshape)]
     Bpeak = Broots[np.argmax(Bamp)]+Eoff
@@ -58,16 +60,19 @@ def makeABpeak(Eoff, calc, roots, ploton, cc, lc):
     Croots = Croots[Croots+Eoff>7116]
     Cshape = np.zeros(np.shape(x))
     for root,amp in zip(Croots,Camp):
-        Cshape = Cshape + amp/50*np.exp(-(x-(root+Eoff))**2/sig**2)
+        Cshape = Cshape + amp*np.exp(-(x-(root+Eoff))**2/sig**2)
     
     Cpeak = x[np.argmax(Cshape)]
     
     if ploton:
-        plt.plot(x, Bshape, color = cc, label = lc)
-        plt.plot([Apeak,Apeak], [0,5e-7], color = cc)
-        plt.plot(x, Cshape, color = cc)
+        plt.plot(x, Bshape, color = cc, label = lc, linestyle = ls)
+        plt.plot(x, Aamp*np.exp(-(x-(Apeak))**2/sig**2), color = cc, linestyle = ls)
+        plt.plot(x, Cshape, color = cc, linestyle = ls)
         plt.legend()
-        plt.xlim([7109, 7130])
+        plt.xlim([7109, 7125])
+        plt.xlabel('x-ray energy (eV)')
+        plt.ylabel('absorption amplitude')
+        plt.tight_layout()
     
     return Apeak, Bpeak, Cpeak
 
@@ -78,7 +83,7 @@ for ii in range(len(holedensity)):
     
     calc = loadtxt(file+str(int(holedensity[ii]*100))+'.dat')
     roots = loadtxt(file+str(int(holedensity[ii]*100))+'.roots')
-    Apeak, Bpeak, Cpeak = makeABpeak(Eoff, calc, roots, ploton, colorchoice[ii], str(holedensity[ii]))
+    Apeak, Bpeak, Cpeak = makeABpeak(Eoff, calc, roots, ii%3==0, colorchoice[ii], str(holedensity[ii]), linestyle[ii])
     
     Apeaks = Apeaks + [Apeak]
     Bpeaks = Bpeaks + [Bpeak]
@@ -114,4 +119,3 @@ plt.plot([-1,-2], [1,2], marker = 'o', label = 'measurement', color = '#e69f00',
 #plt.legend()
 #plt.tight_layout()
 plt.legend()
-

@@ -5,7 +5,7 @@ Created on Mon Apr 29 11:29:47 2019
 @author: chelsea
 """
 
-def makeLineFilter(Cspad, Diode2, selectedRuns, ploton):
+def makeLineFilter(Diode2, Cspad, selectedRuns, ploton):
     
 
     import matplotlib.pyplot as plt
@@ -35,9 +35,9 @@ def makeLineFilter(Cspad, Diode2, selectedRuns, ploton):
         if ploton:
             
             plt.scatter(Cspad[plotfilter], Diode2[plotfilter], s=2, c='r')
-            plt.title(-linfit[1]/linfit[0])
-            plt.xlabel('Cspad')
-            plt.ylabel('Diode')
+            plt.title(linfit[1])
+            plt.xlabel('Diode')
+            plt.ylabel('Rowland')
             print(linfit[1])
         
         
