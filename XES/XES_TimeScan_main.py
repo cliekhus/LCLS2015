@@ -17,24 +17,25 @@ from makeTimePlot import makeTimePlotThree
 from makeTimePlot import makeBootFT
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
-ReEnterData = True
+ReEnterData = False
 FPlots = False
 ReLoadData = False
-SaveData = True
+SaveData = False
 Boot = False
-numBoot = 1000
+numBoot = 100
 
 NumTTSteps = 100
-NumTTStepsPlots = 65
+NumTTStepsPlots = 50
 
 MinTime = -2000 
 MaxTime = 0
 
-MinTimePlots = -500
-MaxTimePlots = 1500
+MinTimePlots = -250
+MaxTimePlots = 1400
 
 removenum = 9
 
@@ -59,7 +60,7 @@ if ReLoadData:
         FileNumsP = pickle.load(f)
 
 peaksProDataP = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP.TimeTool + peaksRawDataP.StageDelay*1e15, RowWOffset = peaksRawDataP.RowlandY - peaksRawDataP.Offset)
-peaksProDataP.makeProPeaks(peaksRawDataP, NumTTSteps, MinTime, MaxTime, True)
+peaksProDataP.makeProPeaks(peaksRawDataP, NumTTSteps, MinTime, MaxTime, FPlots)
 
 
 
@@ -127,24 +128,24 @@ with open(folder_con + "t0.pkl", "wb") as f:
 
 
 
-#peaksProDataPF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP.TimeTool + peaksRawDataP.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP.RowlandY - peaksRawDataP.Offset)
-peaksProDataPF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP.TimeTool + peaksRawDataP.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP.RowlandY)
+peaksProDataPF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP.TimeTool + peaksRawDataP.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP.RowlandY - peaksRawDataP.Offset)
+#peaksProDataPF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP.TimeTool + peaksRawDataP.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP.RowlandY)
 peaksProDataPF.makeProPeaks(peaksRawDataP, NumTTStepsPlots, MinTimePlots, MaxTimePlots, FPlots)
 peaksProDataPF.changeValue(EnergyLabel = round(convertAngle2Energy(FileNumsP2[0], True)*1000,1))
 TCentersPF = (peaksProDataPF.TimeSteps[:-1]+peaksProDataPF.TimeSteps[1:])/2
 
 
 
-#peaksProDataP2F = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP2.TimeTool + peaksRawDataP2.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP2.RowlandY - peaksRawDataP2.Offset)
-peaksProDataP2F = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP2.TimeTool + peaksRawDataP2.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP2.RowlandY)
+peaksProDataP2F = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP2.TimeTool + peaksRawDataP2.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP2.RowlandY - peaksRawDataP2.Offset)
+#peaksProDataP2F = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP2.TimeTool + peaksRawDataP2.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP2.RowlandY)
 peaksProDataP2F.makeProPeaks(peaksRawDataP2, NumTTStepsPlots, MinTimePlots, MaxTimePlots, FPlots)
 peaksProDataP2F.changeValue(EnergyLabel = round(convertAngle2Energy(FileNumsP[0], True)*1000,1))
 TCentersP2F = (peaksProDataP2F.TimeSteps[:-1]+peaksProDataP2F.TimeSteps[1:])/2
 
 
 
-#peaksProDataMF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataM.TimeTool + peaksRawDataM.StageDelay*1e15 - t0, RowWOffset = peaksRawDataM.RowlandY - peaksRawDataM.Offset)
-peaksProDataMF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataM.TimeTool + peaksRawDataM.StageDelay*1e15 - t0, RowWOffset = peaksRawDataM.RowlandY)
+peaksProDataMF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataM.TimeTool + peaksRawDataM.StageDelay*1e15 - t0, RowWOffset = peaksRawDataM.RowlandY - peaksRawDataM.Offset)
+#peaksProDataMF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataM.TimeTool + peaksRawDataM.StageDelay*1e15 - t0, RowWOffset = peaksRawDataM.RowlandY)
 peaksProDataMF.makeProPeaks(peaksRawDataM, NumTTStepsPlots, MinTimePlots, MaxTimePlots, FPlots)
 peaksProDataMF.changeValue(EnergyLabel = round(convertAngle2Energy(FileNumsM[0], True)*1000,1))
 TCentersMF = (peaksProDataMF.TimeSteps[:-1]+peaksProDataMF.TimeSteps[1:])/2
@@ -156,7 +157,7 @@ TCentersMF = (peaksProDataMF.TimeSteps[:-1]+peaksProDataMF.TimeSteps[1:])/2
 
 
 #makeTimePlot(TCentersPF, TCentersMF, peaksProDataPF, peaksProDataMF, MinTimePlots, MaxTimePlots, FPlots)
-makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF, peaksProDataP2F, peaksProDataMF, MinTimePlots, MaxTimePlots, 30, FPlots)
+makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF, peaksProDataP2F, peaksProDataMF, MinTimePlots, MaxTimePlots, 0, FPlots)
 
 
 
@@ -168,30 +169,30 @@ makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF, peaksProD
 
 if Boot:
     
-    peaksProDataPF_boot = peaksProDataPF
+    peaksProDataMF_boot = peaksProDataMF
     
-    PeaksBoot = np.empty((np.shape(TCentersPF)[0],numBoot))
+    PeaksBoot = np.empty((np.shape(TCentersMF)[0],numBoot))
     
-    TT = np.matlib.repmat(True,1,int((np.shape(peaksRawDataP.XOn)[0])/2))
-    FF = np.matlib.repmat(False,1,int((np.shape(peaksRawDataP.XOn)[0])/2))
+    TT = np.matlib.repmat(True,1,int((np.shape(peaksRawDataM.XOn)[0])/2))
+    FF = np.matlib.repmat(False,1,int((np.shape(peaksRawDataM.XOn)[0])/2))
     TF = np.concatenate((TT,FF))
 
     TF = TF.flatten()    
     
-    FTp, FTm, Freq = makeBootFT(TCentersPF, TCentersMF, peaksProDataPF_boot.XESDiff, peaksProDataMF.XESDiff, MinTimePlots, MaxTimePlots, FPlots)
+    FTp, FTm, Freq = makeBootFT(TCentersPF, TCentersMF, peaksProDataPF.XESDiff, peaksProDataMF_boot.XESDiff, MinTimePlots, MaxTimePlots, FPlots)
     FTBoot = np.empty((np.shape(Freq)[0],numBoot))
     
     for ii in range(numBoot):
 
         random.shuffle(TF)  
         
-        peaksProDataPF_boot.makeBootPeaks(peaksRawDataP, NumTTStepsPlots, MinTimePlots, MaxTimePlots, TF, FPlots)
+        peaksProDataMF_boot.makeBootPeaks(peaksRawDataM, NumTTStepsPlots, MinTimePlots, MaxTimePlots, TF, FPlots)
         
-        PeaksBoot[:,ii] = peaksProDataPF_boot.XESDiff
+        PeaksBoot[:,ii] = peaksProDataMF_boot.XESDiff
         
-        FTp, FTm, Freq = makeBootFT(TCentersPF, TCentersMF, peaksProDataPF_boot.XESDiff, peaksProDataMF.XESDiff, MinTimePlots, MaxTimePlots, FPlots)
+        FTp, FTm, Freq = makeBootFT(TCentersPF, TCentersMF, peaksProDataPF.XESDiff, peaksProDataMF_boot.XESDiff, MinTimePlots, MaxTimePlots, FPlots)
         
-        FTBoot[:,ii] = abs(FTp)
+        FTBoot[:,ii] = abs(FTm)
     
     PeaksBootF = np.mean(PeaksBoot,1)
     PeaksBootE = np.std(PeaksBoot,1)
@@ -258,11 +259,11 @@ if SaveData:
     with open(folder + "FileNumsP.pkl", "wb") as f:
         pickle.dump(FileNumsP, f)
         
-    with open(folder + "peaksRawDataP1.pkl", "wb") as f:
-        pickle.dump(peaksRawDataP, f)
+    with open(folder + "peaksRawDataP2.pkl", "wb") as f:
+        pickle.dump(peaksRawDataP2, f)
             
     with open(folder + "peaksProDataP2F.pkl", "wb") as f:
-        pickle.dump(peaksProDataPF, f)
+        pickle.dump(peaksProDataP2F, f)
 
     with open(folder + "FileNumsP2.pkl", "wb") as f:
         pickle.dump(FileNumsP, f)

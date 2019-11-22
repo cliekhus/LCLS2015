@@ -21,10 +21,12 @@ def makeXES(peaksProData, peaksRawData, NumTTSteps, MinTime, MaxTime, ploton):
     
     
     Filter, TTFilter = makeOneFilter(peaksRawData, ploton)
-    SlopeFilter, ROffset = makeLineFilter(peaksRawData.RowlandY, peaksRawData.Diode2, np.logical_and(Filter, TTFilter), ploton)
-    AllFilter = np.logical_and.reduce((Filter, TTFilter, SlopeFilter))
+    AllFilter = np.logical_and(Filter, TTFilter)
     
-    filteroff = np.logical_and.reduce((SlopeFilter, np.logical_not(peaksRawData.LOn), peaksRawData.XOn, Filter))
+    X, ROffset = makeLineFilter(peaksRawData.RowlandY, peaksRawData.Diode2, np.logical_and.reduce((Filter, np.logical_not(peaksRawData.LOn), peaksRawData.XOn)), ploton)
+    SlopeFilterOff, X = makeLineFilter(peaksRawData.RowlandY, peaksRawData.Diode2, np.logical_and(Filter, peaksRawData.XOn), ploton)
+    
+    filteroff = np.logical_and.reduce((SlopeFilterOff, np.logical_not(peaksRawData.LOn), peaksRawData.XOn, Filter))
     SpectraOff = np.sum(peaksProData.RowWOffset[filteroff]-ROffset)/np.sum(peaksRawData.Diode2[filteroff])
     #SpectraOff = np.sum(peaksProData.RowWOffset[filteroff])/np.sum(peaksRawData.Ipm2Sum[filteroff])
     ErrorOff = sem(peaksProData.RowWOffset[filteroff]/peaksRawData.Diode2[filteroff])
@@ -35,12 +37,14 @@ def makeXES(peaksProData, peaksRawData, NumTTSteps, MinTime, MaxTime, ploton):
 
         selectTime = np.logical_and(peaksProData.Delay < TimeSteps[ii+1], peaksProData.Delay >= TimeSteps[ii])
         filteron = np.logical_and.reduce((AllFilter, selectTime, peaksRawData.LOn, peaksRawData.XOn))
+        SlopeFilterOn, X = makeLineFilter(peaksRawData.RowlandY, peaksRawData.Diode2, filteron, ploton)
+        FilterOn = np.logical_and(SlopeFilterOn, filteron)
 
         if np.sum(filteron.astype('int')) > 0 and np.sum(filteroff.astype('int')) > 0:
     
-            SpectraOn[ii] = np.sum(peaksProData.RowWOffset[filteron]-ROffset)/np.sum(peaksRawData.Diode2[filteron])
+            SpectraOn[ii] = np.sum(peaksProData.RowWOffset[FilterOn]-ROffset)/np.sum(peaksRawData.Diode2[FilterOn])
             #SpectraOn[ii] = np.sum(peaksProData.RowWOffset[filteron])/np.sum(peaksRawData.Ipm2Sum[filteron])
-            ErrorOn[ii] = sem(peaksProData.RowWOffset[filteron]/peaksRawData.Diode2[filteron])
+            ErrorOn[ii] = sem(peaksProData.RowWOffset[FilterOn]/peaksRawData.Diode2[FilterOn])
 
         else:
             
