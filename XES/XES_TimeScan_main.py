@@ -32,7 +32,7 @@ NumTTSteps = 100
 NumTTStepsPlots = 50
 
 MinTime = -2000 
-MaxTime = 0
+MaxTime = 0                                                                                                                                                                           
 
 MinTimePlots = -250
 MaxTimePlots = 1400
@@ -48,6 +48,7 @@ if ReEnterData:
     #FileNumsP = list(range(165, 178+1))
     FileNumsP = list(range(123, 130+1))
     #FileNumsP = list(range(155,164+1))
+    #FileNumsP = [103,105,115,121]
     #FileNumsP.remove(FileNumsP[removenum])
     peaksRawDataP = loadData(FileNumsP, "Peaks", 1)
     
@@ -70,16 +71,17 @@ peaksProDataP.makeProPeaks(peaksRawDataP, NumTTSteps, MinTime, MaxTime, FPlots)
 if ReEnterData:
 
     #FileNumsP2 = list(range(123, 130+1))
+    #FileNumsP2 = [105,103]
     FileNumsP2 = list(range(155,164+1))
     #FileNumsP2.remove(FileNumsP2[removenum])
     peaksRawDataP2 = loadData(FileNumsP2, "Peaks", 1)
     
 if ReLoadData:
 
-    with open(folder + "peaksRawDataP.pkl", "rb") as f:
+    with open(folder + "peaksRawDataP2.pkl", "rb") as f:
         peaksRawDataP2 = pickle.load(f)
         
-    with open(folder + "FileNumsP.pkl", "rb") as f:
+    with open(folder + "FileNumsP2.pkl", "rb") as f:
         FileNumsP2 = pickle.load(f)
 
 peaksProDataP2 = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP2.TimeTool + peaksRawDataP2.StageDelay*1e15, RowWOffset = peaksRawDataP2.RowlandY - peaksRawDataP2.Offset)
@@ -157,7 +159,7 @@ TCentersMF = (peaksProDataMF.TimeSteps[:-1]+peaksProDataMF.TimeSteps[1:])/2
 
 
 #makeTimePlot(TCentersPF, TCentersMF, peaksProDataPF, peaksProDataMF, MinTimePlots, MaxTimePlots, FPlots)
-makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF, peaksProDataP2F, peaksProDataMF, MinTimePlots, MaxTimePlots, 0, FPlots)
+params, cov = makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF, peaksProDataP2F, peaksProDataMF, MinTimePlots, MaxTimePlots, 0, FPlots)
 
 
 

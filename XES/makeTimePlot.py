@@ -23,6 +23,8 @@ def makeTimePlot(TCentersP, TCentersM, peaksProDataP, peaksProDataM, minTime, ma
     
     Fitp, Fitm, params, info = fitXES(TCentersP, TCentersM, peaksProDataP.XESDiff, peaksProDataM.XESDiff, 0, ploton)
     
+    print(params)
+    
     cov= np.sqrt(np.diag(info))
     
     Fitp = np.array(convolved(TCentersP, params[0], params[2], 0, params[3], params[4]))
@@ -41,7 +43,7 @@ def makeTimePlot(TCentersP, TCentersM, peaksProDataP, peaksProDataM, minTime, ma
     plt.plot(tt, convolved(tt, params[1], params[2], 0, params[3], params[4]), '--', color = darkminuscolor, label = str(peaksProDataM.EnergyLabel) +' eV fit')
     plt.plot(tt, convolved(tt, params[0], params[2], 0, params[3], params[4]), color = darkpluscolor, label = str(peaksProDataP.EnergyLabel) +' eV fit')
     plt.annotate('BET = ' + str(round(params[2]*math.log(2),0)) + ' $\pm $ ' + str(round(cov[2]*math.log(2),0)) + ' (fs)', (300, -0.01))
-    plt.annotate('IRF = ' + str(round(params[4]*math.sqrt(2*math.log(2)),0)) + ' $\pm $ ' + str(round(cov[4]*math.log(2),0)) + ' (fs)', (300, -0.015))
+    plt.annotate('IRF = ' + str(round(params[4],0)) + ' $\pm $ ' + str(round(cov[4],0)) + ' (fs)', (300, -0.015))
     plt.ylabel('rel. $\Delta$ emission')
     plt.legend()
     plt.tight_layout()
@@ -99,6 +101,8 @@ def makeTimePlot(TCentersP, TCentersM, peaksProDataP, peaksProDataM, minTime, ma
     plt.ylim([0,0.03])
     plt.legend()
     plt.tight_layout()
+    
+
 
     
     
@@ -149,7 +153,7 @@ def makeTimePlotThree(TCentersP, TCentersP2, TCentersM, peaksProDataP, peaksProD
     plt.ylabel('%$\Delta$ emission')
     plt.legend()
     plt.annotate('BET = ' + str(int(params[2]*math.log(2))) + ' $\pm $ ' + str(int(cov[2]*math.log(2))) + ' fs', (450, -1.1))
-    plt.annotate('IRF = ' + str(int(params[4]*math.sqrt(2*math.log(2)))) + ' $\pm $ ' + str(int(cov[4]*math.log(2))) + ' fs', (450, -1.45))
+    plt.annotate('IRF = ' + str(int(params[4])) + ' $\pm $ ' + str(int(cov[4]*math.log(2))) + ' fs', (450, -1.45))
     plt.xlim([-250, 1400])
     plt.xlabel('time delay (fs)')
     plt.tight_layout()
@@ -173,7 +177,7 @@ def makeTimePlotThree(TCentersP, TCentersP2, TCentersM, peaksProDataP, peaksProD
     plt.ylabel('%$\Delta$ emission')
     plt.legend()
     plt.annotate('BET = ' + str(int(params[2]*math.log(2))) + ' $\pm $ ' + str(int(cov[2]*math.log(2))) + ' fs', (450, -1.1))
-    plt.annotate('IRF = ' + str(int(params[4]*math.sqrt(2*math.log(2)))) + ' $\pm $ ' + str(int(cov[4]*math.log(2))) + ' fs', (450, -1.45))
+    plt.annotate('IRF = ' + str(int(params[4])) + ' $\pm $ ' + str(int(cov[4]*math.log(2))) + ' fs', (450, -1.45))
     plt.xlim([-250, 1400])
     plt.xlabel('time delay (fs)')
     plt.tight_layout()
@@ -245,7 +249,7 @@ def makeTimePlotThree(TCentersP, TCentersP2, TCentersM, peaksProDataP, peaksProD
     plt.ylim([0,0.017])
     plt.tight_layout()
     
-
+    return params, cov
 
 
 
@@ -296,33 +300,34 @@ def makeBootFT(TCentersP, TCentersM, XESDiffP, XESDiffM, minTime, maxTime, ploto
 
 
 
-def makeOneBootFT(TCenters, XESDiff, minTime, maxTime, starta, startrate, startsig, ploton):
+def makeOneBootFT(TCenters, XESDiff, minTime, maxTime, starta, startrate, startsig, PM, ploton):
         
     from fitXES import fitOneXES
     import numpy as np
-    from fittingfunctions import convolved
+    from fittingfunctions import convolvedzero
 
-    Fit, params, info = fitOneXES(TCenters, XESDiff, 0, starta, startrate, startsig, ploton)
+    TCenters = np.ndarray.flatten(TCenters)
+    XESDiff = np.ndarray.flatten(XESDiff)
+
+    Fit, params, info = fitOneXES(TCenters, XESDiff, -1500, PM*starta, startrate, startsig, ploton)
     
     
-    Fit = np.array(convolved(TCenters, params[0], params[1], 0, params[2], params[3]))
+    Fit = np.array(convolvedzero(TCenters, params[0], params[1], params[2], params[3]))
 
 
     Residual = XESDiff - Fit
     
-    
-    
-    
+    minFTtime = 60
         
-    bartlettWindow = np.bartlett(len(Residual[TCenters>0]))
+    bartlettWindow = np.bartlett(len(Residual[TCenters>minFTtime]))
     
-    FT = np.fft.rfft([x*y for x,y in zip(Residual[TCenters>0], bartlettWindow)])
+    FT = np.fft.rfft([x*y for x,y in zip(Residual[TCenters>minFTtime], bartlettWindow)])
     
-    Freq = np.fft.rfftfreq(len(Residual[TCenters>0]), d=(TCenters[0]-TCenters[1])*1e-15)
+    Freq = np.fft.rfftfreq(len(Residual[TCenters>minFTtime]), d=(TCenters[0]-TCenters[1])*1e-15)
     
     Freq = [-x*1e-12*33.356 for x in Freq]
     
     
     
     
-    return FT, Freq
+    return FT, Freq, params

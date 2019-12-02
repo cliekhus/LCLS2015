@@ -71,7 +71,7 @@ def fitOneXES(TCenters, XESDiff, startt0, starta, startrate, startsig, ploton):
 
     params,cov = curve_fit(convolvedzero, TCenters, XESDiff, p0 = [starta, startrate, startt0, startsig])
     
-    Fit = convolved(TCenters, params[0], params[1], 0, params[2], params[3])
+    Fit = convolvedzero(TCenters, params[0], params[1], params[2], params[3])
     
     if ploton:
             
@@ -163,6 +163,7 @@ def fitXESthree(TCentersplus, TCentersplus2, TCentersminus, XESDiffplus, XESDiff
     
 
     params,cov = curve_fit(combinedconvolvedzerothree, np.concatenate((TCentersplus,TCentersminus,TCentersplus2)), np.concatenate((XESDiffplus,XESDiffminus,XESDiffplus2)), p0 = [starta, -starta, startrate, startt0, startsig, starta])
+    print(params)
     
     Fitp = convolved(TCentersplus, params[0], params[2], 0, params[3], params[4])
     Fitm = convolved(TCentersminus, params[1], params[2], 0, params[3], params[4])
