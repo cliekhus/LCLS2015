@@ -309,7 +309,7 @@ def makeOneBootFT(TCenters, XESDiff, minTime, maxTime, starta, startrate, starts
     TCenters = np.ndarray.flatten(TCenters)
     XESDiff = np.ndarray.flatten(XESDiff)
 
-    Fit, params, info = fitOneXES(TCenters, XESDiff, -1500, PM*starta, startrate, startsig, ploton)
+    Fit, params, info = fitOneXES(TCenters, XESDiff, 0, PM*starta, startrate, startsig, ploton)
     
     
     Fit = np.array(convolvedzero(TCenters, params[0], params[1], params[2], params[3]))
@@ -331,3 +331,32 @@ def makeOneBootFT(TCenters, XESDiff, minTime, maxTime, starta, startrate, starts
     
     
     return FT, Freq, params
+
+
+
+def makenofitBootFT(TCenters, XESDiff, ploton):
+        
+    from fitXES import fitOneXES
+    import numpy as np
+    from fittingfunctions import convolvedzero
+
+    TCenters = np.ndarray.flatten(TCenters)
+    XESDiff = np.ndarray.flatten(XESDiff)
+
+
+    Residual = XESDiff 
+    
+    minFTtime = 60
+        
+    bartlettWindow = np.bartlett(len(Residual[TCenters>minFTtime]))
+    
+    FT = np.fft.rfft([x*y for x,y in zip(Residual[TCenters>minFTtime], bartlettWindow)])
+    
+    Freq = np.fft.rfftfreq(len(Residual[TCenters>minFTtime]), d=(TCenters[0]-TCenters[1])*1e-15)
+    
+    Freq = [-x*1e-12*33.356 for x in Freq]
+    
+    
+    
+    
+    return FT, Freq, 0

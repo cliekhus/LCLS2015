@@ -6,24 +6,20 @@ Created on Mon May 20 10:34:43 2019
 """
 
 
-def XES_Time_Scan_fn(FileNums, PorM, ReEnterData, SaveData, ReLoadData, FPlots):
+def XES_TimeScan_fn(FileNums, PorM, ReEnterData, SaveData, ReLoadData, starta, startrate, startsig, FPlots):
     
     from loadData import loadData
-    #from fitXES import fitXES
-    from fitXES import fitXESthree
-    from APSXESCalibration import convertAngle2Energy
     import pickle
     import ProcessedDataClass as PDC
-    from makeTimePlot import makeTimePlot
-    from makeTimePlot import makeTimePlotThree
     from makeTimePlot import makeOneBootFT
+    from makeTimePlot import makenofitBootFT
     import numpy as np
-    import random
-    import matplotlib.pyplot as plt
+    from MakeRawBoot import MakeRawBoot
+    import scipy.stats as ss
     
     
     folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
-    numBoot = 100
+    numBoot = 10
     
     NumTTStepsPlots = 50
     
@@ -47,37 +43,49 @@ def XES_Time_Scan_fn(FileNums, PorM, ReEnterData, SaveData, ReLoadData, FPlots):
     
     TCenters = (peaksProDataF.TimeSteps[:-1]+peaksProDataF.TimeSteps[1:])/2
     
-
-        
-    peaksProDataF_boot = peaksProDataF
     
     PeaksBoot = np.empty((np.shape(TCenters)[0],numBoot))
     
-    TT = np.matlib.repmat(True,1,int((np.shape(peaksRawData.XOn)[0])/2))
-    FF = np.matlib.repmat(False,1,int((np.shape(peaksRawData.XOn)[0])/2))
-    TF = np.concatenate((TT,FF))
-
-    TF = TF.flatten()
-    
-    FT, Freq, params = makeOneBootFT(TCenters, peaksProDataF.XESDiff, MinTimePlots, MaxTimePlots, FPlots)
+    try:
+        FT, Freq, params = makeOneBootFT(TCenters, peaksProDataF.XESDiff, MinTimePlots, MaxTimePlots, starta, startrate, startsig, PorM, FPlots)
+    except:
+        FT, Freq, params = makenofitBootFT(TCenters, peaksProDataF.XESDiff, FPlots)
+        
     FTBoot = np.empty((np.shape(Freq)[0],numBoot))
     
     for ii in range(numBoot):
 
-        random.shuffle(TF)  
+        peaksRawBoot = MakeRawBoot(peaksRawData)
         
-        peaksProDataF_boot.makeBootPeaks(peaksRawData, NumTTStepsPlots, MinTimePlots, MaxTimePlots, TF, FPlots)
+        peaksProDataF_boot = PDC.PeaksProcessedData(Delay = 1000*peaksRawBoot.TimeTool + peaksRawBoot.StageDelay*1e15 - t0, RowWOffset = peaksRawBoot.RowlandY - peaksRawBoot.Offset)
+        peaksProDataF_boot.makeProPeaks(peaksRawBoot, NumTTStepsPlots, MinTimePlots, MaxTimePlots, FPlots)
         
         PeaksBoot[:,ii] = peaksProDataF_boot.XESDiff
-        TCenters, XESDiff, minTime, maxTime, starta, startrate, startsig, PM, ploton
-        FTp, FTm, Freq = makeOneBootFT(TCenters, peaksProDataF.XESDiff, MinTimePlots, MaxTimePlots, FPlots)
-        
-        FTBoot[:,ii] = abs(FTm)
+
+        try:
+                
+            FT, Freq, params = makeOneBootFT(TCenters, peaksProDataF_boot.XESDiff, MinTimePlots, MaxTimePlots, starta, startrate, startsig, PorM, FPlots)
+            FTBoot[:,ii] = abs(FT)
+
+        except:
+            
+            try:
+                    
+                FT, Freq, params = makeOneBootFT(TCenters, peaksProDataF_boot.XESDiff, MinTimePlots, MaxTimePlots, starta*.9, startrate*.9, startsig*.9, PorM, FPlots)
+                FTBoot[:,ii] = abs(FT)
+                
+            except:
+                
+                FT, Freq, params = makenofitBootFT(TCenters, peaksProDataF_boot.XESDiff, FPlots)
+                FTBoot[:,ii] = abs(FT)
+            
     
     PeaksBootF = np.mean(PeaksBoot,1)
-    PeaksBootE = np.std(PeaksBoot,1)
+    print(np.std(PeaksBoot,1))
+    print(ss.sem(PeaksBoot,1))
+    PeaksBootE = ss.sem(PeaksBoot,1)
     FTBootF = np.mean(FTBoot,1)
-    FTBootE = np.std(FTBoot,1)
+    FTBootE = ss.sem(FTBoot,1)
 
 
     
@@ -94,7 +102,7 @@ def XES_Time_Scan_fn(FileNums, PorM, ReEnterData, SaveData, ReLoadData, FPlots):
     
     
     
-    return PeaksBootF, PeaksBootE, FTBootF, FTBootE
+    return PeaksBootF, PeaksBootE, FTBootF, FTBootE, Freq, TCenters
 
 
 
