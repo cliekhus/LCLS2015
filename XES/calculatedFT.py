@@ -14,6 +14,7 @@ import matplotlib.gridspec as gridspec
 
 
 calc = loadtxt('Fe1s2p-gap-12.out')
+#calc = loadtxt('Fe1s3p-gap-123.out')
 
 FT = np.fft.rfft(calc[:,5])
 

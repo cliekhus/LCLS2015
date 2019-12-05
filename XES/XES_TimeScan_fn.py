@@ -15,11 +15,10 @@ def XES_TimeScan_fn(FileNums, PorM, ReEnterData, SaveData, ReLoadData, starta, s
     from makeTimePlot import makenofitBootFT
     import numpy as np
     from MakeRawBoot import MakeRawBoot
-    import scipy.stats as ss
     
     
     folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
-    numBoot = 10
+    numBoot = 5
     
     NumTTStepsPlots = 50
     
@@ -81,11 +80,9 @@ def XES_TimeScan_fn(FileNums, PorM, ReEnterData, SaveData, ReLoadData, starta, s
             
     
     PeaksBootF = np.mean(PeaksBoot,1)
-    print(np.std(PeaksBoot,1))
-    print(ss.sem(PeaksBoot,1))
-    PeaksBootE = ss.sem(PeaksBoot,1)
+    PeaksBootE = np.std(PeaksBoot,1)
     FTBootF = np.mean(FTBoot,1)
-    FTBootE = ss.sem(FTBoot,1)
+    FTBootE = np.std(FTBoot,1)
 
 
     

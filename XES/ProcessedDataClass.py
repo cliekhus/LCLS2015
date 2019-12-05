@@ -43,7 +43,7 @@ class XESProcessedData:
 
 class PeaksProcessedData:
     
-    _defaults = "Delay", "XESOn_Norm", "XESOff_Norm", "TTSteps", "Error_On", "Error_Off", "RowWOffset", "TimeSteps", "XESDiff", "EnergyLabel"
+    _defaults = "Delay", "XESOn_Norm", "XESOff_Norm", "TTSteps", "Error_On", "Error_Off", "RowWOffset", "TimeSteps", "XESDiff", "EnergyLabel", "XESDiffE", "FT", "FTE", "TCenters", "Freq"
     _default_value = None
     
     def __init__(self, **kwargs):

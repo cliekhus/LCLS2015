@@ -14,7 +14,7 @@ folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
 ReEnterData = False
 FPlots = False
 ReLoadData = True
-SaveData = True
+SaveData = False
 Boot = True
 
 NumTTSteps = 100

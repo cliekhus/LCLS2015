@@ -25,7 +25,7 @@ import scipy.stats as ss
 from fittingfunctions import lorwoff
 import random
 
-ReEnterData = False
+ReEnterData = True
 FPlots = False
 ReLoadData = False
 SaveData = False
