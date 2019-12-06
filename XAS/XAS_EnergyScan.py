@@ -24,14 +24,15 @@ from scipy import signal
 import scipy.stats as ss
 from fittingfunctions import lorwoff
 import random
+from MakeRawBoot import MakeRawBoot
 
-ReEnterData = True
+ReEnterData = False
 FPlots = False
 ReLoadData = False
 SaveData = False
 Redot0 = False
-Boot = False
-numBoot = 1000
+Boot = True
+numBoot = 10
 folder = "D://LCLS_Data/LCLS_python_data/XAS_Spectra/"
 
 DorH = False #True is diode, False is HERFD
@@ -39,8 +40,8 @@ DorH = False #True is diode, False is HERFD
 
   
 NumTTSteps = 40
-MinTime = -15
-MaxTime = 30
+MinTime = -35
+MaxTime = 35
 
 if ReEnterData:
     
@@ -87,7 +88,7 @@ if Redot0:
 
 
 else:
-
+    print('hi')
     with open(folder + "xasProData.pkl", "rb") as f:
         xasProData = pickle.load(f)
         
@@ -181,25 +182,34 @@ Fit,Params,ParamsP,ParamsDiff,cov,info = fitXASPiecewiseLor(xasProData_one.Energ
 
 if Boot:
     
-    xasProData_boot = xasProData_one
-    
     XASDiffBoot = np.empty((np.shape(xasProData_one.EnergyPlot)[0],numBoot))
-    
-    TT = np.matlib.repmat(True,1,int((np.shape(xasRawData.XOn)[0])/2))
-    FF = np.matlib.repmat(False,1,int((np.shape(xasRawData.XOn)[0])/2))
-    TF = np.concatenate((TT,FF))
+    XASOffBoot = np.empty((np.shape(xasProData_one.EnergyPlot)[0],numBoot))
+    XASOnBoot = np.empty((np.shape(xasProData_one.EnergyPlot)[0],numBoot))
 
-    TF = TF.flatten()    
+
+
     for ii in range(numBoot):
 
-        random.shuffle(TF)  
+        print(ii)
+
+        xasRawDataBoot = MakeRawBoot(xasRawData)
         
-        xasProData_boot.makeBootXAS(xasRawData, DorH, TF, FPlots)
+        xasProData_boot = PDC.XASProcessedData(TTSteps = np.linspace(MinTime,MaxTime,2), TTDelay = 1000*xasRawDataBoot.TimeTool-t0, \
+                                  XEnergy = np.round((xasRawDataBoot.XEnergyRaw+EnergyShift/1000)*500,1)*2)
+        uniXEnergy = np.unique(xasProData_boot.XEnergy)
+        xasProData_boot.changeValue(UniXEnergy = uniXEnergy[np.logical_and(uniXEnergy >= 7110, uniXEnergy <= 7120)])
+        xasProData_boot.makeProXAS(xasRawDataBoot, DorH, FPlots)
         
         XASDiffBoot[:,ii] = xasProData_boot.XASOn_Norm[0,:] - xasProData_boot.XASOff_Norm
+        XASOffBoot[:,ii] = xasProData_boot.XASOff_Norm
+        XASOnBoot[:,ii] = xasProData_boot.XASOn_Norm[0,:]
     
     XASDiffBootF = np.mean(XASDiffBoot,1)
     XASDiffBootE = np.std(XASDiffBoot,1)
+    XASOffBootF = np.mean(XASOffBoot,1)
+    XASOffBootE = np.std(XASOffBoot,1)
+    XASOnBootF = np.mean(XASOnBoot,1)
+    XASOnBootE = np.std(XASOnBoot,1)
         
     if True:
         
@@ -210,13 +220,25 @@ if Boot:
     plt.errorbar(xasProData_one.EnergyPlot, XASDiffBootF, XASDiffBootE)
     
     Fit,Params,ParamsA,ParamsB,cov,info = \
-        fitXASPiecewiseLor(xasProData_one.EnergyPlot, XASDiffBootF, xasProData_one.XASOff_Norm, xasProData_one.XASOn_Norm, True)
+        fitXASPiecewiseGauss(xasProData_one.EnergyPlot, XASDiffBootF, XASOffBootF, XASOnBootF, True)
 
     with open(folder + "XASDiffBootF.pkl", "wb") as f:
         pickle.dump(XASDiffBootF, f)
         
     with open(folder + "XASDiffBootE.pkl", "wb") as f:
         pickle.dump(XASDiffBootE, f)
+        
+    with open(folder + "XASOffBootF.pkl", "wb") as f:
+        pickle.dump(XASOffBootF, f)
+        
+    with open(folder + "XASOffBootE.pkl", "wb") as f:
+        pickle.dump(XASOffBootE, f)
+        
+    with open(folder + "XASOnBootF.pkl", "wb") as f:
+        pickle.dump(XASOnBootF, f)
+        
+    with open(folder + "XASOnBootE.pkl", "wb") as f:
+        pickle.dump(XASOnBootE, f)
 
 else:
     
@@ -226,8 +248,20 @@ else:
     with open(folder + "XASDiffBootE.pkl", "rb") as f:
         XASDiffBootE = pickle.load(f)
         
-    Fit,Params,ParamsA,ParamsB,covA,covB = \
-        fitXASPiecewiseGauss(xasProData_one.EnergyPlot, XASDiffBootF, xasProData_one.XASOff_Norm, xasProData_one.XASOn_Norm, True)
+    with open(folder + "XASOffBootF.pkl", "rb") as f:
+        XASOffBootF = pickle.load(f)
+        
+    with open(folder + "XASOffBootE.pkl", "rb") as f:
+        XASOffBootE = pickle.load(f)
+        
+    with open(folder + "XASOnBootF.pkl", "rb") as f:
+        XASOnBootF = pickle.load(f)
+        
+    with open(folder + "XASOnBootE.pkl", "rb") as f:
+        XASOnBootE = pickle.load(f)
+        
+Fit,Params,ParamsA,ParamsB,covA,covB = \
+        fitXASPiecewiseGauss(xasProData_one.EnergyPlot, XASDiffBootF, XASOffBootF, XASOnBootF, True)
 
 pluscolor = '#009E73'
 minuscolor = '#0072b2'

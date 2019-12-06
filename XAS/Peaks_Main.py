@@ -17,7 +17,7 @@ import ProcessedDataClass as PDC
 import pickle
 from find_t0 import find_t0_XAS
 
-ReEnterData = False
+ReEnterData = True
 FPlots = False
 ReLoadData = False
 SaveData = False

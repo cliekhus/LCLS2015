@@ -110,6 +110,7 @@ def makeTimePlotThree(TCentersP, TCentersP2, TCentersM, peaksProDataP, peaksProD
         
     import matplotlib.pyplot as plt
     from fitXES import fitXESthree
+    from fitXES import fitXESthreeExtra
     import numpy as np
     from fittingfunctions import convolved
     import matplotlib.gridspec as gridspec
@@ -122,16 +123,18 @@ def makeTimePlotThree(TCentersP, TCentersP2, TCentersM, peaksProDataP, peaksProD
     pluscolor2 = '#e69f00'
     
     
-    Fitp, Fitm, params, info = fitXESthree(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, ploton)
+    #Fitp, Fitm, params, info = fitXESthree(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, ploton)
+    Fitp, Fitm, params, info = fitXESthreeExtra(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, ploton)
     
     cov= np.sqrt(np.diag(info))
     
     Fitp = np.array(convolved(TCentersP, params[0], params[2], 0, params[3], params[4]))
     Fitm = np.array(convolved(TCentersM, params[1], params[2], 0, params[3], params[4]))
     Fitp2 = np.array(convolved(TCentersP2, params[5], params[2], 0, params[3], params[4]))
+    Fitm2 = np.array(convolved(TCentersM, params[7], params[6], 0, params[3], params[4]))
 
     Residualp = peaksProDataP.XESDiff - Fitp
-    Residualm = peaksProDataM.XESDiff - Fitm
+    Residualm = peaksProDataM.XESDiff - Fitm- Fitm2
     Residualp2 = peaksProDataP2.XESDiff - Fitp2    
 
     tt = np.linspace(minTime, maxTime, 1000)
@@ -257,6 +260,7 @@ def makeTimePlotThreeError(TCentersP, TCentersP2, TCentersM, peaksProDataP, peak
         
     import matplotlib.pyplot as plt
     from fitXES import fitXESthree
+    from fitXES import fitXESthreeExtra
     import numpy as np
     from fittingfunctions import convolved
     import matplotlib.gridspec as gridspec
@@ -269,16 +273,18 @@ def makeTimePlotThreeError(TCentersP, TCentersP2, TCentersM, peaksProDataP, peak
     pluscolor2 = '#e69f00'
     
     
-    Fitp, Fitm, params, info = fitXESthree(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, ploton)
-    
+#    Fitp, Fitm, params, info = fitXESthree(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, ploton)
+    Fitp, Fitm, params, info = fitXESthreeExtra(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, ploton)
+    print(params)
     cov= np.sqrt(np.diag(info))
     
     Fitp = np.array(convolved(TCentersP, params[0], params[2], 0, params[3], params[4]))
     Fitm = np.array(convolved(TCentersM, params[1], params[2], 0, params[3], params[4]))
     Fitp2 = np.array(convolved(TCentersP2, params[5], params[2], 0, params[3], params[4]))
+    Fitm2 = np.array(convolved(TCentersM, params[7], params[6], 0, params[3], params[4]))
 
     Residualp = peaksProDataP.XESDiff - Fitp
-    Residualm = peaksProDataM.XESDiff - Fitm
+    Residualm = peaksProDataM.XESDiff - Fitm- Fitm2
     Residualp2 = peaksProDataP2.XESDiff - Fitp2    
 
     tt = np.linspace(minTime, maxTime, 1000)
@@ -290,7 +296,7 @@ def makeTimePlotThreeError(TCentersP, TCentersP2, TCentersM, peaksProDataP, peak
         plt.errorbar(TCentersM, peaksProDataM.XESDiff*100, peaksProDataM.XESDiffE*100, marker = 's', color = minuscolor, markersize = 3, linestyle = 'none')
         plt.errorbar(TCentersP2, peaksProDataP2.XESDiff*100, peaksProDataP2.XESDiffE*100, marker = '^', color = pluscolor2, markersize = 3, linestyle = 'none')
         plt.errorbar(TCentersP, peaksProDataP.XESDiff*100, peaksProDataP.XESDiffE*100, marker = 'o', color = pluscolor, markersize = 3, linestyle = 'none')
-        plt.plot(tt, np.array(convolved(tt, params[1], params[2], 0, params[3], params[4]))*100, linestyle = '--', color = minuscolor)
+        plt.plot(tt, np.array(convolved(tt, params[1], params[2], 0, params[3], params[4]))*100+np.array(convolved(tt, params[7], params[6], 0, params[3], params[4]))*100, linestyle = '--', color = minuscolor)
         plt.plot(tt, np.array(convolved(tt, params[5], params[2], 0, params[3], params[4]))*100, color = pluscolor2)
         plt.plot(tt, np.array(convolved(tt, params[0], params[2], 0, params[3], params[4]))*100, linestyle = ':', color = pluscolor)
         plt.plot([-1000, -1000], [0.02, 0.02], 'o', color = pluscolor, markerfacecolor = pluscolor, markeredgecolor = pluscolor, linestyle = ':', markersize = 3, label = str(peaksProDataP.EnergyLabel) +' eV')
@@ -314,7 +320,7 @@ def makeTimePlotThreeError(TCentersP, TCentersP2, TCentersM, peaksProDataP, peak
         plt.plot(TCentersM, ss.savgol_filter(peaksProDataM.XESDiff*100,5,3), 's', color = minuscolor, markersize = 3)
         plt.plot(TCentersP2, ss.savgol_filter(peaksProDataP2.XESDiff*100,5,3), '^', color = pluscolor2, markersize = 3)
         plt.plot(TCentersP, ss.savgol_filter(peaksProDataP.XESDiff*100,5,3), 'o', color = pluscolor, markersize = 3)
-        plt.plot(tt, np.array(convolved(tt, params[1], params[2], 0, params[3], params[4]))*100, linestyle = '--', color = minuscolor)
+        plt.plot(tt, np.array(convolved(tt, params[1], params[2], 0, params[3], params[4]))*100+np.array(convolved(tt, params[7], params[6], 0, params[3], params[4]))*100, linestyle = '--', color = minuscolor)
         plt.plot(tt, np.array(convolved(tt, params[5], params[2], 0, params[3], params[4]))*100, color = pluscolor2)
         plt.plot(tt, np.array(convolved(tt, params[0], params[2], 0, params[3], params[4]))*100, linestyle = ':', color = pluscolor)
         plt.plot([-1000, -1000], [0.02, 0.02], 'o', color = pluscolor, markerfacecolor = pluscolor, markeredgecolor = pluscolor, linestyle = ':', markersize = 3, label = str(peaksProDataP.EnergyLabel) +' eV')

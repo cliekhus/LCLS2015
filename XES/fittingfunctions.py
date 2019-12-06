@@ -80,6 +80,25 @@ def combinedconvolvedzerothree(t, a1, a2, rate, t0, sig, a3):
     return out1+out2+out3
 
 
+
+def combinedzerothreeexp(t, a1, a2, rate, t0, sig, a3, rate2, a4):
+    
+    tfirst = t[0:int(len(t)/3)]
+    out1 = convolved(tfirst, a1, rate, 0, t0, sig)
+    
+    tsecond = t[int(len(t)/3):int(2*len(t)/3)]
+    out2a = convolved(tsecond, a2, rate, 0, t0, sig) 
+    out2b = convolved(tsecond, a4, rate2, 0, t0, sig)
+    out2 = [x+y for x,y in zip(out2a,out2b)]
+    
+    tthird = t[int(2*len(t)/3):]
+    out3 = convolved(tthird, a3, rate, 0, t0, sig)
+    
+    return out1+out2+out3
+
+
+
+
 def combinedconvolvedoff(t, a1, a2, rate, offset1, offset2, t0, sig):
     
     tfirst = t[0:int(len(t)/2)]

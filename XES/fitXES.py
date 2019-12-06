@@ -185,6 +185,64 @@ def fitXESthree(TCentersplus, TCentersplus2, TCentersminus, XESDiffplus, XESDiff
 
 
 
+
+
+def fitXESthreeExtra(TCentersplus, TCentersplus2, TCentersminus, XESDiffplus, XESDiffplus2, XESDiffminus, startt0, ploton):
+    
+    import matplotlib.pyplot as plt
+    from scipy.optimize import curve_fit
+    from fittingfunctions import convolved
+    from fittingfunctions import combinedzerothreeexp
+    from fittingfunctions import combinedconvolvedzerothree
+    import numpy as np
+
+    starta = .02
+    startrate = 50
+    startsig = 30
+    startoffsetp = 0
+    startoffsetm = 0
+    
+    if ploton:
+            
+        plt.figure()
+        plt.plot(TCentersplus, XESDiffplus, 'o')
+        plt.plot(TCentersplus, convolved(TCentersplus, starta, startrate, startoffsetp, startt0, startsig))
+        plt.plot(TCentersplus2, XESDiffplus2, 'o')
+        plt.plot(TCentersplus2, convolved(TCentersplus2, starta, startrate, startoffsetp, startt0, startsig))
+        plt.plot(TCentersminus, XESDiffminus, 'x')
+        plt.plot(TCentersminus, convolved(TCentersminus, -starta, startrate, startoffsetm, startt0, startsig))
+        plt.plot(TCentersminus, convolved(TCentersminus, -starta*.5, startrate*2, startoffsetm, startt0, startsig))
+        plt.title('start parameters')
+        plt.xlabel('time (fs)')
+    
+
+    #params,cov = curve_fit(combinedconvolvedzerothree, np.concatenate((TCentersplus,TCentersminus,TCentersplus2)), np.concatenate((XESDiffplus,XESDiffminus,XESDiffplus2)), p0 = [starta, -starta, startrate, startt0, startsig, starta])
+    params,cov = curve_fit(combinedzerothreeexp, np.concatenate((TCentersplus,TCentersminus,TCentersplus2)), np.concatenate((XESDiffplus,XESDiffminus,XESDiffplus2)), p0 = [starta, -starta, startrate, startt0, startsig, starta, startrate*2, -starta*.5])
+    
+    Fitp = convolved(TCentersplus, params[0], params[2], 0, params[3], params[4])
+    Fitm = convolved(TCentersminus, params[1], params[2], 0, params[3], params[4])
+    Fitp2 = convolved(TCentersplus2, params[5], params[2], 0, params[3], params[4])
+    Fitm2 = convolved(TCentersminus, params[7], params[6], 0, params[3], params[4])
+    
+    if ploton:
+            
+        plt.figure()
+        plt.plot(TCentersplus, XESDiffplus, 'o')
+        plt.plot(TCentersminus, Fitp)
+        plt.plot(TCentersplus, XESDiffminus, 'x')
+        plt.plot(TCentersminus, Fitm)
+        plt.plot(TCentersminus, Fitm2)
+        plt.plot(TCentersplus2, XESDiffplus2, 'o')
+        plt.plot(TCentersminus, Fitp2)
+        plt.title('end parameters')
+        plt.xlabel('time (fs)')
+
+    return Fitp, Fitm, params, cov
+
+
+
+
+
 def fitXESsinethree(TCentersplus, TCentersplus2, TCentersminus, XESDiffplus, XESDiffplus2, XESDiffminus, startt0, ploton):
     
     import matplotlib.pyplot as plt

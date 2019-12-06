@@ -27,9 +27,9 @@ folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
 ReEnterData = True
 FPlots = False
 ReLoadData = False
-SaveData = False
+SaveData = True
 Boot = True
-numBoot = 20
+numBoot = 1000
 
 NumTTSteps = 100
 NumTTStepsPlots = 50
@@ -195,7 +195,7 @@ if Boot:
     IRF = np.empty(numBoot)
     
     
-    params, cov, Freq, FTp, FTm, FTp2 = makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, FPlots, True)
+    params, cov, Freq, FTp, FTm, FTp2 = makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, FPlots, False)
     
     
     FTBootP = np.empty((np.shape(Freq)[0],numBoot))
