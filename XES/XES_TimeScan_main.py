@@ -16,6 +16,7 @@ from makeTimePlot import makeTimePlot
 from makeTimePlot import makeTimePlotThree
 from makeTimePlot import makeTimePlotThreeError
 from makeTimePlot import makeBootFT
+from makeTimePlot import makeOneBootFT
 import numpy as np
 import random
 import matplotlib.pyplot as plt
@@ -24,12 +25,12 @@ from MakeRawBoot import MakeRawBoot
 
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
-ReEnterData = True
+ReEnterData = False
 FPlots = False
 ReLoadData = False
-SaveData = True
+SaveData = False
 Boot = True
-numBoot = 1000
+numBoot = 100
 
 NumTTSteps = 100
 NumTTStepsPlots = 50
@@ -165,9 +166,11 @@ TCentersMF = (peaksProDataMF.TimeSteps[:-1]+peaksProDataMF.TimeSteps[1:])/2
 params, cov, Freq, FTp, FTm, FTp2 = makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF, peaksProDataP2F, peaksProDataMF, MinTimePlots, MaxTimePlots, 0, FPlots, True)
 
 
+FT, Freq, params = makeOneBootFT(TCentersPF, peaksProDataPF, MinTimePlots, MaxTimePlots, 0.02, 60, 30, True, FPlots)
 
+FT, Freq, params = makeOneBootFT(TCentersP2F, peaksProDataP2F, MinTimePlots, MaxTimePlots, 0.02, 60, 30, True, FPlots)
 
-
+FT, Freq, params = makeOneBootFT(TCentersMF, peaksProDataMF, MinTimePlots, MaxTimePlots, 0.02, 60, 30, False, FPlots)
 
 
 
@@ -261,7 +264,7 @@ if Boot:
     peaksProDataMF_boot.changeValue(XESDiff = PeaksBootMF, XESDiffE = PeaksBootME, FT = FTBootMF, FTE = FTBootME, Freq = Freq, EnergyLabel = peaksProDataMF.EnergyLabel)
     
     makeTimePlotThreeError(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, FPlots, True)
-    
+    makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 300, FPlots, True)
     
 """        
     if True:
