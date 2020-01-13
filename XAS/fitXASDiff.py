@@ -13,7 +13,7 @@ def fitXASDiff(XEnergy, XASDiff, XASOff, XASOn, ploton):
     from fittingfunctions import xasoff
     from fittingfunctions import lor
     
-    if True:
+    if False:
         sigAS = 10
         AS = 0.001
         x0ApS = 7112.3

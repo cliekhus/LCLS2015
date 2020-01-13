@@ -451,16 +451,15 @@ def makeOneBootFT(TCenters, XESDiff, minTime, maxTime, starta, startrate, starts
     TCenters = np.ndarray.flatten(TCenters)
     XESDiff = np.ndarray.flatten(XESDiff)
 
-    Fit, params, info = fitOneXES(TCenters, XESDiff, -1500, PM*starta, startrate, startsig, ploton)
-    
-    print(params)
+    Fit, params, info = fitOneXES(TCenters, XESDiff, 0, PM*starta, startrate, startsig, ploton)
     
     Fit = np.array(convolvedzero(TCenters, params[0], params[1], params[2], params[3]))
 
 
     Residual = XESDiff - Fit
     
-    minFTtime = -1500
+    #minFTtime = -1500
+    minFTtime = 200
         
     bartlettWindow = np.bartlett(len(Residual[TCenters>minFTtime]))
     

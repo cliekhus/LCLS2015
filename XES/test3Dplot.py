@@ -11,6 +11,7 @@ from mpl_toolkits.mplot3d import axes3d
 import matplotlib.pyplot as plt
 from matplotlib import style
 import numpy as np
+import numpy.matlib as npm
 
 #style.use('fivethirtyeight')
 
@@ -23,7 +24,7 @@ ax1 = fig.add_subplot(111, projection='3d')
 for jj in range(len(Freq)):
         
     
-    Z = np.ndarray.flatten(np.matlib.repmat(Energy[jj],len(Freq[jj]),1))
+    Z = np.ndarray.flatten(npm.repmat(Energy[jj],len(Freq[jj]),1))
     ax1.plot(Freq[jj], Z, FTBootF[jj], color=color[jj])
     
     for ii in range(len(Freq[jj])):
@@ -49,7 +50,7 @@ ax1 = fig.add_subplot(111, projection='3d')
 for jj in range(len(TCenters)):
         
     
-    Z = np.ndarray.flatten(np.matlib.repmat(Energy[jj],len(TCenters[jj]),1))
+    Z = np.ndarray.flatten(npm.repmat(Energy[jj],len(TCenters[jj]),1))
     ax1.plot(TCenters[jj], Z, PeaksBootF[jj], color=color[jj])
     
     for ii in range(len(TCenters[jj])):

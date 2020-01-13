@@ -7,12 +7,13 @@ Created on Thu May  2 15:24:58 2019
 
 
 
-def findEnergyShift(XASOff, UniXEnergy, ploton):
+def findEnergyShift(XASOff, UniXEnergy, DorH, savecal, ploton):
         
     import numpy as np
     import matplotlib.pyplot as plt
     import scipy.signal as scisig
     import scipy.io
+    import pickle
     
     ALSName = scipy.io.loadmat('D:\LCLS_Data\ALS\IronII.mat')
     
@@ -41,6 +42,27 @@ def findEnergyShift(XASOff, UniXEnergy, ploton):
         plt.xlabel('x-ray energy (keV)')
         plt.ylabel('x-ray absorption')
         plt.legend()
+        
+    if savecal:
+        if DorH:
+            with open("D:\LCLS_Data\LCLS_python_data\XAS_Spectra\TFY.pkl", "wb") as f:
+                pickle.dump(XASOff_Norm, f)
+            with open("D:\LCLS_Data\LCLS_python_data\XAS_Spectra\TFY_E.pkl", "wb") as f:
+                pickle.dump(UniXEnergy, f)
+            
+            plt.figure()
+            plt.plot(UniXEnergy, XASOff_Norm)
+                
+        else:
+            with open("D:\LCLS_Data\LCLS_python_data\XAS_Spectra\HERFD.pkl", "wb") as f:
+                pickle.dump(XASOff_Norm, f)
+            with open("D:\LCLS_Data\LCLS_python_data\XAS_Spectra\HERFD_E.pkl", "wb") as f:
+                pickle.dump(UniXEnergy, f)
+            
+            plt.figure()
+            plt.plot(UniXEnergy, XASOff_Norm)
+                
+            
     
     Fitted = ALSXASNorm - poly(incident_axis)
     Fitted[np.logical_or(incident_axis > 7118, incident_axis < 7111.5)] = 0

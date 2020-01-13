@@ -22,6 +22,8 @@ import random
 import matplotlib.pyplot as plt
 import math
 from MakeRawBoot import MakeRawBoot
+import time
+import datetime
 
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
@@ -30,7 +32,7 @@ FPlots = False
 ReLoadData = False
 SaveData = False
 Boot = True
-numBoot = 100
+numBoot = 1000
 
 NumTTSteps = 100
 NumTTStepsPlots = 50
@@ -77,6 +79,7 @@ if ReEnterData:
     #FileNumsP2 = list(range(123, 130+1))
     #FileNumsP2 = [105,103]
     FileNumsP2 = list(range(155,164+1))
+    #FileNumsP2 = list(range(144, 154+1))
     #FileNumsP2.remove(FileNumsP2[removenum])
     peaksRawDataP2 = loadData(FileNumsP2, "Peaks", 1)
     
@@ -137,7 +140,7 @@ with open(folder_con + "t0.pkl", "wb") as f:
 peaksProDataPF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP.TimeTool + peaksRawDataP.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP.RowlandY - peaksRawDataP.Offset)
 #peaksProDataPF = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP.TimeTool + peaksRawDataP.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP.RowlandY)
 peaksProDataPF.makeProPeaks(peaksRawDataP, NumTTStepsPlots, MinTimePlots, MaxTimePlots, FPlots)
-peaksProDataPF.changeValue(EnergyLabel = round(convertAngle2Energy(FileNumsP2[0], True)*1000,1))
+peaksProDataPF.changeValue(EnergyLabel = round(convertAngle2Energy(FileNumsP[0], True)*1000,1))
 TCentersPF = (peaksProDataPF.TimeSteps[:-1]+peaksProDataPF.TimeSteps[1:])/2
 
 
@@ -145,7 +148,7 @@ TCentersPF = (peaksProDataPF.TimeSteps[:-1]+peaksProDataPF.TimeSteps[1:])/2
 peaksProDataP2F = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP2.TimeTool + peaksRawDataP2.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP2.RowlandY - peaksRawDataP2.Offset)
 #peaksProDataP2F = PDC.PeaksProcessedData(Delay = 1000*peaksRawDataP2.TimeTool + peaksRawDataP2.StageDelay*1e15 - t0, RowWOffset = peaksRawDataP2.RowlandY)
 peaksProDataP2F.makeProPeaks(peaksRawDataP2, NumTTStepsPlots, MinTimePlots, MaxTimePlots, FPlots)
-peaksProDataP2F.changeValue(EnergyLabel = round(convertAngle2Energy(FileNumsP[0], True)*1000,1))
+peaksProDataP2F.changeValue(EnergyLabel = round(convertAngle2Energy(FileNumsP2[0], True)*1000,1))
 TCentersP2F = (peaksProDataP2F.TimeSteps[:-1]+peaksProDataP2F.TimeSteps[1:])/2
 
 
@@ -166,12 +169,14 @@ TCentersMF = (peaksProDataMF.TimeSteps[:-1]+peaksProDataMF.TimeSteps[1:])/2
 params, cov, Freq, FTp, FTm, FTp2 = makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF, peaksProDataP2F, peaksProDataMF, MinTimePlots, MaxTimePlots, 0, FPlots, True)
 
 
-FT, Freq, params = makeOneBootFT(TCentersPF, peaksProDataPF, MinTimePlots, MaxTimePlots, 0.02, 60, 30, True, FPlots)
+FT, Freq, params = makeOneBootFT(TCentersPF, peaksProDataPF.XESDiff, MinTimePlots, MaxTimePlots, 0.02, 60, 30, True, True)
+print(params)
 
-FT, Freq, params = makeOneBootFT(TCentersP2F, peaksProDataP2F, MinTimePlots, MaxTimePlots, 0.02, 60, 30, True, FPlots)
+FT, Freq, params = makeOneBootFT(TCentersP2F, peaksProDataP2F.XESDiff, MinTimePlots, MaxTimePlots, 0.02, 60, 30, True, True)
+print(params)
 
-FT, Freq, params = makeOneBootFT(TCentersMF, peaksProDataMF, MinTimePlots, MaxTimePlots, 0.02, 60, 30, False, FPlots)
-
+FT, Freq, params = makeOneBootFT(TCentersMF, peaksProDataMF.XESDiff, MinTimePlots, MaxTimePlots, 0.02, 60, 30, False, True)
+print(params)
 
 
 
@@ -205,7 +210,10 @@ if Boot:
     FTBootP2 = np.empty((np.shape(Freq)[0],numBoot))
     FTBootM = np.empty((np.shape(Freq)[0],numBoot))
     
+    startT = time.time()
+    
     for ii in range(numBoot):
+        print(ii)
 
         peaksRawBootP = MakeRawBoot(peaksRawDataP)
         peaksRawBootP2 = MakeRawBoot(peaksRawDataP2)
@@ -235,6 +243,10 @@ if Boot:
         FTBootP[:,ii] = abs(FTp)
         FTBootP2[:,ii] = abs(FTp2)
         FTBootM[:,ii] = abs(FTm)
+        
+        elapsed = time.time() - startT
+        timeleft = elapsed/(ii+1)*(numBoot-ii-1)
+        print('time left ' + str(datetime.timedelta(seconds = timeleft)) + ' seconds')
     
     PeaksBootPF = np.mean(PeaksBootP,1)
     PeaksBootPE = np.std(PeaksBootP,1)

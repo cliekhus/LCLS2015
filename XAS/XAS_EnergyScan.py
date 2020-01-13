@@ -25,21 +25,23 @@ import scipy.stats as ss
 from fittingfunctions import lorwoff
 import random
 from MakeRawBoot import MakeRawBoot
+import time
+import datetime
 
 ReEnterData = False
 FPlots = False
-ReLoadData = False
+ReLoadData = True
 SaveData = False
 Redot0 = False
-Boot = True
-numBoot = 10
+Boot = False
+numBoot = 100
 folder = "D://LCLS_Data/LCLS_python_data/XAS_Spectra/"
 
 DorH = False #True is diode, False is HERFD
 
 
   
-NumTTSteps = 40
+NumTTSteps = 10
 MinTime = -35
 MaxTime = 35
 
@@ -63,7 +65,7 @@ if Redot0:
                                   XEnergy = np.round(xasRawData.XEnergyRaw*1000,1)*1)
     uniXEnergy = np.unique(xasProData.XEnergy)
     xasProData.changeValue(UniXEnergy = uniXEnergy[np.logical_and(uniXEnergy >= 7108, uniXEnergy <= 7120)])
-    xasProData.makeProXAS(xasRawData, True, FPlots)
+    xasProData.makeProXAS(xasRawData, DorH, FPlots)
     
     
     
@@ -84,14 +86,13 @@ if Redot0:
     
     with open(folder + "t0.pkl", "wb") as f:
         pickle.dump(t0, f)
-
+    
 
 
 else:
-    print('hi')
     with open(folder + "xasProData.pkl", "rb") as f:
         xasProData = pickle.load(f)
-        
+       
     with open(folder + "xasProData_one.pkl", "rb") as f:
         xasProData_one = pickle.load(f)
         
@@ -101,9 +102,7 @@ else:
 
 
 
-
-
-EnergyShift = findEnergyShift(xasProData.XASOff_Norm, xasProData.UniXEnergy, FPlots)
+EnergyShift = findEnergyShift(xasProData.XASOff_Norm, xasProData.UniXEnergy, DorH, False, FPlots)
 
 
 
@@ -187,7 +186,8 @@ if Boot:
     XASOnBoot = np.empty((np.shape(xasProData_one.EnergyPlot)[0],numBoot))
 
 
-
+    starttime = time.time()
+    
     for ii in range(numBoot):
 
         print(ii)
@@ -203,6 +203,10 @@ if Boot:
         XASDiffBoot[:,ii] = xasProData_boot.XASOn_Norm[0,:] - xasProData_boot.XASOff_Norm
         XASOffBoot[:,ii] = xasProData_boot.XASOff_Norm
         XASOnBoot[:,ii] = xasProData_boot.XASOn_Norm[0,:]
+        
+        elapsedtime = time.time()-starttime
+        print("elapsed time: " + str(datetime.timedelta(seconds=elapsedtime)))
+        print(str(datetime.timedelta(seconds=elapsedtime/(ii+1)*(numBoot-ii-1))) + " time left" )
     
     XASDiffBootF = np.mean(XASDiffBoot,1)
     XASDiffBootE = np.std(XASDiffBoot,1)
@@ -211,36 +215,36 @@ if Boot:
     XASOnBootF = np.mean(XASOnBoot,1)
     XASOnBootE = np.std(XASOnBoot,1)
         
-    if True:
-        
-        plt.figure()
-        plt.plot(xasProData_one.EnergyPlot, XASDiffBoot)
-        
-    plt.figure()
-    plt.errorbar(xasProData_one.EnergyPlot, XASDiffBootF, XASDiffBootE)
-    
     Fit,Params,ParamsA,ParamsB,cov,info = \
         fitXASPiecewiseGauss(xasProData_one.EnergyPlot, XASDiffBootF, XASOffBootF, XASOnBootF, True)
-
-    with open(folder + "XASDiffBootF.pkl", "wb") as f:
-        pickle.dump(XASDiffBootF, f)
-        
-    with open(folder + "XASDiffBootE.pkl", "wb") as f:
-        pickle.dump(XASDiffBootE, f)
-        
-    with open(folder + "XASOffBootF.pkl", "wb") as f:
-        pickle.dump(XASOffBootF, f)
-        
-    with open(folder + "XASOffBootE.pkl", "wb") as f:
-        pickle.dump(XASOffBootE, f)
-        
-    with open(folder + "XASOnBootF.pkl", "wb") as f:
-        pickle.dump(XASOnBootF, f)
-        
-    with open(folder + "XASOnBootE.pkl", "wb") as f:
-        pickle.dump(XASOnBootE, f)
+    
+    if SaveData:
+            
+        with open(folder + "XASDiffBoot.pkl", "wb") as f:
+            pickle.dump(XASDiffBoot, f)
+    
+        with open(folder + "XASDiffBootF.pkl", "wb") as f:
+            pickle.dump(XASDiffBootF, f)
+            
+        with open(folder + "XASDiffBootE.pkl", "wb") as f:
+            pickle.dump(XASDiffBootE, f)
+            
+        with open(folder + "XASOffBootF.pkl", "wb") as f:
+            pickle.dump(XASOffBootF, f)
+            
+        with open(folder + "XASOffBootE.pkl", "wb") as f:
+            pickle.dump(XASOffBootE, f)
+            
+        with open(folder + "XASOnBootF.pkl", "wb") as f:
+            pickle.dump(XASOnBootF, f)
+            
+        with open(folder + "XASOnBootE.pkl", "wb") as f:
+            pickle.dump(XASOnBootE, f)
 
 else:
+    
+    #with open(folder + "XASDiffBoot.pkl", "rb") as f:
+    #    XASDiffBoot = pickle.load(f)
     
     with open(folder + "XASDiffBootF.pkl", "rb") as f:
         XASDiffBootF = pickle.load(f)
@@ -304,3 +308,6 @@ if SaveData:
             
     with open(folder + "xasProData_one.pkl", "wb") as f:
         pickle.dump(xasProData_one, f)
+        
+    with open(folder + "EnergyShift.pkl", "wb") as f:
+        pickle.dump(EnergyShift, f)
