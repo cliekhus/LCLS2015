@@ -28,20 +28,20 @@ from MakeRawBoot import MakeRawBoot
 import time
 import datetime
 
-ReEnterData = False
+ReEnterData = True
 FPlots = False
-ReLoadData = True
-SaveData = False
-Redot0 = False
-Boot = False
-numBoot = 100
+ReLoadData = False
+SaveData = True
+Redot0 = True
+Boot = True
+numBoot = 1000
 folder = "D://LCLS_Data/LCLS_python_data/XAS_Spectra/"
 
 DorH = False #True is diode, False is HERFD
 
 
   
-NumTTSteps = 10
+NumTTSteps = 25
 MinTime = -35
 MaxTime = 35
 
@@ -65,7 +65,7 @@ if Redot0:
                                   XEnergy = np.round(xasRawData.XEnergyRaw*1000,1)*1)
     uniXEnergy = np.unique(xasProData.XEnergy)
     xasProData.changeValue(UniXEnergy = uniXEnergy[np.logical_and(uniXEnergy >= 7108, uniXEnergy <= 7120)])
-    xasProData.makeProXAS(xasRawData, DorH, FPlots)
+    xasProData.makeProXAS(xasRawData, True, FPlots)
     
     
     

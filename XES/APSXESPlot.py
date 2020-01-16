@@ -26,13 +26,23 @@ with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataPF.pkl", "
 with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataP2F.pkl", "rb") as f:
     peaksProDataP2 = pickle.load(f)
 
-
 with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataMF.pkl", "rb") as f:
     peaksProDataM = pickle.load(f)
     
+with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataPF_boot.pkl", "rb") as f:
+    peaksProDataPF_boot = pickle.load(f)
+        
+with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataMF_boot.pkl", "rb") as f:
+    peaksProDataMF_boot = pickle.load(f)
+    
+with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataP2F_boot.pkl", "rb") as f:
+    peaksProDataP2F_boot = pickle.load(f)
+
     
 with open("D://LCLS_Data/LCLS_python_data/XES_conversion_info/x0.pkl", "rb") as f:
     x0 = pickle.load(f)
+    
+
 
 pluscolor = '#009E73'
 minuscolor = '#0072b2'

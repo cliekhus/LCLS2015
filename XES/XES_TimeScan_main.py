@@ -32,7 +32,7 @@ FPlots = False
 ReLoadData = False
 SaveData = False
 Boot = True
-numBoot = 1000
+numBoot = 10
 
 NumTTSteps = 100
 NumTTStepsPlots = 50
@@ -278,42 +278,6 @@ if Boot:
     makeTimePlotThreeError(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, FPlots, True)
     makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 300, FPlots, True)
     
-"""        
-    if True:
-        
-        plt.figure()
-        plt.plot(xasProData_one.EnergyPlot, XASDiffBoot)
-        
-    plt.figure()
-    plt.errorbar(xasProData_one.EnergyPlot, XASDiffBootF, XASDiffBootE)
-    
-    Fit,Params,ParamsA,ParamsB,cov,info = \
-        fitXASPiecewiseLor(xasProData_one.EnergyPlot, XASDiffBootF, xasProData_one.XASOff_Norm, xasProData_one.XASOn_Norm, True)
-
-    with open(folder + "PeaksBootF.pkl", "wb") as f:
-        pickle.dump(PeaksBootF, f)
-        
-    with open(folder + "PeaksBootE.pkl", "wb") as f:
-        pickle.dump(PeaksBootE, f)
-        
-    with open(folder + "FTBootF.pkl", "wb") as f:
-        pickle.dump(FTBootF, f)
-        
-    with open(folder + "FTBootE.pkl", "wb") as f:
-        pickle.dump(FTBootE, f)
-
-else:
-    
-    with open(folder + "XASDiffBootF.pkl", "rb") as f:
-        XASDiffBootF = pickle.load(f)
-        
-    with open(folder + "XASDiffBootE.pkl", "rb") as f:
-        XASDiffBootE = pickle.load(f)
-        
-    Fit,Params,ParamsA,ParamsB,covA,covB = \
-        fitXASPiecewiseGauss(xasProData_one.EnergyPlot, XASDiffBootF, xasProData_one.XASOff_Norm, xasProData_one.XASOn_Norm, True)
-
-"""
 
 
 
@@ -347,7 +311,15 @@ if SaveData:
 
     with open(folder + "FileNumsP2.pkl", "wb") as f:
         pickle.dump(FileNumsP, f)
-
+        
+    with open(folder + "peaksProDataPF_boot.pkl", "wb") as f:
+        pickle.dump(peaksProDataPF_boot, f)
+        
+    with open(folder + "peaksProDataP2F_boot.pkl", "wb") as f:
+        pickle.dump(peaksProDataP2F_boot, f)
+        
+    with open(folder + "peaksProDataMF_boot.pkl", "wb") as f:
+        pickle.dump(peaksProDataMF_boot, f)
 
 
 

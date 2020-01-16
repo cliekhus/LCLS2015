@@ -173,9 +173,27 @@ def gauswslope(x,sig,x0,a,off,slope):
     import numpy as np
     return abs(a)*np.exp(-((x-x0)/sig)**2)+off+slope*x
 
-def xasdiff(x, A,sigA,x0Ap, B,Bp,sigB,sigBp,x0B,x0Bp, C,Cp,sigC,sigCp,x0C,x0Cp):
+def xasdiff_old(x, A,sigA,x0Ap, B,Bp,sigB,sigBp,x0B,x0Bp, C,Cp,sigC,sigCp,x0C,x0Cp, EF, off,slope):
+    import numpy as np
+    import math
     
-    return (abs(A)/(1+(2*(x-x0Ap)/sigA)**2) + abs(Bp)/(1+(2*(x-x0Bp)/sigBp)**2) - abs(B)/(1+(2*(x-x0B)/sigB)**2) + abs(Cp)/(1+(2*(x-x0Cp)/sigCp)**2) - abs(C)/(1+(2*(x-x0C)/sigC)**2))
+    return np.array([EF*(A*math.exp(-(xx-x0Ap)**2/sigA) + Bp*math.exp(-(xx-x0Bp)**2/sigBp) - B*math.exp(-(xx-x0B)**2/sigB) + Cp*math.exp(-(xx-x0Cp)**2/sigCp) - C*math.exp(-(xx-x0C)**2/sigC)) +off+xx*slope for xx in x])
+    #return (abs(A)/(1+(2*(x-x0Ap)/sigA)**2) + abs(Bp)/(1+(2*(x-x0Bp)/sigBp)**2) - abs(B)/(1+(2*(x-x0B)/sigB)**2) + abs(Cp)/(1+(2*(x-x0Cp)/sigCp)**2) - abs(C)/(1+(2*(x-x0C)/sigC)**2))
+
+
+def xasdiff(x, B,Bp,sigB,sigBp,x0B,x0Bp, EF, off,slope):
+    import numpy as np
+    import math
+    
+    return np.array([EF*Bp*math.exp(-(xx-x0Bp)**2/sigBp) - B*math.exp(-(xx-x0B)**2/sigB) +off+xx*slope for xx in x])
+
+
+def xasdiff_old2(x, A,sigA,x0Ap, B,Bp,sigB,sigBp,x0B,x0Bp, EF, off,slope):
+    import numpy as np
+    import math
+    
+    return np.array([A*math.exp(-(xx-x0Ap)**2/sigA) + EF*(Bp*math.exp(-(xx-x0Bp)**2/sigBp) - B*math.exp(-(xx-x0B)**2/sigB)) +off+xx*slope for xx in x])
+ 
 
 def xas2diff(x,B,Bp,sigB,sigBp,x0B,x0Bp,off):
     
@@ -186,4 +204,27 @@ def xasoff(x, sigB,aB,x0B, sigC,aC,x0C, offset, erfamp, erfslope, peak):
     import numpy as np
     import math
     
-    return aB/(1+(2*(x-x0B)/sigB)**2) + aC/(1+(2*(x-x0C)/sigC)**2) + offset + erfamp*np.array([math.erf((xx-peak)/erfslope) for xx in x])
+    return np.array([aB*math.exp(-(xx-x0B)**2/sigB) + aC*math.exp(-(xx-x0C)**2/sigC) for xx in x]) + offset + erfamp*np.array([math.erf((xx-peak)/erfslope) for xx in x])
+    #return aB/(1+(2*(x-x0B)/sigB)**2) + aC/(1+(2*(x-x0C)/sigC)**2) + offset + erfamp*np.array([math.erf((xx-peak)/erfslope) for xx in x])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
