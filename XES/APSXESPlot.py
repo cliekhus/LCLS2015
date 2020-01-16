@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import h5py
 import pickle
+from makeTimePlot import makeTimePlotThreeError
+from makeTimePlot import makeTimePlotSubPlot
 
 
 
@@ -37,8 +39,17 @@ with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataMF_boot.pk
     
 with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataP2F_boot.pkl", "rb") as f:
     peaksProDataP2F_boot = pickle.load(f)
+"""
+with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\TCentersPF.pkl", "rb") as f:
+    TCentersPF = pickle.load(f)
 
-    
+with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\TCentersP2F.pkl", "rb") as f:
+    TCentersP2F = pickle.load(f)
+
+with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\TCentersMF.pkl", "rb") as f:
+    TCentersMF = pickle.load(f)
+"""
+        
 with open("D://LCLS_Data/LCLS_python_data/XES_conversion_info/x0.pkl", "rb") as f:
     x0 = pickle.load(f)
     
@@ -60,6 +71,9 @@ FeIIEnergy = FeII[0][indexlow:indexhigh]
 
 xlimL = min(FeIIEnergy*1000)
 xlimH = max(FeIIEnergy*1000)
+
+#makeTimePlotThreeError(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, FPlots, True)
+makeTimePlotSubPlot(FeIIIEnergy, FeIIISignal, FeIIEnergy, FeIISignal, TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, FPlots, True)
 
 plt.figure(figsize = (4,5))
 

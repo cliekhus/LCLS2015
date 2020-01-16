@@ -27,7 +27,7 @@ import datetime
 
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
-ReEnterData = False
+ReEnterData = True
 FPlots = False
 ReLoadData = False
 SaveData = False
@@ -320,11 +320,13 @@ if SaveData:
         
     with open(folder + "peaksProDataMF_boot.pkl", "wb") as f:
         pickle.dump(peaksProDataMF_boot, f)
+        
+    with open(folder + "TCentersPF.pkl", "wb") as f:
+        pickle.dump(TCentersPF, f)
 
+    with open(folder + "TCentersP2F.pkl", "wb") as f:
+        pickle.dump(TCentersP2F, f)
 
-
-
-
-
-
+    with open(folder + "TCentersMF.pkl", "wb") as f:
+        pickle.dump(TCentersMF, f)
 
