@@ -30,9 +30,9 @@ folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
 ReEnterData = True
 FPlots = False
 ReLoadData = False
-SaveData = False
+SaveData = True
 Boot = True
-numBoot = 10
+numBoot = 1000
 
 NumTTSteps = 100
 NumTTStepsPlots = 50

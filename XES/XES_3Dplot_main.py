@@ -11,7 +11,7 @@ from XES_TimeScan_fn import XES_TimeScan_fn
 
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
-ReEnterData = False
+ReEnterData = True
 FPlots = False
 ReLoadData = True
 SaveData = False
