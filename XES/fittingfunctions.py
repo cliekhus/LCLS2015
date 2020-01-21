@@ -183,3 +183,72 @@ def offsetsine(t,oscamp,period,onset):
 
     return out
 
+
+
+
+
+
+def globalfit(t, t0, sig, a11, a21, a31, rate1, a12, a22, a32, rate2):
+    
+    tfirst = t[0:int(len(t)/3)]
+    out11 = globalconvolved(tfirst, t0, sig, a11, rate1, 0)
+    out12 = globalconvolved(tfirst, t0, sig, a12, rate2, 0)
+    out1 = [x+y for x,y in zip(out11, out12)]
+    
+    tsecond = t[int(len(t)/3):int(2*len(t)/3)]
+    out21 = globalconvolved(tsecond, t0, sig, a21, rate1, 0) 
+    out22 = globalconvolved(tsecond, t0, sig, a22, rate2, 0)
+    out2 = [x+y for x,y in zip(out21,out22)]
+    
+    tthird = t[int(2*len(t)/3):]
+    out31 = globalconvolved(tthird, t0, sig, a31, rate1, 0)
+    out32 = globalconvolved(tthird, t0, sig, a32, rate2, 0)
+    out3 = [x+y for x,y in zip(out31, out32)]
+    
+    return out1+out2+out3
+
+
+
+
+def globalfitsimple(t, t0, sig, a1, a2, a3, rate):
+    
+    tfirst = t[0:int(len(t)/3)]
+    out1 = globalconvolved(tfirst, t0, sig, a1, rate, 0)
+    
+    tsecond = t[int(len(t)/3):int(2*len(t)/3)]
+    out2 = globalconvolved(tsecond, t0, sig, a2, rate, 0)
+    
+    tthird = t[int(2*len(t)/3):]
+    out3 = globalconvolved(tthird, t0, sig, a3, rate, 0)
+    
+    return out1+out2+out3
+
+
+
+def globalconvolved(t, t0, sig, a, rate, offset):
+    
+    import math
+    
+    out = [a*(1-math.erf(1/math.sqrt(2)*(sig/rate-(tt-t0)/sig)))*math.exp(-(tt-t0)/rate) + offset for tt in t]
+    
+    return out
+
+
+
+
+def halffit(t, t0, sig, a11, a21, a31, rate1, a22, rate2):
+    
+    tfirst = t[0:int(len(t)/3)]
+    out11 = globalconvolved(tfirst, t0, sig, a11, rate1, 0)
+    out1 = out11
+    
+    tsecond = t[int(len(t)/3):int(2*len(t)/3)]
+    out21 = globalconvolved(tsecond, t0, sig, a21, rate1, 0) 
+    out22 = globalconvolved(tsecond, t0, sig, a22, rate2, 0)
+    out2 = [x+y for x,y in zip(out21,out22)]
+    
+    tthird = t[int(2*len(t)/3):]
+    out31 = globalconvolved(tthird, t0, sig, a31, rate1, 0)
+    out3 = out31
+    
+    return out1+out2+out3
