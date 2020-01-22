@@ -864,44 +864,50 @@ def makeTimePlotSubPlot(FeIIIEnergy, FeIIISignal, FeIIEnergy, FeIISignal, TCente
         
         
     
-    mt = 200
+    mt = 400
     
     
     bartlettWindowp = np.bartlett(len(Residualp[TCentersP>mt]))
     bartlettWindowm = np.bartlett(len(Residualm[TCentersM>mt]))
     bartlettWindowp2 = np.bartlett(len(Residualp2[TCentersP2>mt]))    
     
-    Residualp = np.concatenate((Residualp,np.zeros((numzeros))))
-    Residualm = np.concatenate((Residualm,np.zeros((numzeros))))
-    Residualp2 = np.concatenate((Residualp2,np.zeros((numzeros))))
+    Residualpp = np.concatenate((Residualp[TCentersP>mt],np.zeros((numzeros))))
+    Residualmp = np.concatenate((Residualm[TCentersM>mt],np.zeros((numzeros))))
+    Residualp2p = np.concatenate((Residualp2[TCentersP2>mt],np.zeros((numzeros))))
     
     
     bartlettWindowp = np.concatenate((bartlettWindowp,np.zeros((numzeros))))
     bartlettWindowm = np.concatenate((bartlettWindowm,np.zeros((numzeros))))
     bartlettWindowp2 = np.concatenate((bartlettWindowp2,np.zeros((numzeros))))
     
-    TCentersP = np.concatenate((TCentersP,np.linspace(TCentersP[-1]+TCentersP[1]-TCentersP[0], TCentersP[-1]+(TCentersP[1]-TCentersP[0])*numzeros, num=numzeros)))
-    TCentersM = np.concatenate((TCentersM,np.linspace(TCentersM[-1]+TCentersM[1]-TCentersM[0], TCentersM[-1]+(TCentersM[1]-TCentersM[0])*numzeros, num=numzeros)))
-    TCentersP2 = np.concatenate((TCentersP2,np.linspace(TCentersP2[-1]+TCentersP2[1]-TCentersP2[0], TCentersP2[-1]+(TCentersP2[1]-TCentersP2[0])*numzeros, num=numzeros)))
+    TCentersPp = np.concatenate((TCentersP,np.linspace(TCentersP[-1]+TCentersP[1]-TCentersP[0], TCentersP[-1]+(TCentersP[1]-TCentersP[0])*numzeros, num=numzeros)))
+    TCentersMp = np.concatenate((TCentersM,np.linspace(TCentersM[-1]+TCentersM[1]-TCentersM[0], TCentersM[-1]+(TCentersM[1]-TCentersM[0])*numzeros, num=numzeros)))
+    TCentersP2p = np.concatenate((TCentersP2,np.linspace(TCentersP2[-1]+TCentersP2[1]-TCentersP2[0], TCentersP2[-1]+(TCentersP2[1]-TCentersP2[0])*numzeros, num=numzeros)))
 
-    FTp = np.fft.rfft([x*y for x,y in zip(Residualp[TCentersP>mt], bartlettWindowp)])
-    FTm = np.fft.rfft([x*y for x,y in zip(Residualm[TCentersM>mt], bartlettWindowm)])
-    FTp2 = np.fft.rfft([x*y for x,y in zip(Residualp2[TCentersP2>mt], bartlettWindowp2)])
+    FTp = np.fft.rfft([x*y for x,y in zip(Residualpp, bartlettWindowp)])
+    FTm = np.fft.rfft([x*y for x,y in zip(Residualmp, bartlettWindowm)])
+    FTp2 = np.fft.rfft([x*y for x,y in zip(Residualp2p, bartlettWindowp2)])
     
-    Freq = np.fft.rfftfreq(len(Residualp[TCentersP>mt]), d=(TCentersP[0]-TCentersP[1])*1e-15)
+    Freqp = np.fft.rfftfreq(len(Residualpp), d=(TCentersPp[1]-TCentersPp[0])*1e-15)
+    Freqp = [x*1e-12*33.356 for x in Freqp]
     
-    Freq = [-x*1e-12*33.356 for x in Freq]
+    Freqm = np.fft.rfftfreq(len(Residualmp), d=(TCentersMp[1]-TCentersMp[0])*1e-15)
+    Freqm = [x*1e-12*33.356 for x in Freqm]
+    
+    Freqp2 = np.fft.rfftfreq(len(Residualp2p), d=(TCentersP2p[1]-TCentersP2p[0])*1e-15)
+    Freqp2 = [x*1e-12*33.356 for x in Freqp2]
 
     
     
     
     if MakePlots:
-            
-        plt.figure(figsize = (4,5))
-        plt.errorbar(peaksProDataP.Freq, peaksProDataP.FT+0.01, peaksProDataP.FTE, color = pluscolor, linewidth = 2, label = str(peaksProDataP.EnergyLabel) +' eV', linestyle = ':')
-        plt.errorbar(peaksProDataP2.Freq, peaksProDataP2.FT+0.005, peaksProDataP2.FTE, color = pluscolor2, linewidth = 2, label = str(peaksProDataP2.EnergyLabel) +' eV')
-        plt.errorbar(peaksProDataM.Freq, peaksProDataM.FT, peaksProDataM.FTE, color = minuscolor, linewidth = 2, label = str(peaksProDataM.EnergyLabel) + ' eV', linestyle = '--')
-        plt.legend()
+        
+        fig = plt.figure(figsize = (4,5))
+        ax1 = fig.add_subplot(2,1,1)
+        ax1.plot(Freqp, abs(FTp), color = pluscolor, linewidth = 2, label = str(peaksProDataP.EnergyLabel) +' eV', linestyle = ':')
+        ax1.plot(Freqm, abs(FTm), color = pluscolor2, linewidth = 2, label = str(peaksProDataP2.EnergyLabel) +' eV')
+        ax1.plot(Freqp2, abs(FTp2), color = minuscolor, linewidth = 2, label = str(peaksProDataM.EnergyLabel) + ' eV', linestyle = '--')
+        leg = ax1.legend()
         
         
         #plt.plot([0,1000], [0.004,0.004], color = minuscolor, linestyle = '--')
@@ -917,10 +923,115 @@ def makeTimePlotSubPlot(FeIIIEnergy, FeIIISignal, FeIIEnergy, FeIISignal, TCente
         #plt.annotate(str(peaksProDataP2.EnergyLabel) +' eV', (372, 0.028))
         
         
-        plt.ylabel('fourier amplitude')
-        plt.xlabel('cm$^{-1}$')
-        plt.xlim([0,500])
-        plt.ylim([0,0.03])
+        ax1.set_ylabel('fourier amplitude')
+        ax1.set_xlabel('cm$^{-1}$')
+        ax1.set_xlim([0,500])
+        ax1.set_ylim([0,0.015])
+        ax1.set_title('> ' + str(mt) + ' fs')
+        leg.get_frame().set_edgecolor('k')
+        leg.get_frame().set_linewidth(0.8)
+        
+
+
+
+
+
+
+
+    
+    
+    bartlettWindowp = np.bartlett(len(Residualp[TCentersP<mt]))
+    bartlettWindowm = np.bartlett(len(Residualm[TCentersM<mt]))
+    bartlettWindowp2 = np.bartlett(len(Residualp2[TCentersP2<mt]))    
+    
+    Residualpp = np.concatenate((Residualp[TCentersP<mt],np.zeros((numzeros))))
+    Residualmp = np.concatenate((Residualm[TCentersM<mt],np.zeros((numzeros))))
+    Residualp2p = np.concatenate((Residualp2[TCentersP2<mt],np.zeros((numzeros))))
+    
+    
+    bartlettWindowp = np.concatenate((bartlettWindowp,np.zeros((numzeros))))
+    bartlettWindowm = np.concatenate((bartlettWindowm,np.zeros((numzeros))))
+    bartlettWindowp2 = np.concatenate((bartlettWindowp2,np.zeros((numzeros))))
+    
+    TCentersP = np.concatenate((TCentersP,np.linspace(TCentersP[-1]+TCentersP[1]-TCentersP[0], TCentersP[-1]+(TCentersP[1]-TCentersP[0])*numzeros, num=numzeros)))
+    TCentersM = np.concatenate((TCentersM,np.linspace(TCentersM[-1]+TCentersM[1]-TCentersM[0], TCentersM[-1]+(TCentersM[1]-TCentersM[0])*numzeros, num=numzeros)))
+    TCentersP2 = np.concatenate((TCentersP2,np.linspace(TCentersP2[-1]+TCentersP2[1]-TCentersP2[0], TCentersP2[-1]+(TCentersP2[1]-TCentersP2[0])*numzeros, num=numzeros)))
+
+    FTp = np.fft.rfft([x*y for x,y in zip(Residualpp, bartlettWindowp)])
+    FTm = np.fft.rfft([x*y for x,y in zip(Residualmp, bartlettWindowm)])
+    FTp2 = np.fft.rfft([x*y for x,y in zip(Residualp2p, bartlettWindowp2)])
+    
+    Freqp = np.fft.rfftfreq(len(Residualpp), d=(TCentersP[1]-TCentersP[0])*1e-15)
+    Freqp = [x*1e-12*33.356 for x in Freqp]
+    
+    Freqm = np.fft.rfftfreq(len(Residualmp), d=(TCentersM[1]-TCentersM[0])*1e-15)
+    Freqm = [x*1e-12*33.356 for x in Freqm]
+    
+    Freqp2 = np.fft.rfftfreq(len(Residualp2p), d=(TCentersP2[1]-TCentersP2[0])*1e-15)
+    Freqp2 = [x*1e-12*33.356 for x in Freqp2]
+
+    
+    
+    
+    if MakePlots:
+
+        ax2 = fig.add_subplot(2,1,2)
+        ax2.plot(Freqp, abs(FTp), color = pluscolor, linewidth = 2, label = str(peaksProDataP.EnergyLabel) +' eV', linestyle = ':')
+        ax2.plot(Freqm, abs(FTm), color = pluscolor2, linewidth = 2, label = str(peaksProDataP2.EnergyLabel) +' eV')
+        ax2.plot(Freqp2, abs(FTp2), color = minuscolor, linewidth = 2, label = str(peaksProDataM.EnergyLabel) + ' eV', linestyle = '--')
+        #plt.legend()
+        
+        
+        #plt.plot([0,1000], [0.004,0.004], color = minuscolor, linestyle = '--')
+        #plt.plot([0,1000], [0.005+0.01, 0.005+0.01], color = pluscolor, linestyle = ':')
+        #plt.plot([0,1000], [0.0065+0.02, 0.0065+0.02], color = pluscolor2)
+        
+        
+        #plt.plot([0,1000], [0.01, 0.01], linewidth = 0.5, color = 'k')
+        #plt.plot([0,1000], [0.02, 0.02], linewidth = 0.5, color = 'k')
+        
+        #plt.annotate(str(peaksProDataM.EnergyLabel) +' eV', (372, 0.008))
+        #plt.annotate(str(peaksProDataP.EnergyLabel) +' eV', (372, 0.018))
+        #plt.annotate(str(peaksProDataP2.EnergyLabel) +' eV', (372, 0.028))
+        
+        ax2.set_ylabel('fourier amplitude')
+        ax2.set_xlabel('cm$^{-1}$')
+        ax2.set_xlim([0,500])
+        ax2.set_ylim([0,0.015])
+        ax2.set_title('< ' + str(mt) + ' fs')
         plt.tight_layout()
-    
-    
+        
+        
+        no = 19
+        ns = 20
+        
+        f,t,spectra = ss.spectrogram(Residualp, 1e15/(TCentersP[1]-TCentersP[0]), noverlap=no, nperseg=ns)
+        plt.figure()
+        plt.pcolormesh([x*1e15-250 for x in t],[x*1e-12*33.356 for x in f],spectra)
+        plt.title(str(peaksProDataP.EnergyLabel) +' eV')
+        plt.xlabel('time (fs)')
+        plt.ylabel('frequency cm$^{-1}$')
+        
+        f,t,spectra = ss.spectrogram(Residualm, 1e15/(TCentersM[1]-TCentersM[0]), noverlap=no, nperseg=ns)
+        plt.figure()
+        plt.pcolormesh([x*1e15-250 for x in t],[x*1e-12*33.356 for x in f],spectra)
+        plt.title(str(peaksProDataM.EnergyLabel) + ' eV')
+        plt.xlabel('time (fs)')
+        plt.ylabel('frequency cm$^{-1}$')
+        
+        f,t,spectra = ss.spectrogram(Residualp2, 1e15/(TCentersP2[1]-TCentersP2[0]), noverlap=no, nperseg=ns)
+        plt.figure()
+        plt.pcolormesh([x*1e15-250 for x in t],[x*1e-12*33.356 for x in f],spectra)
+        plt.title(str(peaksProDataP2.EnergyLabel) +' eV')
+        plt.xlabel('time (fs)')
+        plt.ylabel('frequency cm$^{-1}$')
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
