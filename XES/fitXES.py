@@ -351,6 +351,7 @@ def fitXESGlobal(TCentersplus, TCentersplus2, TCentersminus, XESDiffplus, XESDif
     from fittingfunctions import globalfitsimple
     from fittingfunctions import halffit
     import numpy as np
+    import math
 
     starta = .02
     startrate = 50
@@ -375,6 +376,7 @@ def fitXESGlobal(TCentersplus, TCentersplus2, TCentersminus, XESDiffplus, XESDif
     
     times = np.concatenate((TCentersplus,TCentersminus,TCentersplus2))
     ys = np.concatenate((XESDiffplus,XESDiffminus,XESDiffplus2))
+    tt = np.linspace(min(times), max(times), 1000)
 
 
     params,cov = curve_fit(globalfit, times, ys, \
@@ -383,7 +385,25 @@ def fitXESGlobal(TCentersplus, TCentersplus2, TCentersminus, XESDiffplus, XESDif
     
     Rsquared = 1-(np.sum((ys - globalfit(times, *params))**2) / np.sum((ys - np.mean(globalfit(times, *params)))**2))
     print('Rsquared for global ' + str(Rsquared))
-
+    print('BET = ' + str(int(params[5])) + ' $\pm$ ' + str(int(cov[5])) + ' fs')
+    print('IRF = ' + str(int(params[1]*2*math.sqrt(2*math.log(2)))) + ' $\pm$ ' + str(int(cov[1]*2*math.sqrt(2*math.log(2)))) + ' fs')
+    print('LD = ' + str(int(params[9])) + ' $\pm$ ' + str(int(cov[9])) + ' fs')
+    print('Ap1 = ' + str(params[2]) + ' $\pm$ ' + str(cov[2]) + ' fs')
+    print('Ap2 = ' + str(params[3]) + ' $\pm$ ' + str(cov[3]) + ' fs')
+    print('Ap3 = ' + str(params[4]) + ' $\pm$ ' + str(cov[4]) + ' fs')
+    print('Bp1 = ' + str(params[6]) + ' $\pm$ ' + str(cov[6]) + ' fs')
+    print('Bp2 = ' + str(params[7]) + ' $\pm$ ' + str(cov[7]) + ' fs')
+    print('Bp3 = ' + str(params[8]) + ' $\pm$ ' + str(cov[8]) + ' fs')
+    
+    if ploton:
+        plt.figure()
+        plt.plot(TCentersplus, XESDiffplus, 'o')
+        plt.plot(TCentersplus2, XESDiffplus2, 's')
+        plt.plot(TCentersminus, XESDiffminus, 'x')
+        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[2], params[5], 0)) + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9], 0)))
+        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], params[5], 0)) + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0)))
+        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[4], params[5], 0)) + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9], 0)))
+        plt.title('two exponentials')
 
     paramshalf,covhalf = curve_fit(halffit, times, ys, \
                            p0 = [startt0, startsig, starta, -starta, starta, startrate, -starta*ampfactor, startrate*ratefactor])
@@ -391,7 +411,19 @@ def fitXESGlobal(TCentersplus, TCentersplus2, TCentersminus, XESDiffplus, XESDif
     
     Rsquared = 1-(np.sum((ys - halffit(times, *paramshalf))**2) / np.sum((ys - np.mean(halffit(times, *paramshalf)))**2))
     print('Rsquared for half ' + str(Rsquared))
+    print('BET = ' + str(int(paramshalf[5])) + ' $\pm$ ' + str(int(covhalf[5])) + ' fs')
+    print('IRF = ' + str(int(paramshalf[1]*2*math.sqrt(2*math.log(2)))) + ' $\pm$' + str(int(covhalf[1]*2*math.sqrt(2*math.log(2)))) + ' fs')
+    print('LD = ' + str(int(paramshalf[7])) + ' $\pm$ ' + str(int(covhalf[7])) + ' fs')
     
+    if ploton:
+        plt.figure()
+        plt.plot(TCentersplus, XESDiffplus, 'o')
+        plt.plot(TCentersplus2, XESDiffplus2, 's')
+        plt.plot(TCentersminus, XESDiffminus, 'x')
+        plt.plot(tt, np.array(globalconvolved(tt, paramshalf[0], paramshalf[1], paramshalf[2], paramshalf[5], 0)))
+        plt.plot(tt, np.array(globalconvolved(tt, paramshalf[0], paramshalf[1], paramshalf[3], paramshalf[5], 0)) + np.array(globalconvolved(tt, paramshalf[0], paramshalf[1], paramshalf[6], paramshalf[7], 0)))
+        plt.plot(tt, np.array(globalconvolved(tt, paramshalf[0], paramshalf[1], paramshalf[4], paramshalf[5], 0)))
+        plt.title('half exponentials')
 
     paramssimple,covsimple = curve_fit(globalfitsimple, np.concatenate((TCentersplus,TCentersminus,TCentersplus2)), np.concatenate((XESDiffplus,XESDiffminus,XESDiffplus2)), \
                            p0 = [startt0, startsig, starta, -starta, starta, startrate])
@@ -399,7 +431,32 @@ def fitXESGlobal(TCentersplus, TCentersplus2, TCentersminus, XESDiffplus, XESDif
     
     Rsquared = 1-(np.sum((ys - globalfitsimple(times, *paramssimple))**2) / np.sum((ys - np.mean(globalfitsimple(times, *paramssimple)))**2))
     print('Rsquared for simpleglobal ' + str(Rsquared))
+    print('BET = ' + str(int(paramssimple[5])) + ' $\pm $ ' + str(int(covsimple[5])) + ' fs')
+    print('IRF = ' + str(int(paramssimple[1]*2*math.sqrt(2*math.log(2)))) + ' $\pm $' + str(int(covsimple[1]*2*math.sqrt(2*math.log(2)))) + ' fs')
     
+    if ploton:
+        plt.figure()
+        plt.plot(TCentersplus, XESDiffplus, 'o')
+        plt.plot(TCentersplus2, XESDiffplus2, 's')
+        plt.plot(TCentersminus, XESDiffminus, 'x')
+        plt.plot(tt, np.array(globalconvolved(tt, paramssimple[0], paramssimple[1], paramssimple[2], paramssimple[5], 0)))
+        plt.plot(tt, np.array(globalconvolved(tt, paramssimple[0], paramssimple[1], paramssimple[3], paramssimple[5], 0)))
+        plt.plot(tt, np.array(globalconvolved(tt, paramssimple[0], paramssimple[1], paramssimple[4], paramssimple[5], 0)))
+        plt.title('one exponential')
+
+    
+    if ploton:
+        plt.figure()
+        plt.plot(TCentersplus, XESDiffplus, 'o')
+        plt.plot(TCentersplus2, XESDiffplus2, 's')
+        plt.plot(TCentersminus, XESDiffminus, 'x')
+        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[2], params[5], 0)) + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9], 0)))
+        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], params[5], 0)) + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0)))
+        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[4], params[5], 0)) + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9], 0)))
+        plt.plot(tt, np.array(globalconvolved(tt, paramssimple[0], paramssimple[1], paramssimple[2], paramssimple[5], 0)))
+        plt.plot(tt, np.array(globalconvolved(tt, paramssimple[0], paramssimple[1], paramssimple[3], paramssimple[5], 0)))
+        plt.plot(tt, np.array(globalconvolved(tt, paramssimple[0], paramssimple[1], paramssimple[4], paramssimple[5], 0)))
+        
     
     Fitp1 = globalconvolved(TCentersplus, params[0], params[1], params[2], params[5], 0)
     Fitm1 = globalconvolved(TCentersminus, params[0], params[1], params[3], params[5], 0)

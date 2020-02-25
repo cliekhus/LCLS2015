@@ -24,9 +24,9 @@ import matplotlib.pyplot as plt
 folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
 ReEnterData = True
 FPlots = False
-ReLoadData = False
+ReLoadData = True
 SaveData = False
-Boot = True
+Boot = False
 numBoot = 100
 
 NumTTSteps = 100

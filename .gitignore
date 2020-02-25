@@ -1,6 +1,7 @@
 $ cat .gitignore
 *.h5
 *.png
+*.pdf
 /__pycache__
 /Figures
 /Starting_Code

@@ -113,7 +113,7 @@ for ii in range(len(holedensity)):
 
 fig, ax = plt.subplots(figsize = (4,5))
 AB = [x-y for x,y in zip(Bpeaks, Apeaks)]
-plt.plot(AB, holedensity, 'o', color = '#0072b2', marker = 's', label = 'calculation')
+plt.plot(AB, holedensity, 'o', color = '#009E73', marker = 's', label = 'calculation')#'#0072b2'
 line = np.polyfit(AB, holedensity, 1)
 linefit = np.poly1d(line)
 plt.plot(AB, linefit(AB), color = 'k')
@@ -123,13 +123,14 @@ plt.ylabel('Fe hole density')
 #plt.xlim([0,3.5])
 plt.tight_layout()
 
+
 with open("D://LCLS_Data/LCLS_python_data/XAS_Spectra/BmA.pkl", "rb") as f:
     BmA = pickle.load(f)
 with open("D://LCLS_Data/LCLS_python_data/XAS_Spectra/uncertainty.pkl", "rb") as f:
     uncertainty = pickle.load(f)
 
 #fig, ax = plt.subplots(figsize = (4,5))
-patch = pat.Ellipse((BmA,linefit(BmA)), 2*uncertainty[1], 2*(linefit(BmA+uncertainty[1])-linefit(BmA-uncertainty[1])), color='#e69f00')
+patch = pat.Ellipse((BmA,linefit(BmA)), 2*uncertainty[1], 2*(linefit(BmA+uncertainty[1])-linefit(BmA-uncertainty[1])), color='#c70039')#'#e69f00'
 ax.add_patch(patch)
 #plt.plot([Bpeak40-Apeak40-Eoff,Bpeak77-Apeak77-Eoff,Bpeak86-Apeak86-Eoff,Bpeak100-Apeak100-Eoff]\
 #            ,[.4,.77,.86,1], 'o', linestyle='solid', label = 'calculated')
@@ -137,7 +138,7 @@ ax.add_patch(patch)
 #plt.ylabel('Fe hole density')
 plt.ylim([0,1])
 plt.xlim([0,3])
-plt.plot([-1,-2], [1,2], marker = 'o', label = 'measurement', color = '#e69f00', linestyle = 'none')
+plt.plot([-1,-2], [1,2], marker = 'o', label = 'measurement', color = '#c70039', linestyle = 'none')#'#e69f00'
 #plt.legend()
 #plt.tight_layout()
 plt.legend()
@@ -171,6 +172,7 @@ with open(folder + "xasProData_one.pkl", "rb") as f:
 Fit,Params,ParamsA,ParamsB,covA,covB = \
         fitXASPiecewiseGauss(xasProData_one.EnergyPlot, XASDiffBootF, XASOffBootF, XASOnBootF, True)
         
+BmA = ParamsA[1]-ParamsB[1]
 
 pluscolor = '#009E73'
 minuscolor = '#0072b2'
@@ -190,13 +192,15 @@ xA = np.linspace(7110.5, 7113, 1000)
 xB = np.linspace(7112.5, 7115, 1000)
 
 ax = plt.subplot2grid((20,1), (4,0), colspan = 1, rowspan = 16)
-plt.plot(xA, lorwslope(xA,ParamsA[0],ParamsA[1],ParamsA[2],ParamsA[3],ParamsA[4]), label = 'A peak fit, ' + str(round(ParamsA[1],1)), linewidth = 5, color = pluscolor2,zorder=1)
-plt.plot(xB, lorwslope(xB,ParamsB[0],ParamsB[1],ParamsB[2],ParamsB[3],ParamsB[4]), label = 'B peak fit, ' + str(round(ParamsB[1],1)), linewidth = 5, color = minuscolor,zorder=2)
+#plt.plot(xA, lorwslope(xA,ParamsA[0],ParamsA[1],ParamsA[2],ParamsA[3],ParamsA[4]), label = 'A peak fit, ' + str(round(ParamsA[1],1)), linewidth = 5, color = pluscolor2,zorder=1)
+plt.fill_between(xA, ParamsA[3]+xA*ParamsA[4], lorwslope(xA,ParamsA[0],ParamsA[1],ParamsA[2],ParamsA[3],ParamsA[4]), label = 'A peak fit, ' + str(round(ParamsA[1],1)), linewidth = 5, color = pluscolor2,zorder=1)
+#plt.plot(xB, lorwslope(xB,ParamsB[0],ParamsB[1],ParamsB[2],ParamsB[3],ParamsB[4]), label = 'B peak fit, ' + str(round(ParamsB[1],1)), linewidth = 5, color = minuscolor,zorder=2)
+plt.fill_between(xB, ParamsB[3]+xB*ParamsB[4], lorwslope(xB,ParamsB[0],ParamsB[1],ParamsB[2],ParamsB[3],ParamsB[4]), label = 'B peak fit, ' + str(round(ParamsB[1],1)), linewidth = 5, color = minuscolor,zorder=2)
 plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(XASDiffBootF,-4), np.delete(XASDiffBootE,-4), \
              marker='.', label = str(MinTime) + ' to ' + str(MaxTime) + ' fs delay', color = 'k',zorder=10)
 plt.xlabel('x-ray energy (eV)')
 plt.ylabel('$I_{on}-I_{off}$')
-plt.ylim([-300,150])
+plt.ylim([-325,150])
 leg = plt.legend()
 leg.get_frame().set_edgecolor('k')
 leg.get_frame().set_linewidth(0.8)

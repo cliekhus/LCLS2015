@@ -113,8 +113,39 @@ plt.legend()
 #plt.tight_layout()
 
 
+def chunkIt(seq, num):
+    avg = len(seq) / float(num)
+    out = []
+    last = 0.0
 
+    while last < len(seq):
+        out.append(seq[int(last):int(last + avg)])
+        last += avg
 
+    return out
+
+nb = 15
+nt = 3
+chunks = chunkIt(calc[:,5], nt)
+times = chunkIt(calc[:,0], nt)
+
+plt.figure()
+num,bins,pat = plt.hist(calc[:,5],nb)
+average = num/sum(num)
+plt.figure(51)
+plt.plot(bins[:-1], average, label = 'average')
+
+for ii in range(nt):
+    
+    plt.figure(50)
+    num,bins,pat = plt.hist(chunks[ii],nb)
+    plt.figure(51)
+    plt.plot(bins[:-1],num/sum(num), label = np.mean(times[ii]))
+    plt.legend()
+    plt.figure(52)
+    plt.plot(bins[:-1], (num/sum(num)-average)/average, label=np.mean(times[ii]))
+    
+plt.legend()
 
 
 
