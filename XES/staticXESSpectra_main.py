@@ -12,7 +12,7 @@ import pickle
 import ProcessedDataClass as PDC
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_Spectra/"
-ReEnterData = True
+ReEnterData = False
 FPlots = False
 ReLoadData = False
 SaveData = False
@@ -53,7 +53,7 @@ xesProData.changeValue(UniAngle = np.unique(xesRawData.Angle))
 xesProData.changeValue(RowWOffset = xesRawData.RowlandY - xesRawData.Offset)
 
 xesProData.makeProXES(xesRawData, MaxTime, MinTime, FPlots)
-xesProData.energyConversion(FPlots)
+xesProData.energyConversion(True)
 
 xesProData.makeStaticPlot()
 
