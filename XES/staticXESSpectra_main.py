@@ -12,13 +12,13 @@ import pickle
 import ProcessedDataClass as PDC
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_Spectra/"
-ReEnterData = False
-FPlots = True
+ReEnterData = True
+FPlots = False
 ReLoadData = False
 SaveData = False
 
-MinTime = -25
-MaxTime = 25
+MinTime = -35
+MaxTime = 35
 
 
 if ReEnterData:

@@ -131,11 +131,11 @@ ax.add_patch(patch)
 plt.ylim([0,1])
 plt.xlim([0,3])
 plt.plot([-1,-2], [1,2], marker = 'o', label = 'measurement', color = '#c70039', linestyle = 'none')#'#e69f00'
-plt.legend()
+leg = plt.legend()
+leg.get_frame().set_edgecolor('k')
 
 
-
-
+print('Hole density: ' + str(linefit(FitOuts['BmA'])) + ' pm ' + str(linefit(FitOuts['BmAunc'])))
 
 
 folder = "D://LCLS_Data/LCLS_python_data/XAS_Spectra/"
@@ -160,36 +160,20 @@ with open(folder + "xasProData_one.pkl", "rb") as f:
 
 
 
-
-
-Fit,Params,ParamsA,ParamsB,covA,covB = \
-        fitXASPiecewiseGauss(xasProData_one.EnergyPlot, XASDiffBootF, XASOffBootF, XASOnBootF, True)
-        
-BmA = ParamsB[1]-ParamsA[1]
-uncertainty = np.sqrt(np.diag(covA)+np.diag(covB))
-
-with open("D://LCLS_Data/LCLS_python_data/XAS_Spectra/BmA.pkl", "wb") as f:
-    pickle.dump(BmA, f)
-
-with open("D://LCLS_Data/LCLS_python_data/XAS_Spectra/uncertainty.pkl", "wb") as f:
-    pickle.dump(uncertainty, f)
-    
-    
-    
     
 
 pluscolor = '#009E73'
 minuscolor = '#0072b2'
 pluscolor2 = '#e69f00'
 
-plt.figure(figsize = (4,6))
+plt.figure(figsize = (4,5))
 
-gridspec.GridSpec(20,1)
+gridspec.GridSpec(10,1)
 
-ax = plt.subplot2grid((20,1), (0,0), colspan = 1, rowspan = 4)
+ax = plt.subplot2grid((10,1), (0,0), colspan = 1, rowspan = 2)
 plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(xasProData_one.XASOff_Norm,-4), np.delete(xasProData_one.Error_Off,-4), color = 'k')
 plt.text(7112.8, 1250, 'B')
-plt.text(7115, 2050, 'C')
+plt.text(7115, 1990, 'C')
 plt.ylabel('$I_{off}$')
 ax.set_xticklabels([])
 plt.tight_layout()
@@ -197,19 +181,23 @@ plt.tight_layout()
 xA = np.linspace(7110.5, 7113, 1000)
 xB = np.linspace(7112.5, 7115, 1000)
 
-ax = plt.subplot2grid((20,1), (4,0), colspan = 1, rowspan = 16)
-plt.fill_between(xA, ParamsA[3]+xA*ParamsA[4], gauswslope(xA,ParamsA[0],ParamsA[1],ParamsA[2],ParamsA[3],ParamsA[4]), label = 'A peak fit, ' + str(round(ParamsA[1],1)), linewidth = 5, color = pluscolor2,zorder=1)
-plt.fill_between(xB, ParamsB[3]+xB*ParamsB[4], gauswslope(xB,ParamsB[0],ParamsB[1],ParamsB[2],ParamsB[3],ParamsB[4]), label = 'B peak fit, ' + str(round(ParamsB[1],1)), linewidth = 5, color = minuscolor,zorder=2)
+ax = plt.subplot2grid((10,1), (2,0), colspan = 1, rowspan = 8)
+plt.fill_between(xA, FitOuts['Aoff']-xA*FitOuts['Aslope'], gauswslope(xA,FitOuts['Asig'],FitOuts['Ax0'],FitOuts['Aa'],FitOuts['Aoff'],FitOuts['Aslope']), label = 'A peak fit, ' + str(round(FitOuts['Ax0'],1)) + ' eV', linewidth = 5, color = pluscolor2,zorder=1)
+plt.fill_between(xB, FitOuts['Boff']-xB*FitOuts['Bslope'], gauswslope(xB,FitOuts['Bsig'],FitOuts['Bx0'],FitOuts['Ba'],FitOuts['Boff'],FitOuts['Bslope']), label = 'B peak fit, ' + str(round(FitOuts['Bx0'],1)) + ' eV', linewidth = 5, color = minuscolor,zorder=2)
 plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(XASDiffBootF,-4), np.delete(XASDiffBootE,-4), \
              marker='.', label = str(MinTime) + ' to ' + str(MaxTime) + ' fs delay', color = 'k',zorder=10)
 plt.xlabel('x-ray energy (eV)')
 plt.ylabel('$I_{on}-I_{off}$')
-plt.ylim([-325,150])
+plt.ylim([-250,150])
 leg = plt.legend()
 leg.get_frame().set_edgecolor('k')
 leg.get_frame().set_linewidth(0.8)
 plt.tight_layout()
 
+
+print('number of points used: ' + str(FitOuts['numpoints']))
+
+"""
 axins = inset_axes(ax, width=.8, height=1.5, bbox_to_anchor=(.43, .45), bbox_transform=ax.transAxes)
 axins.plot(AB, holedensity, 'o', color = '#009E73', marker = 's', label = 'calculation')
 axins.plot(AB, linefit(AB), color = 'k')
@@ -218,7 +206,7 @@ axins.set_ylim([0,0.9])
 #patch = pat.Ellipse((BmA,linefit(BmA)), 5*uncertainty[1], linefit(BmA+uncertainty[1]*5)-linefit(BmA-uncertainty[1]*5), color='#c70039')
 patch = pat.Ellipse((BmA,linefit(BmA)), 1.9, linefit(1.8+1.9)-linefit(1.8-1.9), color='#c70039')
 axins.add_patch(patch)
-
+"""
 
 
 

@@ -42,6 +42,6 @@ def makeStaticPlot(xesProData):
     ax.annotate('', xy=(peaksProDataM.EnergyLabel,-0.5), xytext=(peaksProDataM.EnergyLabel,1.5), arrowprops={'arrowstyle': '->', 'ec': minuscolor, 'lw': 3})
     plt.xlabel('energy (eV)')
     plt.ylabel('% $\Delta$ emission')
-    plt.ylim([-4, 4])
+    #plt.ylim([-4, 4])
     plt.xlim([xlimL, xlimH])
     plt.tight_layout()

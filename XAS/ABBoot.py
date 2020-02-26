@@ -72,20 +72,20 @@ for ii in range(numboot):
         errorhit += 1
 
 
-    Asig[ii-errorhit] = ParamsA[0]
-    Bsig[ii-errorhit] = ParamsB[0]
+    Asig[ii-errorhit] = abs(ParamsA[0])
+    Bsig[ii-errorhit] = abs(ParamsB[0])
 
-    Ax0[ii-errorhit] = ParamsA[1]
-    Bx0[ii-errorhit] = ParamsB[1]
+    Ax0[ii-errorhit] = abs(ParamsA[1])
+    Bx0[ii-errorhit] = abs(ParamsB[1])
     
-    Aa[ii-errorhit] = ParamsA[2]
-    Ba[ii-errorhit] = ParamsB[2]
+    Aa[ii-errorhit] = abs(ParamsA[2])
+    Ba[ii-errorhit] = abs(ParamsB[2])
     
-    Aoff[ii-errorhit] = ParamsA[3]
-    Boff[ii-errorhit] = ParamsB[3]
+    Aoff[ii-errorhit] = abs(ParamsA[3])
+    Boff[ii-errorhit] = abs(ParamsB[3])
     
-    Aslope[ii-errorhit] = ParamsA[4]
-    Bslope[ii-errorhit] = ParamsB[4]
+    Aslope[ii-errorhit] = abs(ParamsA[4])
+    Bslope[ii-errorhit] = abs(ParamsB[4])
     
 Asig = Asig[:numboot-errorhit]
 Bsig = Bsig[:numboot-errorhit]
@@ -102,21 +102,24 @@ Boff = Boff[:numboot-errorhit]
 Aslope = Aslope[:numboot-errorhit]
 Bslope = Bslope[:numboot-errorhit]
 
-cond = np.logical_and.reduce((Ax0>7110, Bx0<7115, Ax0<7113))
+cond = np.logical_and.reduce((Ax0>7110, Bx0<7115, Ax0<7113, Aa < 500, Ba < 500))
 
 fitout = {'Asig': np.mean(Asig[cond]), 'Bsig': np.mean(Bsig[cond]), \
           'Ax0': np.mean(Ax0[cond]), 'Bx0': np.mean(Bx0[cond]), \
           'Ax0unc': np.std(Ax0[cond]), 'Bx0unc': np.std(Bx0[cond]), \
           'BmA': np.mean(Bx0[cond]-Ax0[cond]), 'BmAunc': np.std(Bx0[cond]-Ax0[cond]), \
-          'Aa': np.mean(Ax0[cond]), 'Ba': np.mean(Bx0[cond]), \
-          'Aoff': np.mean(Ax0[cond]), 'Boff': np.mean(Bx0[cond]), \
-          'Aslope': np.mean(Ax0[cond]), 'Bslope': np.mean(Bx0[cond])}
+          'Aa': np.mean(Aa[cond]), 'Ba': np.mean(Ba[cond]), \
+          'Aoff': np.mean(Aoff[cond]), 'Boff': np.mean(Boff[cond]), \
+          'Aslope': np.mean(Aslope[cond]), 'Bslope': np.mean(Bslope[cond]), \
+          'numpoints': np.sum(cond.astype('int'))}
 
 
 
 with open(folder + "FitOuts.pkl", "wb") as f:
     XASDiffBoot = pickle.dump(fitout, f)
 
+
+print('B A split: ' + str(fitout['BmA']) + ' pm ' + str(fitout['BmAunc']))
 
 
 
