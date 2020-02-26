@@ -14,16 +14,11 @@ from loadData import loadData
 from APSXASCalibration import findEnergyShift
 import ProcessedDataClass as PDC
 import pickle
-from fitXASDiff import fitXASDiff
-from fitXASDiff import fitXASPiecewiseDiff
 from fitXASDiff import fitXASPiecewiseLor
 from fitXASDiff import fitXASPiecewiseGauss
 from fittingfunctions import lorwslope
 import matplotlib.gridspec as gridspec
 from scipy import signal
-import scipy.stats as ss
-from fittingfunctions import lorwoff
-import random
 from MakeRawBoot import MakeRawBoot
 import time
 import datetime

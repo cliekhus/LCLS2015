@@ -1,8 +1,56 @@
+def gauswslope(x,sig,x0,a,off,slope):
+    import numpy as np
+    return abs(a)*np.exp(-((x-abs(x0))/sig)**2)+abs(off)-abs(slope)*x
+
+
+
+
+def xasoff(x, sigB,aB,x0B, sigC,aC,x0C, offset, erfamp, erfslope, peak):
+    import numpy as np
+    import math
+    
+    return np.array([aB*math.exp(-(xx-x0B)**2/sigB) + aC*math.exp(-(xx-x0C)**2/sigC) for xx in x]) + offset + erfamp*np.array([math.erf((xx-peak)/erfslope) for xx in x])
+
+
+
+
+def lor(x,sig,x0,a):
+    
+    return a/(1+(2*(x-x0)/sig)**2)
+
+
+
+
+
+
+
+###############################################################################
+# Functions I don't use below #################################################
+###############################################################################
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def gauss(t,sig,t0,a):
     
     import math
     
     return [a*math.exp(-(tt-t0)**2/2/sig**2) for tt in t]
+
 
 
 def expdecay(a,t,t0,rate):
@@ -20,6 +68,7 @@ def expdecay(a,t,t0,rate):
     return out
 
 
+
 def convolved(t,a,rate,offset,t0,sig):
     
     import math
@@ -27,6 +76,8 @@ def convolved(t,a,rate,offset,t0,sig):
     out = [a*(1-math.erf(1/math.sqrt(2)*(sig/rate-(tt-t0)/sig)))*math.exp(-(tt-t0)/rate) + offset for tt in t]
     
     return out
+
+
 
 
 def convolvedzero(t,a,rate,t0,sig):
@@ -50,6 +101,8 @@ def combinedconvolved(t, a1, rate1, offset1, a2, rate2, offset2, t0, sig):
     return out1+out2
 
 
+
+
 def combinedconvolvedzero(t, a1, a2, rate, t0, sig):
     
     tfirst = t[0:int(len(t)/2)]
@@ -59,6 +112,8 @@ def combinedconvolvedzero(t, a1, a2, rate, t0, sig):
     out2 = convolved(tsecond, a2, rate, 0, t0, sig)
     
     return out1+out2
+
+
 
 
 def combinedconvolvedzerothree(t, a1, a2, rate, t0, sig, a3):
@@ -75,6 +130,9 @@ def combinedconvolvedzerothree(t, a1, a2, rate, t0, sig, a3):
     return out1+out2+out3
 
 
+
+
+
 def combinedconvolvedoff(t, a1, a2, rate, offset1, offset2, t0, sig):
     
     tfirst = t[0:int(len(t)/2)]
@@ -84,6 +142,9 @@ def combinedconvolvedoff(t, a1, a2, rate, offset1, offset2, t0, sig):
     out2 = convolved(tsecond, a2, rate, offset2, t0, sig)
     
     return out1+out2
+
+
+
 
 
 def combinedconvolvedsine(t, a1, a2, rate, t0, sig, oscamp1, oscamp2, period, onset):
@@ -99,6 +160,9 @@ def combinedconvolvedsine(t, a1, a2, rate, t0, sig, oscamp1, oscamp2, period, on
     out2 = [x+y*z for x,y,z in zip(convolved(tsecond, a2, rate, 0, t0, sig),oscamp2*np.sin(tsecond*2*math.pi/period),hssecond)]
     
     return out1+out2
+
+
+
 
 
 def combinedconvolvedsinethree(t, a1, a2, rate, t0, sig, oscamp1, oscamp2, oscamp3, period, onset, a3):
@@ -120,6 +184,10 @@ def combinedconvolvedsinethree(t, a1, a2, rate, t0, sig, oscamp1, oscamp2, oscam
     return out1+out2+out3
 
 
+
+
+
+
 def convolvedsine(t,a,rate,offset,t0,sig,oscamp,period,onset):
     import numpy as np
     import math
@@ -131,6 +199,9 @@ def convolvedsine(t,a,rate,offset,t0,sig,oscamp,period,onset):
     out = [x+y for x,y in zip(out1,out2)]
     
     return out
+
+
+
 
 
 def combinedconvolvedtwo(t, a1, a2, rate1, t0, sig1, rate2, sig2):
@@ -145,6 +216,8 @@ def combinedconvolvedtwo(t, a1, a2, rate1, t0, sig1, rate2, sig2):
 
 
 
+
+
 def offsetsine(t,oscamp,period,onset):
     import numpy as np
     import math
@@ -156,22 +229,24 @@ def offsetsine(t,oscamp,period,onset):
 
 
 
-def lor(x,sig,x0,a):
-    
-    return a/(1+(2*(x-x0)/sig)**2)
+
 
 
 def lorwoff(x,sig,x0,a,off):
     
     return abs(a)/(1+(2*(x-x0)/sig)**2)+off
 
+
+
+
+
 def lorwslope(x,sig,x0,a,off,slope):
     
     return abs(a)/(1+(2*(x-x0)/sig)**2)+off+slope*x
 
-def gauswslope(x,sig,x0,a,off,slope):
-    import numpy as np
-    return abs(a)*np.exp(-((x-x0)/sig)**2)+off+slope*x
+
+
+
 
 def xasdiff_old(x, A,sigA,x0Ap, B,Bp,sigB,sigBp,x0B,x0Bp, C,Cp,sigC,sigCp,x0C,x0Cp, EF, off,slope):
     import numpy as np
@@ -181,11 +256,17 @@ def xasdiff_old(x, A,sigA,x0Ap, B,Bp,sigB,sigBp,x0B,x0Bp, C,Cp,sigC,sigCp,x0C,x0
     #return (abs(A)/(1+(2*(x-x0Ap)/sigA)**2) + abs(Bp)/(1+(2*(x-x0Bp)/sigBp)**2) - abs(B)/(1+(2*(x-x0B)/sigB)**2) + abs(Cp)/(1+(2*(x-x0Cp)/sigCp)**2) - abs(C)/(1+(2*(x-x0C)/sigC)**2))
 
 
+
+
+
 def xasdiff(x, B,Bp,sigB,sigBp,x0B,x0Bp, EF, off,slope):
     import numpy as np
     import math
     
     return np.array([EF*Bp*math.exp(-(xx-x0Bp)**2/sigBp) - B*math.exp(-(xx-x0B)**2/sigB) +off+xx*slope for xx in x])
+
+
+
 
 
 def xasdiff_old2(x, A,sigA,x0Ap, B,Bp,sigB,sigBp,x0B,x0Bp, EF, off,slope):
@@ -195,17 +276,15 @@ def xasdiff_old2(x, A,sigA,x0Ap, B,Bp,sigB,sigBp,x0B,x0Bp, EF, off,slope):
     return np.array([A*math.exp(-(xx-x0Ap)**2/sigA) + EF*(Bp*math.exp(-(xx-x0Bp)**2/sigBp) - B*math.exp(-(xx-x0B)**2/sigB)) +off+xx*slope for xx in x])
  
 
+
+
+
+
 def xas2diff(x,B,Bp,sigB,sigBp,x0B,x0Bp,off):
     
     return (abs(Bp)/(1+(2*(x-x0Bp)/sigBp)**2) - abs(B)/(1+(2*(x-x0B)/sigB)**2) + off)
 
 
-def xasoff(x, sigB,aB,x0B, sigC,aC,x0C, offset, erfamp, erfslope, peak):
-    import numpy as np
-    import math
-    
-    return np.array([aB*math.exp(-(xx-x0B)**2/sigB) + aC*math.exp(-(xx-x0C)**2/sigC) for xx in x]) + offset + erfamp*np.array([math.erf((xx-peak)/erfslope) for xx in x])
-    #return aB/(1+(2*(x-x0B)/sigB)**2) + aC/(1+(2*(x-x0C)/sigC)**2) + offset + erfamp*np.array([math.erf((xx-peak)/erfslope) for xx in x])
 
 
 
