@@ -63,7 +63,59 @@ def MakeRawBoot(peaksRawData):
     
     
     
+def MakeRawBootXES(xesRawData):
     
+    import random
+    import numpy as np
+    import RawDataClass as RDC
+    
+    
+    
+    nn = len(xesRawData.XOn)
+    
+    XOn = np.empty(nn, dtype=bool)
+    LOn = np.empty(nn, dtype=bool)
+    Angle = np.empty(nn)
+    Diode2 = np.empty(nn)
+    Ipm2Sum = np.empty(nn)
+    TimeTool = np.empty(nn)
+    TTAmp = np.empty(nn)
+    TTFWHM = np.empty(nn)
+    ScanNum = np.empty(nn)
+    RowlandY = np.empty(nn)
+    Offset = np.empty(nn)
+    L3E = np.empty(nn)
+    CspadSum = np.empty(nn)
+    TTFP = np.empty(nn)
+    
+    
+    for ii in range(nn):
+        
+        index = random.randint(0,nn-1)
+        
+        XOn[ii] = xesRawData.XOn[index]
+        LOn[ii] = xesRawData.LOn[index]
+        Angle[ii] = xesRawData.Angle[index]
+        Diode2[ii] = xesRawData.Diode2[index]
+        Ipm2Sum[ii] = xesRawData.Ipm2Sum[index]
+        TimeTool[ii] = xesRawData.TimeTool[index]
+        TTAmp[ii] = xesRawData.TTAmp[index]
+        TTFWHM[ii] = xesRawData.TTFWHM[index]
+        ScanNum[ii] = xesRawData.ScanNum[index]
+        RowlandY[ii] = xesRawData.RowlandY[index]
+        Offset[ii] = xesRawData.Offset[index]
+        L3E[ii] = xesRawData.L3E[index]
+        CspadSum[ii] = xesRawData.CspadSum[index]
+        TTFP[ii] = xesRawData.TTFP[index]
+
+
+    xesRawData = RDC.XESRawData()
+
+    xesRawData.changeValue(XOn = XOn, LOn = LOn, Angle = Angle, Diode2 = Diode2, Ipm2Sum = Ipm2Sum, TimeTool = TimeTool, \
+       TTAmp = TTAmp, TTFWHM = TTFWHM, ScanNum = ScanNum, RowlandY = RowlandY, Offset = Offset, L3E = L3E, CspadSum = CspadSum, TTFP = TTFP)
+    
+    
+    return xesRawData
     
     
     

@@ -12,6 +12,8 @@ import h5py
 import pickle
 from makeTimePlot import makeTimePlotThreeError
 from makeTimePlot import makeTimePlotSubPlot
+from makeTimePlot import makeTimePlotSubPlot_LCLS
+from scipy.signal import savgol_filter
 
 
 
@@ -51,7 +53,9 @@ with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\TCentersMF.pkl", "rb")
         
 with open("D://LCLS_Data/LCLS_python_data/XES_conversion_info/x0.pkl", "rb") as f:
     x0 = pickle.load(f)
-    
+
+with open("D://LCLS_Data/LCLS_python_data/XES_Spectra/xesProData.pkl", "rb") as f:
+    static = pickle.load(f)
 
 
 pluscolor = '#009E73'
@@ -76,8 +80,13 @@ MaxTimePlots = 1400
 
 FPlots = False
 
-#makeTimePlotThreeError(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, FPlots, True)
-makeTimePlotSubPlot(FeIIIEnergy, FeIIISignal, FeIIEnergy, FeIISignal, TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, FPlots, True)
+#makeTimePlotSubPlot(FeIIIEnergy, FeIIISignal, FeIIEnergy, FeIISignal, TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, FPlots, True)
+
+StaticS = savgol_filter((static.XESOn_Norm - static.XESOff_Norm)/static.XESOff_Norm*100, 5,3)
+StaticEr = np.sqrt(static.Error_On**2+static.Error_On**2)/static.XESOff_Norm*100
+
+makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, static.KaEnergy, StaticS, StaticEr, TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, FPlots, True)
+
 
 plt.figure(figsize = (4,5))
 

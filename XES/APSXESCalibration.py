@@ -71,7 +71,21 @@ def makeConversion(xesProData, ploton):
 
 
 
+def Angle2Energy(UA):
+    
+    import pickle
+    
+    folder = "D://LCLS_Data/LCLS_python_data/XES_conversion_info/"
 
+    with open(folder + "slope.pkl", "rb") as f:
+        slope = pickle.load(f)
+        
+    with open(folder + "x0.pkl", "rb") as f:
+        x0 = pickle.load(f)
+        
+    LCLSEnergy = [-xx*slope+x0 for xx in UA]
+    
+    return LCLSEnergy
 
 
 

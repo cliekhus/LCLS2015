@@ -10,15 +10,19 @@ from loadData import loadData
 import os
 import pickle
 import ProcessedDataClass as PDC
+import matplotlib.pyplot as plt
+from MakeRawBoot import MakeRawBootXES
+import time
+import datetime
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_Spectra/"
-ReEnterData = False
+ReEnterData = True
 FPlots = False
 ReLoadData = False
-SaveData = False
+SaveData = True
 
-MinTime = -35
-MaxTime = 35
+MinTime = -100
+MaxTime = 100
 
 
 if ReEnterData:
@@ -55,7 +59,37 @@ xesProData.changeValue(RowWOffset = xesRawData.RowlandY - xesRawData.Offset)
 xesProData.makeProXES(xesRawData, MaxTime, MinTime, FPlots)
 xesProData.energyConversion(True)
 
-xesProData.makeStaticPlot()
+
+numboot = 100
+startT = time.time()
+
+for ii in range(numboot):
+    
+    xesRawBoot = MakeRawBootXES(xesRawData)
+        
+    xesProData_loop = PDC.XESProcessedData(TTDelay = 1000*xesRawBoot.TimeTool - 1400 - t0, \
+                                           UniAngle = np.unique(xesRawBoot.Angle), RowWOffset = xesRawBoot.RowlandY - xesRawBoot.Offset)
+    xesProData_loop.makeProXES(xesRawBoot, MaxTime, MinTime, FPlots)
+    xesProData_loop.getEnergy()
+    
+    if ii == 0:
+        
+        xesProData_boot = xesProData_loop
+        xesProData_boot.changeValue(Num_Boot = np.ones(np.shape(xesProData_boot.UniAngle)))
+        
+    else:
+        
+        xesProData_boot.add(xesProData_loop)
+
+    elapsed = time.time() - startT
+    timeleft = elapsed/(ii+1)*(numboot-ii-1)
+    print('time left ' + str(datetime.timedelta(seconds = timeleft)) + ' seconds')
+        
+
+xesProData_boot.boot_ave()
+
+
+xesProData_boot.makeStaticPlot()
 
 
 
@@ -66,7 +100,7 @@ if SaveData:
         pickle.dump(xesRawData, f)
             
     with open(folder + "xesProData.pkl", "wb") as f:
-        pickle.dump(xesProData, f)
+        pickle.dump(xesProData_boot, f)
 
 
 
