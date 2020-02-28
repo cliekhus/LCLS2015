@@ -99,7 +99,7 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         
         
     
-    mt = 450
+    mt = 300
     
     
     bartlettWindowp = np.bartlett(len(Residualp[TCentersP>mt]))
@@ -139,29 +139,24 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
 
         fig = plt.figure(figsize = (4,5))
 
-        ax1 = fig.add_subplot(1,1,1)
+        ax1 = fig.add_subplot(2,1,1)
         
         amp = max([max(abs(FTp)), max(abs(FTm)), max(abs(FTp2))])
         
-        lens1 = ax1.plot(Freqp, abs(FTp)/amp, color = pluscolor, linewidth = 2, label = str(peaksProDataP.EnergyLabel) +' eV', linestyle = ':')
-        ax1.tick_params(axis='y', labelcolor = pluscolor)
+        ax1.plot(Freqp, abs(FTp)/amp, color = pluscolor, linewidth = 2, label = '> ' + str(mt) + ' fs', linestyle = ':')
         #ax1.set_xlabel('cm$^{-1}$')
-        ax1.set_ylabel('oscillation magnitude', color = pluscolor)
-        #ax1.legend()
+        ax1.set_ylabel('oscillatior strength')
+        ax1.set_xlabel('cm$^{-1}$')
+        ax1.legend()
         ax1.set_ylim(0, 1.01)
-        ax2 = ax1.twinx()
-        ax2.set_ylabel('oscillation magnitude', color = minuscolor)
-        lens2 = ax2.plot(Freqm, abs(FTm)/amp, color = minuscolor, linewidth = 2, label = str(peaksProDataM.EnergyLabel) +' eV', linestyle = '--')
-        ax2.tick_params(axis='y', labelcolor = minuscolor)
-        lens = lens1+lens2
-        labs = [l.get_label() for l in lens]
-        leg = ax2.legend(lens, labs, loc = 0)
-        ax2.set_ylim(0, .3)
-        plt.title('> ' + str(mt) + ' fs')
-        plt.tight_layout()
-        leg.get_frame().set_edgecolor('k')
-        leg.get_frame().set_linewidth(0.8)
-    
+        ax1.set_title(str(peaksProDataP.EnergyLabel) +' eV')
+        
+        ax2 = fig.add_subplot(2,1,2)
+        ax2.plot(Freqm, abs(FTm)/amp, color = minuscolor, linewidth = 2, label = '> ' + str(mt) + ' fs', linestyle = '--')
+        ax2.set_xlabel('cm$^{-1}$')
+        ax2.set_ylabel('oscillatior strength')
+        ax2.set_title(str(peaksProDataM.EnergyLabel) +' eV')
+        print(len(Freqm))
     
     
     
@@ -202,24 +197,26 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
     if MakePlots:
         
         
-        lens1 = ax1.plot(Freqp, abs(FTp)/amp, color = pluscolor, linewidth = 1, label = str(peaksProDataP.EnergyLabel) +' eV', linestyle = ':')
+        ax1.fill_between(Freqp, abs(FTp)/amp, color = pluscolor, label = '< ' + str(mt) + ' fs', alpha = 0.2)
         #ax1.tick_params(axis='y', labelcolor = pluscolor)
         #ax1.set_xlabel('cm$^{-1}$')
         #ax1.set_ylabel('oscillation magnitude', color = pluscolor)
-        #ax1.legend()
+        ax1.legend()
         #ax1.set_ylim(0, 1.01)
         #ax2 = ax1.twinx()
         #ax2.set_ylabel('oscillation magnitude', color = minuscolor)
-        lens2 = ax2.plot(Freqm, abs(FTm)/amp, color = minuscolor, linewidth = 1, label = str(peaksProDataM.EnergyLabel) +' eV', linestyle = '--')
+        ax2.fill_between(Freqm, abs(FTm)/amp, color = minuscolor, label = '< ' + str(mt) + ' fs', alpha = 0.2)
+        ax2.legend()
         #ax2.tick_params(axis='y', labelcolor = minuscolor)
         #lens = lens1+lens2
         #labs = [l.get_label() for l in lens]
         #leg = ax2.legend(lens, labs, loc = 0)
         #ax2.set_ylim(0, .2525)
         #plt.title('> ' + str(mt) + ' fs')
-        #plt.tight_layout()
+        plt.tight_layout()
         #leg.get_frame().set_edgecolor('k')
         #leg.get_frame().set_linewidth(0.8)
+        print(len(Freqm))
         
         
         """
