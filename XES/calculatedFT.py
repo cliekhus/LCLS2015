@@ -75,13 +75,6 @@ plt.xlim([0,500])
 
 
 
-plt.figure()
-plt.plot(calc[:,0], calc[:,5])
-plt.ylabel('2p-1s energy difference')
-plt.xlabel('time (fs)')
-
-
-
 
 makeSpectralPlot(calc[:,5], calc[:,0], 50, 500, True)
 
@@ -92,18 +85,22 @@ makeSpectralPlot(calc[:,5], calc[:,0], 50, 500, True)
 
 
 
-plt.figure(figsize = (4,5))
+plt.figure()
+plt.subplot(211)
+plt.plot(calc[:,0], np.array(calc[:,5])-np.mean(calc[:,5]))
+plt.ylabel('$\Delta$ 2p-1s (eV)')
+plt.xlabel('time (fs)')
 
 #gridspec.GridSpec(10,1)
 
 #ax = plt.subplot2grid((10,1), (0,0), colspan = 1, rowspan = 7)
-plt.plot(Freq, abs(FT), color='k', label='calculation')
+plt.subplot(212)
+plt.plot(Freq, abs(FT), color='k')
 plt.ylim([0,60])
 plt.xlim([0,500])
 plt.xlabel('frequency (cm$^{-1}$)')
-plt.ylabel('fourier amplitude')
-plt.legend()
-#plt.tight_layout()
+plt.ylabel('oscillation strength')
+plt.tight_layout()
 
 
 #ax = plt.subplot2grid((10,1), (7,0), colspan = 1, rowspan = 3)

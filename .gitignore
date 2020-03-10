@@ -2,9 +2,10 @@ $ cat .gitignore
 *.h5
 *.png
 *.pdf
+*.gif
 /__pycache__
 /Figures
 /Starting_Code
 /XAS/__pycache__
 /XES/__pycache__
-/Calculations
+/Calculations/__pycache__

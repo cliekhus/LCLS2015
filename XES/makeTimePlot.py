@@ -42,7 +42,7 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
     
     if MakePlots:
             
-        fig, ax = plt.subplots(figsize = (4,6))
+        fig, ax = plt.subplots(figsize = (3.3,5))
 
                 
         plt.plot(TCentersM, peaksProDataM.XESDiff*100, marker = 's', color = minuscolor, markersize = 3, linestyle = 'none')
@@ -66,25 +66,31 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         leg.get_frame().set_linewidth(0.8)
 
         plt.xlim([-250, 1400])
-        plt.ylim([-3, 3.1])
+        plt.ylim([-2.3, 3.1])
         plt.xlabel('time delay (fs)')
         plt.tight_layout()
         
         
-        axins = inset_axes(ax, width=1.75, height=.5, bbox_to_anchor=(1, .39), bbox_transform=ax.transAxes)
+        axins = inset_axes(ax, width=1.2, height=.75, bbox_to_anchor=(.99, .31), bbox_transform=ax.transAxes)
   
         plt.rcParams.update({'mathtext.default': 'regular' }     )
         axins.plot(FeIIEnergy*1000, FeIISignal/100000, color = 'k', linewidth = 0.85, label = 'GS')
-        axins.plot([0, 0],[0,0], linewidth = 0.85, color = 'k', linestyle = '--', label = 'DS')
+        #axins.plot([0, 0],[0,0], linewidth = 0.85, color = 'k', linestyle = '--', label = 'DS')
         axins.set_xlim([xlimL, xlimH])
         axins.set_xticks(np.arange(xlimL, xlimH, 4))
-        axins.set_xticklabels([])
-        leg = axins.legend(bbox_to_anchor=(0.03, 1.5), loc='upper left', borderaxespad=0., facecolor = 'white', handlelength = 1.2)
+        #axins.set_xticklabels([])
+        axins.set_ylabel('emission')
+        axins.set_xlabel('energy (eV)')
+        axins.annotate('', xy=(peaksProDataP.EnergyLabel,0.9), xytext=(peaksProDataP.EnergyLabel,0.1), arrowprops={'arrowstyle': '->', 'ls': 'dotted', 'ec': pluscolor, 'lw': 2})
+        axins.annotate('', xy=(peaksProDataM.EnergyLabel,0.1), xytext=(peaksProDataM.EnergyLabel,0.9), arrowprops={'arrowstyle': '->', 'ls': 'dashed', 'ec': minuscolor, 'lw': 2})
+        axins.annotate('', xy=(peaksProDataP2.EnergyLabel,0.9), xytext=(peaksProDataP2.EnergyLabel,0.1), arrowprops={'arrowstyle': '->', 'ec': pluscolor2, 'lw': 2})
+        
+        leg = axins.legend(bbox_to_anchor=(0.52, 1.37), loc='upper left', borderaxespad=0., facecolor = 'white', handlelength = 1.2)
         leg.get_frame().set_alpha(1)
         leg.get_frame().set_edgecolor('k')
         leg.get_frame().set_linewidth(0.8)
 
-
+        """
         axins2 = inset_axes(ax, width=1.75, height=.8, bbox_to_anchor=(1, .27), bbox_transform=ax.transAxes)
         axins2.errorbar(StaticEnergy, StaticS, StaticEr, color = 'k', linewidth = 0.85, linestyle = '--', label = 'DS')
         axins2.annotate('', xy=(peaksProDataP.EnergyLabel,0.1*10), xytext=(peaksProDataP.EnergyLabel,-0.19*10), arrowprops={'arrowstyle': '->', 'ls': 'dotted', 'ec': pluscolor, 'lw': 2})
@@ -94,7 +100,7 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         axins2.set_ylim([-2, 3])
         axins2.set_xticks(np.arange(xlimL, xlimH, 4))
         axins2.set_xlabel('energy (eV)')
-        
+        """
     
         
         
@@ -137,25 +143,27 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
     
     if MakePlots:
 
-        fig = plt.figure(figsize = (4,5))
+        fig = plt.figure(figsize = (3.33,5))
 
         ax1 = fig.add_subplot(2,1,1)
         
         amp = max([max(abs(FTp)), max(abs(FTm)), max(abs(FTp2))])
         
         ax1.plot(Freqp, abs(FTp)/amp, color = pluscolor, linewidth = 2, label = '> ' + str(mt) + ' fs', linestyle = ':')
-        #ax1.set_xlabel('cm$^{-1}$')
+        ax1.set_ylim(0, 1.05)
+        ax1.set_xlim(0,400)
         ax1.set_ylabel('oscillatior strength')
-        ax1.set_xlabel('cm$^{-1}$')
-        ax1.legend()
-        ax1.set_ylim(0, 1.01)
         ax1.set_title(str(peaksProDataP.EnergyLabel) +' eV')
+        leg.get_frame().set_edgecolor('k')
+        leg.get_frame().set_linewidth(0.8)
         
         ax2 = fig.add_subplot(2,1,2)
         ax2.plot(Freqm, abs(FTm)/amp, color = minuscolor, linewidth = 2, label = '> ' + str(mt) + ' fs', linestyle = '--')
         ax2.set_xlabel('cm$^{-1}$')
         ax2.set_ylabel('oscillatior strength')
         ax2.set_title(str(peaksProDataM.EnergyLabel) +' eV')
+        ax2.set_xlim(0,400)
+        ax2.set_ylim(0,.29)
         print(len(Freqm))
     
     
@@ -198,24 +206,14 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         
         
         ax1.fill_between(Freqp, abs(FTp)/amp, color = pluscolor, label = '< ' + str(mt) + ' fs', alpha = 0.2)
-        #ax1.tick_params(axis='y', labelcolor = pluscolor)
-        #ax1.set_xlabel('cm$^{-1}$')
-        #ax1.set_ylabel('oscillation magnitude', color = pluscolor)
-        ax1.legend()
-        #ax1.set_ylim(0, 1.01)
-        #ax2 = ax1.twinx()
-        #ax2.set_ylabel('oscillation magnitude', color = minuscolor)
+        leg = ax1.legend()
+        leg.get_frame().set_edgecolor('k')
+        leg.get_frame().set_linewidth(0.8)
         ax2.fill_between(Freqm, abs(FTm)/amp, color = minuscolor, label = '< ' + str(mt) + ' fs', alpha = 0.2)
-        ax2.legend()
-        #ax2.tick_params(axis='y', labelcolor = minuscolor)
-        #lens = lens1+lens2
-        #labs = [l.get_label() for l in lens]
-        #leg = ax2.legend(lens, labs, loc = 0)
-        #ax2.set_ylim(0, .2525)
-        #plt.title('> ' + str(mt) + ' fs')
+        leg = ax2.legend()
+        leg.get_frame().set_edgecolor('k')
+        leg.get_frame().set_linewidth(0.8)
         plt.tight_layout()
-        #leg.get_frame().set_edgecolor('k')
-        #leg.get_frame().set_linewidth(0.8)
         print(len(Freqm))
         
         

@@ -14,6 +14,8 @@ import matplotlib.gridspec as gridspec
 from fitXASDiff import fitXASPiecewiseGauss
 from fittingfunctions import gauswslope
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+import matplotlib.image as mpimg
+from matplotlib.offsetbox import TextArea, DrawingArea, OffsetImage, AnnotationBbox
 
 MinTime = -35
 MaxTime = 35
@@ -106,8 +108,6 @@ for ii in range(len(holedensity)):
 
 
 
-
-
 fig, ax = plt.subplots(figsize = (4,5))
 AB = [x-y for x,y in zip(Bpeaks, Apeaks)]
 plt.plot(AB, holedensity, 'o', color = '#009E73', marker = 's', label = 'calculation')#'#0072b2'
@@ -120,22 +120,6 @@ plt.tight_layout()
 
 
 
-
-
-
-with open("D://LCLS_Data/LCLS_python_data/XAS_Spectra/FitOuts.pkl", "rb") as f:
-    FitOuts = pickle.load(f)
-
-patch = pat.Ellipse((FitOuts['BmA'],linefit(FitOuts['BmA'])), FitOuts['BmAunc'], linefit(FitOuts['BmAunc']), color='#c70039')
-ax.add_patch(patch)
-plt.ylim([0,1])
-plt.xlim([0,3])
-plt.plot([-1,-2], [1,2], marker = 'o', label = 'measurement', color = '#c70039', linestyle = 'none')#'#e69f00'
-leg = plt.legend()
-leg.get_frame().set_edgecolor('k')
-
-
-print('Hole density: ' + str(linefit(FitOuts['BmA'])) + ' pm ' + str(linefit(FitOuts['BmAunc'])))
 
 
 folder = "D://LCLS_Data/LCLS_python_data/XAS_Spectra/"
@@ -158,23 +142,24 @@ with open(folder + "XASOnBootF.pkl", "rb") as f:
 with open(folder + "xasProData_one.pkl", "rb") as f:
     xasProData_one = pickle.load(f)
 
-
-
+with open("D://LCLS_Data/LCLS_python_data/XAS_Spectra/FitOuts.pkl", "rb") as f:
+    FitOuts = pickle.load(f)
     
-
+    
+    
 pluscolor = '#009E73'
 minuscolor = '#0072b2'
 pluscolor2 = '#e69f00'
 
-plt.figure(figsize = (4,5))
+plt.figure(figsize = (3.5,5))
 
-gridspec.GridSpec(10,1)
 
 ax = plt.subplot2grid((10,1), (0,0), colspan = 1, rowspan = 2)
 plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(xasProData_one.XASOff_Norm,-4), np.delete(xasProData_one.Error_Off,-4), color = 'k')
 plt.text(7112.8, 1250, 'B')
 plt.text(7115, 1990, 'C')
 plt.ylabel('$I_{off}$')
+plt.xlim([7110,7120])
 ax.set_xticklabels([])
 plt.tight_layout()
 
@@ -189,29 +174,121 @@ plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(XASDiffBootF,-4)
 plt.xlabel('x-ray energy (eV)')
 plt.ylabel('$I_{on}-I_{off}$')
 plt.ylim([-250,150])
+plt.xlim([7110,7120])
 leg = plt.legend()
 leg.get_frame().set_edgecolor('k')
 leg.get_frame().set_linewidth(0.8)
 plt.tight_layout()
 
 
+
+
+
+
+
+
+
+
+
+
+
+nchoice = 4
+width = 1
+roots = loadtxt(file+str(int(holedensity[nchoice]*100))+'.roots')
+
+
+plt.figure(figsize=(3.5,5))
+ax=plt.subplot(2,1,1)
+plt.stem(roots[:,0]+Eoff, roots[:,1]/np.max(roots[:,1]), markerfmt = 'none', basefmt='none', linefmt='k')
+
+XX = np.linspace(min(xasProData_one.EnergyPlot), max(xasProData_one.EnergyPlot), 1000)
+Amp = np.zeros(np.shape(XX))
+
+import math 
+
+for ii in range(len(roots[:,1])):
+    Amp = Amp + roots[ii,1]/np.max(roots[:,1])/((XX-roots[ii,0]-Eoff)**2+(.5*width)**2)/math.pi/2*width
+ 
+plt.plot(XX, Amp, color = '#009E73')
+
+x1pos = 7113.75
+x2pos = 7116.25
+bally = 3.4
+         
+plt.plot([x1pos,x2pos], [bally,bally], lw=2, color='k')
+
+plt.plot(x1pos,bally,'ko', markersize = 30, fillstyle = 'full', color = '0.7')
+plt.plot(x2pos,bally,'ko', markersize = 30, fillstyle = 'full', color = '0.3')
+
+ax.annotate('A', xy=(Apeaks[nchoice],roots[0,1]/np.max(roots[:,1])+.1), xytext=(Apeaks[nchoice],2.1), ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
+ax.annotate('B', xy=(Bpeaks[nchoice],roots[3,1]/np.max(roots[:,1])+.1), xytext=(Bpeaks[nchoice],2.1), ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
+
+ax.text(x1pos,bally, 'Fe', horizontalalignment='center', verticalalignment='center', color='k')
+ax.text(x2pos,bally, 'Ru', horizontalalignment='center', verticalalignment='center', color='w')
+ax.text(x1pos,2.65, str(holedensity[nchoice])+' hd', horizontalalignment='center', verticalalignment='center', color='k')
+ax.text(x2pos,2.65, str(1-holedensity[nchoice])+' hd', horizontalalignment='center', verticalalignment='center', color='k')
+
+
+plt.xlim([7110,7120])
+plt.ylim([0,4])
+
+plt.xlabel('X-ray energy')
+
+plt.ylabel('calculated $I_{off}$')
+#ax.set_xticklabels([])
+
+ax=plt.subplot(2,1,2)
+
+arr_lena = mpimg.imread('0p77T.png')
+imagebox = OffsetImage(arr_lena, zoom=0.45)
+ab = AnnotationBbox(imagebox, (0.9, 0.7), frameon=False)
+ax.add_artist(ab)
+ax.annotate('', xy=(1.6,0.7), xytext=(1.95,0.63), arrowprops={'arrowstyle': '<-', 'ls': 'solid', 'ec': 'k', 'lw': 2})
+
+
+arr_lena = mpimg.imread('0p10T.png')
+imagebox = OffsetImage(arr_lena, zoom=0.45)
+ab = AnnotationBbox(imagebox, (2.2, 0.25), frameon=False)
+ax.add_artist(ab)
+ax.annotate('', xy=(1.5, .25), xytext=(0.4,0.1), arrowprops={'arrowstyle': '<-', 'ls': 'solid', 'ec': 'k', 'lw': 2})
+
+AB = [x-y for x,y in zip(Bpeaks, Apeaks)]
+plt.plot(AB, holedensity, 'o', color = '#009E73', marker = 's', label = 'calc.')
+patch = pat.Ellipse((FitOuts['BmA'],linefit(FitOuts['BmA'])), FitOuts['BmAunc'], linefit(FitOuts['BmAunc']), color='#c70039')
+plt.plot(-10,-10, color = '#c70039', marker = 'o', label = 'exp.', linestyle = 'none')
+plt.tight_layout()
+ax.add_patch(patch)
+line = np.polyfit(AB, holedensity, 1)
+linefit = np.poly1d(line)
+plt.plot(AB, linefit(AB), color = 'k')
+plt.xlabel('B - A peak energy difference')
+plt.ylabel('Fe hole density')
+plt.xlim([.12,2.9])
+plt.ylim([0,1])
+plt.tight_layout()
+
+leg = ax.legend(bbox_to_anchor=(0.7, 1.15), loc='upper left', borderaxespad=0., facecolor = 'white', handlelength = 1.2)
+leg.get_frame().set_edgecolor('k')
+leg.get_frame().set_linewidth(0.8)
+leg.get_frame().set_alpha(1)
+
+
+
+
+
+
+
+
+
+
+print('Hole density: ' + str(linefit(FitOuts['BmA'])) + ' pm ' + str(linefit(FitOuts['BmAunc'])))
+
+
+
+
+
+    
 print('number of points used: ' + str(FitOuts['numpoints']))
-
-"""
-axins = inset_axes(ax, width=.8, height=1.5, bbox_to_anchor=(.43, .45), bbox_transform=ax.transAxes)
-axins.plot(AB, holedensity, 'o', color = '#009E73', marker = 's', label = 'calculation')
-axins.plot(AB, linefit(AB), color = 'k')
-axins.set_xlim([0,3])
-axins.set_ylim([0,0.9])
-#patch = pat.Ellipse((BmA,linefit(BmA)), 5*uncertainty[1], linefit(BmA+uncertainty[1]*5)-linefit(BmA-uncertainty[1]*5), color='#c70039')
-patch = pat.Ellipse((BmA,linefit(BmA)), 1.9, linefit(1.8+1.9)-linefit(1.8-1.9), color='#c70039')
-axins.add_patch(patch)
-"""
-
-
-
-
-
 
 
 

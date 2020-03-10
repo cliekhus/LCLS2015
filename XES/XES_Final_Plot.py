@@ -17,44 +17,44 @@ from scipy.signal import savgol_filter
 
 
 
-APSName = h5py.File('D:\LCLS_Data\APS\APS_Aug_2015_Fesamples.mat')
+APSName = h5py.File('C:\LCLS_Data\APS\APS_Aug_2015_Fesamples.mat')
 
 indexlow = 400
 indexhigh = 500
 
 
 
-with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataPF.pkl", "rb") as f:
+with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataPF.pkl", "rb") as f:
     peaksProDataP = pickle.load(f)
     
-with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataP2F.pkl", "rb") as f:
+with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataP2F.pkl", "rb") as f:
     peaksProDataP2 = pickle.load(f)
 
-with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataMF.pkl", "rb") as f:
+with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataMF.pkl", "rb") as f:
     peaksProDataM = pickle.load(f)
     
-with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataPF_boot.pkl", "rb") as f:
+with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataPF_boot.pkl", "rb") as f:
     peaksProDataPF_boot = pickle.load(f)
         
-with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataMF_boot.pkl", "rb") as f:
+with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataMF_boot.pkl", "rb") as f:
     peaksProDataMF_boot = pickle.load(f)
     
-with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataP2F_boot.pkl", "rb") as f:
+with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataP2F_boot.pkl", "rb") as f:
     peaksProDataP2F_boot = pickle.load(f)
 
-with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\TCentersPF.pkl", "rb") as f:
+with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\TCentersPF.pkl", "rb") as f:
     TCentersPF = pickle.load(f)
 
-with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\TCentersP2F.pkl", "rb") as f:
+with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\TCentersP2F.pkl", "rb") as f:
     TCentersP2F = pickle.load(f)
 
-with open("D:\LCLS_Data\LCLS_python_data\XES_TimeResolved\TCentersMF.pkl", "rb") as f:
+with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\TCentersMF.pkl", "rb") as f:
     TCentersMF = pickle.load(f)
         
-with open("D://LCLS_Data/LCLS_python_data/XES_conversion_info/x0.pkl", "rb") as f:
+with open("C://LCLS_Data/LCLS_python_data/XES_conversion_info/x0.pkl", "rb") as f:
     x0 = pickle.load(f)
 
-with open("D://LCLS_Data/LCLS_python_data/XES_Spectra/xesProData.pkl", "rb") as f:
+with open("C://LCLS_Data/LCLS_python_data/XES_Spectra/xesProData.pkl", "rb") as f:
     static = pickle.load(f)
 
 
@@ -88,7 +88,7 @@ StaticEr = np.sqrt(static.Error_On**2+static.Error_On**2)/static.XESOff_Norm*100
 makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, static.KaEnergy, StaticS, StaticEr, TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, FPlots, True)
 
 
-plt.figure(figsize = (4,5))
+plt.figure(figsize = (3.33,5))
 
 gridspec.GridSpec(10,1)
 
