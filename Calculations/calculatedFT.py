@@ -16,7 +16,7 @@ import matplotlib.gridspec as gridspec
 calc = loadtxt('Fe1s2p-gap-12.out')
 #calc = loadtxt('Fe1s3p-gap-123.out')
 
-FT = np.fft.rfft(calc[:,5])
+FT = np.fft.rfft(calc[:,5]-np.mean(calc[:,5]))
 
 Freq = np.fft.rfftfreq(len(calc[:,5]), d=(calc[0,0]-calc[1,0])*1e-15)
 
@@ -57,7 +57,7 @@ plt.xlim([0,500])
 
 BlackmanWindow = np.blackman(len(calc[:,5]))
 
-FT = np.fft.rfft([x*y for x,y in zip(calc[:,5], BlackmanWindow)])
+FT = np.fft.rfft([x*y for x,y in zip(calc[:,5]-np.mean(calc[:,5]), BlackmanWindow)])
 
 Freq = np.fft.rfftfreq(len(calc[:,5]), d=(calc[0,0]-calc[1,0])*1e-15)
 

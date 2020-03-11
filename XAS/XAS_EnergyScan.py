@@ -26,7 +26,7 @@ import datetime
 ReEnterData = True
 FPlots = False
 ReLoadData = False
-SaveData = True
+SaveData = False
 Redot0 = True
 Boot = True
 numBoot = 1000

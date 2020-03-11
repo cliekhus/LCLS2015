@@ -12,14 +12,10 @@ from fitXES import fitXESthree
 from APSXESCalibration import convertAngle2Energy
 import pickle
 import ProcessedDataClass as PDC
-from makeTimePlot import makeTimePlot
 from makeTimePlot import makeTimePlotThree
 from makeTimePlot import makeTimePlotThreeError
-from makeTimePlot import makeBootFT
 from makeTimePlot import makeOneBootFT
 import numpy as np
-import random
-import matplotlib.pyplot as plt
 import math
 from MakeRawBoot import MakeRawBoot
 import time

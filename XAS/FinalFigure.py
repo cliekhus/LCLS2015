@@ -122,7 +122,8 @@ plt.tight_layout()
 
 
 
-folder = "D://LCLS_Data/LCLS_python_data/XAS_Spectra/"
+#folder = "D://LCLS_Data/LCLS_python_data/XAS_Spectra/"
+folder = "C:/Users/chels/Downloads/LCLS_python_data/LCLS_python_data/XAS_Spectra/"
         
 with open(folder + "XASDiffBootF.pkl", "rb") as f:
     XASDiffBootF = pickle.load(f)
@@ -142,7 +143,7 @@ with open(folder + "XASOnBootF.pkl", "rb") as f:
 with open(folder + "xasProData_one.pkl", "rb") as f:
     xasProData_one = pickle.load(f)
 
-with open("D://LCLS_Data/LCLS_python_data/XAS_Spectra/FitOuts.pkl", "rb") as f:
+with open(folder + "FitOuts.pkl", "rb") as f:
     FitOuts = pickle.load(f)
     
     
@@ -232,7 +233,7 @@ ax.text(x2pos,2.65, str(1-holedensity[nchoice])+' hd', horizontalalignment='cent
 plt.xlim([7110,7120])
 plt.ylim([0,4])
 
-plt.xlabel('X-ray energy')
+plt.xlabel('X-ray energy (eV)')
 
 plt.ylabel('calculated $I_{off}$')
 #ax.set_xticklabels([])
@@ -261,13 +262,13 @@ ax.add_patch(patch)
 line = np.polyfit(AB, holedensity, 1)
 linefit = np.poly1d(line)
 plt.plot(AB, linefit(AB), color = 'k')
-plt.xlabel('B - A peak energy difference')
+plt.xlabel('B - A peak energy difference (eV)')
 plt.ylabel('Fe hole density')
 plt.xlim([.12,2.9])
 plt.ylim([0,1])
 plt.tight_layout()
 
-leg = ax.legend(bbox_to_anchor=(0.7, 1.15), loc='upper left', borderaxespad=0., facecolor = 'white', handlelength = 1.2)
+leg = ax.legend(bbox_to_anchor=(0.8, 1.15), loc='upper left', borderaxespad=0., facecolor = 'white', handlelength = 1.2)
 leg.get_frame().set_edgecolor('k')
 leg.get_frame().set_linewidth(0.8)
 leg.get_frame().set_alpha(1)
@@ -297,3 +298,87 @@ print('number of points used: ' + str(FitOuts['numpoints']))
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+plt.figure(figsize=(7.5,10))
+
+for ii in range(7):
+    
+    roots = loadtxt(file+str(int(holedensity[ii]*100))+'.roots')
+    
+    ax=plt.subplot(4,2,ii+1)
+    plt.stem(roots[:,0]+Eoff, roots[:,1]/np.max(roots[:,1]), markerfmt = 'none', basefmt='none', linefmt='k')
+    
+    XX = np.linspace(min(xasProData_one.EnergyPlot), max(xasProData_one.EnergyPlot), 1000)
+    Amp = np.zeros(np.shape(XX))
+    
+    
+    
+    for jj in range(len(roots[:,1])):
+        Amp = Amp + roots[jj,1]/np.max(roots[:,1])/((XX-roots[jj,0]-Eoff)**2+(.5*width)**2)/math.pi/2*width
+     
+    plt.plot(XX, Amp, color = '#009E73')
+    
+    x1pos = 7113.75
+    x2pos = 7116.25
+    bally = 3.4
+             
+    plt.plot([x1pos,x2pos], [bally,bally], lw=2, color='k')
+    
+    plt.plot(x1pos,bally,'ko', markersize = 30, fillstyle = 'full', color = str(holedensity[ii]))
+    plt.plot(x2pos,bally,'ko', markersize = 30, fillstyle = 'full', color = str(1-holedensity[ii]))
+    
+    ax.annotate('A', xy=(Apeaks[ii],roots[0,1]/np.max(roots[:,1])+.1), xytext=(Apeaks[ii],2.1), ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
+    ax.annotate('B', xy=(Bpeaks[ii],1.1), xytext=(Bpeaks[ii],2.1), ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
+    
+    if ii <= 2:
+            
+        ax.text(x1pos,bally, 'Fe', horizontalalignment='center', verticalalignment='center', color='w')
+        ax.text(x2pos,bally, 'Ru', horizontalalignment='center', verticalalignment='center', color='k')
+        ax.text(x1pos,2.65, str(round(holedensity[ii],2))+' hd', horizontalalignment='center', verticalalignment='center', color='k')
+        ax.text(x2pos,2.65, str(round(1-holedensity[ii],2))+' hd', horizontalalignment='center', verticalalignment='center', color='k')
+    
+    else:
+    
+        ax.text(x1pos,bally, 'Fe', horizontalalignment='center', verticalalignment='center', color='k')
+        ax.text(x2pos,bally, 'Ru', horizontalalignment='center', verticalalignment='center', color='w')
+        ax.text(x1pos,2.65, str(round(holedensity[ii],2))+' hd', horizontalalignment='center', verticalalignment='center', color='k')
+        ax.text(x2pos,2.65, str(round(1-holedensity[ii],2))+' hd', horizontalalignment='center', verticalalignment='center', color='k')
+
+    
+    
+    plt.xlim([7110.5,7118.5])
+    plt.ylim([0,4])
+    
+    plt.xlabel('X-ray energy (eV)')
+    plt.ylabel('absorption')
+    
+    #plt.ylabel('calculated $I_{off}$')
+
+ax=plt.subplot(4,2,8)
+
+plt.plot(AB, holedensity, 'o', color = '#009E73', marker = 's', label = 'calculation')#'#0072b2'
+line = np.polyfit(AB, holedensity, 1)
+linefit = np.poly1d(line)
+plt.plot(AB, linefit(AB), color = 'k')
+plt.xlabel('B - A peak energy difference (eV)')
+plt.ylabel('Fe hole density')
+
+plt.tight_layout()

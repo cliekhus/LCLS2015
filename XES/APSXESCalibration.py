@@ -93,7 +93,8 @@ def convertAngle2Energy(ScanNum, TorS):
     
     import pickle
     
-    folder = "D://LCLS_Data/LCLS_python_data/XES_conversion_info/"
+    #folder = "D://LCLS_Data/LCLS_python_data/XES_conversion_info/"
+    folder = "C://Users/chels/Downloads/LCLS_python_data/LCLS_python_data/XES_conversion_info/"
     
     with open(folder + "runNum.pkl", "rb") as f:
         runNum = pickle.load(f)
