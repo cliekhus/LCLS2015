@@ -22,12 +22,13 @@ import time
 import datetime
 
 
-folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
-ReEnterData = True
+#folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
+folder = "C://Users/chels/Downloads/LCLS_python_data/LCLS_python_data/XES_TimeResolved/"
+ReEnterData = False
 FPlots = False
-ReLoadData = False
-SaveData = True
-Boot = True
+ReLoadData = True
+SaveData = False
+Boot = False
 numBoot = 1000
 
 NumTTSteps = 100
@@ -125,7 +126,9 @@ Fit1, Fit2, params, info = fitXESthree(TCentersP, TCentersM, TCentersP2, peaksPr
 
 t0 = params[3]
 
-folder_con = "D://LCLS_Data/LCLS_python_data/XES_conversion_info/"
+#folder_con = "D://LCLS_Data/LCLS_python_data/XES_conversion_info/"
+folder_con = "C://Users/chels/Downloads/LCLS_python_data/LCLS_python_data/XES_conversion_info/"
+
 with open(folder_con + "t0.pkl", "wb") as f:
         pickle.dump(t0, f)
 
