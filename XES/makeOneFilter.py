@@ -15,7 +15,7 @@ def makeOneFilter(xesRawData, ploton):
 
     import matplotlib.pyplot as plt
     import numpy as np
-        
+    
 
     NanCheck = np.logical_not(np.logical_or.reduce((np.isnan(xesRawData.Diode2), np.isnan(xesRawData.Ipm2Sum), np.isnan(xesRawData.CspadSum), np.isnan(xesRawData.L3E))))
 
@@ -54,34 +54,39 @@ def makeOneFilter(xesRawData, ploton):
     AllFilter = np.logical_and.reduce((IpmFilter, L3EFilter, CspadSumFilter, RowlandFilter, DiodeFilter, NanCheck, xesRawData.XOn))
     
     if ploton:
-        plt.figure()
-        plt.plot(xesRawData.L3E)
-        plt.plot(xesRawData.L3E[L3EFilter])
-        plt.title('L3E')
+        plt.figure(figsize = (5,7))
+        plt.subplot(3,2,1)
+        plt.plot(xesRawData.L3E/np.max(xesRawData.L3E))
+        plt.plot(xesRawData.L3E[L3EFilter]/np.max(xesRawData.L3E))
+        plt.title('electron bunch energy')
         plt.xlabel('shot number')
         
-        plt.figure()
-        plt.plot(xesRawData.Ipm2Sum)
-        plt.plot(xesRawData.Ipm2Sum[IpmFilter])
-        plt.title('Ipm')
+        #plt.figure()
+        plt.subplot(3,2,2)
+        plt.plot(xesRawData.Ipm2Sum/np.nanmax(xesRawData.Ipm2Sum))
+        plt.plot(xesRawData.Ipm2Sum[IpmFilter]/np.nanmax(xesRawData.Ipm2Sum))
+        plt.title('x-ray intensity')
         plt.xlabel('shotnumber')
         
-        plt.figure()
-        plt.plot(xesRawData.CspadSum)
-        plt.plot(xesRawData.CspadSum[CspadSumFilter])
-        plt.title('Cspad')
+        #plt.figure()
+        plt.subplot(3,2,3)
+        plt.plot(xesRawData.CspadSum/np.max(xesRawData.CspadSum))
+        plt.plot(xesRawData.CspadSum[CspadSumFilter]/np.max(xesRawData.CspadSum))
+        plt.title('cspad sum')
         plt.xlabel('shotnumber')
         
-        plt.figure()
-        plt.plot(xesRawData.RowlandY)
-        plt.plot(xesRawData.RowlandY[RowlandFilter])
-        plt.title('RowlandY')
+        #plt.figure()
+        plt.subplot(3,2,4)
+        plt.plot(xesRawData.RowlandY/np.max(xesRawData.RowlandY))
+        plt.plot(xesRawData.RowlandY[RowlandFilter]/np.max(xesRawData.RowlandY))
+        plt.title('rowland measurement')
         plt.xlabel('shotnumber')
         
-        plt.figure()
-        plt.plot(xesRawData.Diode2)
-        plt.plot(xesRawData.Diode2[DiodeFilter])
-        plt.title('Diode2')
+        #plt.figure()
+        plt.subplot(3,2,5)
+        plt.plot(xesRawData.Diode2/np.max(xesRawData.Diode2))
+        plt.plot(xesRawData.Diode2[DiodeFilter]/np.max(xesRawData.Diode2))
+        plt.title('TFY diode')
         plt.xlabel('shotnumber')
     
     
@@ -113,13 +118,13 @@ def makeOneFilter(xesRawData, ploton):
     
     if ploton:
             
-        fig=plt.figure()
-        fig.add_subplot(121)
-        plt.hist(xesRawData.TimeTool[np.logical_and(xesRawData.XOn, xesRawData.LOn)], 1000)
-        plt.title('time tool before filters')
-        fig.add_subplot(122)
-        plt.hist(xesRawData.TimeTool[np.logical_and.reduce((TTFilter, xesRawData.XOn, xesRawData.LOn))], 1000)
-        plt.title('time tool after filters')
+        #fig=plt.figure()
+        #fig.add_subplot(121)
+        plt.subplot(3,2,6)
+        plt.plot(xesRawData.TimeTool[np.logical_and(xesRawData.XOn, xesRawData.LOn)]/np.max(xesRawData.TimeTool[np.logical_and(xesRawData.XOn, xesRawData.LOn)]))
+        plt.plot(xesRawData.TimeTool[np.logical_and.reduce((TTFilter, xesRawData.XOn, xesRawData.LOn))]/np.max(xesRawData.TimeTool[np.logical_and(xesRawData.XOn, xesRawData.LOn)]))
+        plt.title('time tool')
+        plt.tight_layout()
     
 
     return AllFilter, TTFilter
