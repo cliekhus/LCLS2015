@@ -25,7 +25,6 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
     xlimH = 6407
 
     params, cov, paramshalf, covhalf, paramssimple, covsimple = fitXESGlobal(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, ploton)
-    cov = np.sqrt(np.diag(cov))
     
     Fitp1 = globalconvolved(TCentersP, params[0], params[1], params[2], params[5], 0)
     Fitm1 = globalconvolved(TCentersM, params[0], params[1], params[3], params[5], 0)
@@ -54,8 +53,16 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         plt.errorbar(TCentersP, peaksProDataP.XESDiff*100+1, peaksProDataP.XESDiffE*100, marker = 'o', color = pluscolor, markersize = 3, linestyle = 'none')
      
         plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[2], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9], 0))*100 + 1, linestyle = ':', color = pluscolor)
+        plt.plot(tt, np.array(globalconvolved(tt, params[0]+cov[0], params[1]+cov[1], params[2]+cov[2], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0]+cov[0], params[1]+cov[1], params[6]+cov[6], params[9]+cov[9], 0))*100 + 1, linestyle = ':', color = pluscolor)
+        plt.plot(tt, np.array(globalconvolved(tt, params[0]-cov[0], params[1]-cov[1], params[2]-cov[2], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0]-cov[0], params[1]-cov[1], params[6]-cov[6], params[9]-cov[9], 0))*100 + 1, linestyle = ':', color = pluscolor)
+        
         plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100,  linestyle = '--', color = minuscolor)
+        plt.plot(tt, np.array(globalconvolved(tt, params[0]+cov[0], params[1]+cov[1], params[3]+cov[3], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0]+cov[0], params[1]+cov[1], params[7]+cov[7], params[9]+cov[9], 0))*100,  linestyle = '--', color = minuscolor)
+        plt.plot(tt, np.array(globalconvolved(tt, params[0]-cov[0], params[1]-cov[1], params[3]-cov[3], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0]-cov[0], params[1]-cov[1], params[7]-cov[7], params[9]-cov[9], 0))*100,  linestyle = '--', color = minuscolor)
+        
         plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[4], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9], 0))*100 + 0.5, color = pluscolor2)
+        plt.plot(tt, np.array(globalconvolved(tt, params[0]+cov[0], params[1]+cov[1], params[4]+cov[4], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0]+cov[0], params[1]+cov[1], params[8]+cov[8], params[9]+cov[9], 0))*100 + 0.5, color = pluscolor2)
+        plt.plot(tt, np.array(globalconvolved(tt, params[0]-cov[0], params[1]-cov[1], params[4]-cov[4], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0]-cov[0], params[1]-cov[1], params[8]-cov[8], params[9]-cov[9], 0))*100 + 0.5, color = pluscolor2)
 
         plt.plot([-1000, -1000], [0.02, 0.02], 'o', color = pluscolor, markerfacecolor = pluscolor, markeredgecolor = pluscolor, linestyle = ':', markersize = 3, label = str(peaksProDataP.EnergyLabel) +' eV')
         plt.plot([-1000, -1000], [0.02, 0.02], '^', color = pluscolor2, markerfacecolor = pluscolor2, markeredgecolor = pluscolor2, linestyle = 'solid', markersize = 3, label = str(peaksProDataP2.EnergyLabel) +' eV')
@@ -74,7 +81,10 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         axins = inset_axes(ax, width=1.2, height=.75, bbox_to_anchor=(.99, .31), bbox_transform=ax.transAxes)
   
         plt.rcParams.update({'mathtext.default': 'regular' }     )
-        axins.plot(FeIIEnergy*1000, FeIISignal/100000, color = 'k', linewidth = 0.85, label = 'GS')
+        if max(FeIIEnergy > 100):
+            axins.plot(FeIIEnergy, FeIISignal/np.max(FeIISignal), color = 'k', linewidth = 0.85, label = 'GS')
+        else:
+            axins.plot(FeIIEnergy*1000, FeIISignal/np.max(FeIISignal), color = 'k', linewidth = 0.85, label = 'GS')
         #axins.plot([0, 0],[0,0], linewidth = 0.85, color = 'k', linestyle = '--', label = 'DS')
         axins.set_xlim([xlimL, xlimH])
         axins.set_xticks(np.arange(xlimL, xlimH, 4))

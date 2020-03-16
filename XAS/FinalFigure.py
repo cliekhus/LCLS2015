@@ -255,14 +255,14 @@ ax.annotate('', xy=(1.5, .25), xytext=(0.4,0.1), arrowprops={'arrowstyle': '<-',
 
 AB = [x-y for x,y in zip(Bpeaks, Apeaks)]
 plt.plot(AB, holedensity, 'o', color = '#009E73', marker = 's', label = 'calc.')
-patch = pat.Ellipse((FitOuts['BmA'],linefit(FitOuts['BmA'])), FitOuts['BmAunc'], linefit(FitOuts['BmAunc']), color='#c70039')
+patch = pat.Ellipse((FitOuts['BmA'],linefit(FitOuts['BmA'])), FitOuts['BmAunc'], linefit(FitOuts['BmA']+FitOuts['BmAunc'])-linefit(FitOuts['BmA']-FitOuts['BmAunc']), color='#c70039')
 plt.plot(-10,-10, color = '#c70039', marker = 'o', label = 'exp.', linestyle = 'none')
 plt.tight_layout()
 ax.add_patch(patch)
 line = np.polyfit(AB, holedensity, 1)
 linefit = np.poly1d(line)
 plt.plot(AB, linefit(AB), color = 'k')
-plt.xlabel('B - A peak energy difference (eV)')
+plt.xlabel('A - B peak energy difference (eV)')
 plt.ylabel('Fe hole density')
 plt.xlim([.12,2.9])
 plt.ylim([0,1])
@@ -282,7 +282,7 @@ leg.get_frame().set_alpha(1)
 
 
 
-print('Hole density: ' + str(linefit(FitOuts['BmA'])) + ' pm ' + str(linefit(FitOuts['BmAunc'])))
+print('Hole density: ' + str(linefit(FitOuts['BmA'])) + ' pm ' + str(linefit(FitOuts['BmA']+FitOuts['BmAunc'])-linefit(FitOuts['BmA']-FitOuts['BmAunc'])))
 
 
 
@@ -378,7 +378,7 @@ plt.plot(AB, holedensity, 'o', color = '#009E73', marker = 's', label = 'calcula
 line = np.polyfit(AB, holedensity, 1)
 linefit = np.poly1d(line)
 plt.plot(AB, linefit(AB), color = 'k')
-plt.xlabel('B - A peak energy difference (eV)')
+plt.xlabel('A - B peak energy difference (eV)')
 plt.ylabel('Fe hole density')
 
 plt.tight_layout()

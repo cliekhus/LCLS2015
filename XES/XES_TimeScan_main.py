@@ -20,6 +20,7 @@ import math
 from MakeRawBoot import MakeRawBoot
 import time
 import datetime
+from fitXES import fitXESGlobal
 
 
 #folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
@@ -202,8 +203,8 @@ if Boot:
     IRF = np.empty(numBoot)
     
     
-    params, cov, Freq, FTp, FTm, FTp2 = makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, FPlots, False)
-    
+    params, cov, paramshalf, covhalf, paramssimple, covsimple = fitXESGlobal(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, False)
+        
     
     FTBootP = np.empty((np.shape(Freq)[0],numBoot))
     FTBootP2 = np.empty((np.shape(Freq)[0],numBoot))
@@ -233,8 +234,7 @@ if Boot:
         PeaksBootM[:,ii] = peaksProDataMF_boot.XESDiff
         
         
-        params, cov, Freq, FTp, FTm, FTp2 = makeTimePlotThree(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, FPlots, False)
-        
+        params, cov, paramshalf, covhalf, paramssimple, covsimple = fitXESGlobal(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, False)
         BET[ii] = params[2]*math.log(2)
         IRF[ii] = params[4]
         
