@@ -57,6 +57,11 @@ with open("C://LCLS_Data/LCLS_python_data/XES_conversion_info/x0.pkl", "rb") as 
 with open("C://LCLS_Data/LCLS_python_data/XES_Spectra/xesProData.pkl", "rb") as f:
     static = pickle.load(f)
 
+with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\ParamsF.pkl", "rb") as f:
+    ParamsF = pickle.load(f)
+
+with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\ParamsE.pkl", "rb") as f:
+    ParamsE = pickle.load(f)
 
 pluscolor = '#009E73'
 minuscolor = '#0072b2'

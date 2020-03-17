@@ -28,9 +28,9 @@ folder = "C://Users/chels/Downloads/LCLS_python_data/LCLS_python_data/XES_TimeRe
 ReEnterData = False
 FPlots = False
 ReLoadData = True
-SaveData = False
-Boot = False
-numBoot = 1000
+SaveData = True
+Boot = True
+numBoot = 10
 
 NumTTSteps = 100
 NumTTStepsPlots = 50
@@ -199,16 +199,15 @@ if Boot:
     PeaksBootP2 = np.empty((np.shape(TCentersP2F)[0],numBoot))
     PeaksBootM = np.empty((np.shape(TCentersMF)[0],numBoot))
     
-    BET = np.empty(numBoot)
-    IRF = np.empty(numBoot)
     
-    
-    params, cov, paramshalf, covhalf, paramssimple, covsimple = fitXESGlobal(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, False)
+    params, cov, paramshalf, covhalf, paramssimple, covsimple = fitXESGlobal(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot.XESDiff, peaksProDataP2F_boot.XESDiff, peaksProDataMF_boot.XESDiff, 0, False)
         
     
     FTBootP = np.empty((np.shape(Freq)[0],numBoot))
     FTBootP2 = np.empty((np.shape(Freq)[0],numBoot))
     FTBootM = np.empty((np.shape(Freq)[0],numBoot))
+    
+    Params = np.empty((len(params),numBoot))
     
     startT = time.time()
     
@@ -234,14 +233,9 @@ if Boot:
         PeaksBootM[:,ii] = peaksProDataMF_boot.XESDiff
         
         
-        params, cov, paramshalf, covhalf, paramssimple, covsimple = fitXESGlobal(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, False)
-        BET[ii] = params[2]*math.log(2)
-        IRF[ii] = params[4]
-        
-        
-        FTBootP[:,ii] = abs(FTp)
-        FTBootP2[:,ii] = abs(FTp2)
-        FTBootM[:,ii] = abs(FTm)
+        params, cov, paramshalf, covhalf, paramssimple, covsimple = fitXESGlobal(TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot.XESDiff, peaksProDataP2F_boot.XESDiff, peaksProDataMF_boot.XESDiff, 0, False)
+        Params[:,ii] = params
+
         
         elapsed = time.time() - startT
         timeleft = elapsed/(ii+1)*(numBoot-ii-1)
@@ -264,11 +258,8 @@ if Boot:
     FTBootMF = np.mean(FTBootM,1)
     FTBootME = np.std(FTBootM,1)
     
-    BETF = np.mean(BET)
-    BETE = np.std(BET)
-    
-    IRFF = np.mean(IRF)
-    IRFE = np.std(IRF)
+    ParamsF = np.mean(Params,1)
+    ParamsE = np.std(Params,1)
     
     peaksProDataPF_boot.changeValue(XESDiff = PeaksBootPF, XESDiffE = PeaksBootPE, FT = FTBootPF, FTE = FTBootPE, Freq = Freq, EnergyLabel = peaksProDataPF.EnergyLabel)
     peaksProDataP2F_boot.changeValue(XESDiff = PeaksBootP2F, XESDiffE = PeaksBootP2E, FT = FTBootP2F, FTE = FTBootP2E, Freq = Freq, EnergyLabel = peaksProDataP2F.EnergyLabel)
@@ -284,11 +275,11 @@ if Boot:
 
 if SaveData:
         
-    with open(folder + "peaksRawDataP.pkl", "wb") as f:
-        pickle.dump(peaksRawDataP, f)
+    #with open(folder + "peaksRawDataP.pkl", "wb") as f:
+    #    pickle.dump(peaksRawDataP, f)
         
-    with open(folder + "peaksRawDataM.pkl", "wb") as f:
-        pickle.dump(peaksRawDataM, f)
+    #with open(folder + "peaksRawDataM.pkl", "wb") as f:
+    #    pickle.dump(peaksRawDataM, f)
             
     with open(folder + "peaksProDataPF.pkl", "wb") as f:
         pickle.dump(peaksProDataPF, f)
@@ -302,8 +293,8 @@ if SaveData:
     with open(folder + "FileNumsP.pkl", "wb") as f:
         pickle.dump(FileNumsP, f)
         
-    with open(folder + "peaksRawDataP2.pkl", "wb") as f:
-        pickle.dump(peaksRawDataP2, f)
+    #with open(folder + "peaksRawDataP2.pkl", "wb") as f:
+    #    pickle.dump(peaksRawDataP2, f)
             
     with open(folder + "peaksProDataP2F.pkl", "wb") as f:
         pickle.dump(peaksProDataP2F, f)
@@ -328,4 +319,10 @@ if SaveData:
 
     with open(folder + "TCentersMF.pkl", "wb") as f:
         pickle.dump(TCentersMF, f)
+        
+    with open(folder + "ParamsF.pkl", "wb") as f:
+        pickle.dump(ParamsF, f)
+    
+    with open(folder + "ParamsE.pkl", "wb") as f:
+        pickle.dump(ParamsE, f)
 

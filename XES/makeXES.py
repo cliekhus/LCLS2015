@@ -20,10 +20,10 @@ def makeXES(peaksProData, peaksRawData, NumTTSteps, MinTime, MaxTime, ploton):
     TimeSteps = np.linspace(MinTime, MaxTime, NumTTSteps)
     
     
-    Filter, TTFilter = makeOneFilter(peaksRawData, True)
+    Filter, TTFilter = makeOneFilter(peaksRawData, ploton)
     AllFilter = np.logical_and(Filter, TTFilter)
     
-    X, ROffset = makeLineFilter(peaksRawData.RowlandY, peaksRawData.Diode2, np.logical_and.reduce((Filter, np.logical_not(peaksRawData.LOn), peaksRawData.XOn)), True)
+    X, ROffset = makeLineFilter(peaksRawData.RowlandY, peaksRawData.Diode2, np.logical_and.reduce((Filter, np.logical_not(peaksRawData.LOn), peaksRawData.XOn)), ploton)
     SlopeFilterOff, X = makeLineFilter(peaksRawData.RowlandY, peaksRawData.Diode2, np.logical_and(Filter, peaksRawData.XOn), ploton)
     
     filteroff = np.logical_and.reduce((SlopeFilterOff, np.logical_not(peaksRawData.LOn), peaksRawData.XOn, Filter))
