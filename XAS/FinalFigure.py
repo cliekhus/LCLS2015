@@ -174,8 +174,55 @@ plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(XASDiffBootF,-4)
              marker='.', label = str(MinTime) + ' to ' + str(MaxTime) + ' fs delay', color = 'k',zorder=10)
 plt.xlabel('x-ray energy (eV)')
 plt.ylabel('$I_{on}-I_{off}$')
-plt.ylim([-250,150])
+plt.ylim([-250,175])
 plt.xlim([7110,7120])
+
+
+
+
+
+
+
+import math
+
+width = 1
+nchoice = 0
+roots = loadtxt(file+str(int(holedensity[nchoice]*100))+'.roots')
+
+XX = np.linspace(min(xasProData_one.EnergyPlot), max(xasProData_one.EnergyPlot), 1000)
+Amp0 = np.zeros(np.shape(XX))
+for ii in range(len(roots[:,1])):
+    Amp0 = Amp0 + roots[ii,1]/np.max(roots[:,1])/((XX-roots[ii,0]-Eoff)**2+(.5*width)**2)/math.pi/2*width
+
+
+nchoice = 4
+roots = loadtxt(file+str(int(holedensity[nchoice]*100))+'.roots')
+
+XX = np.linspace(min(xasProData_one.EnergyPlot), max(xasProData_one.EnergyPlot), 1000)
+Amp = np.zeros(np.shape(XX))
+
+ 
+
+for ii in range(len(roots[:,1])):
+    Amp = Amp + roots[ii,1]/np.max(roots[:,1])/((XX-roots[ii,0]-Eoff)**2+(.5*width)**2)/math.pi/2*width
+
+
+Ampp = Amp[XX<7112]
+XXp = XX[XX<7112]
+IMax = np.argmax(Ampp)
+XXA = XX[IMax]
+
+shift = FitOuts['Ax0']-XXA
+#plt.plot(XX-shift, Amp0*100)
+
+
+#plt.figure()
+#plt.plot(XXp, Ampp)
+
+
+
+
+#plt.plot(XX+shift, (Amp-Amp0)*150, color = pluscolor,  label = 'calculation', linewidth = 2)
 leg = plt.legend()
 leg.get_frame().set_edgecolor('k')
 leg.get_frame().set_linewidth(0.8)
@@ -183,34 +230,13 @@ plt.tight_layout()
 
 
 
-
-
-
-
-
-
-
-
-
-
-nchoice = 4
-width = 1
-roots = loadtxt(file+str(int(holedensity[nchoice]*100))+'.roots')
-
-
 plt.figure(figsize=(3.5,5))
 ax=plt.subplot(2,1,1)
-plt.stem(roots[:,0]+Eoff, roots[:,1]/np.max(roots[:,1]), markerfmt = 'none', basefmt='none', linefmt='k')
-
-XX = np.linspace(min(xasProData_one.EnergyPlot), max(xasProData_one.EnergyPlot), 1000)
-Amp = np.zeros(np.shape(XX))
-
-import math 
-
-for ii in range(len(roots[:,1])):
-    Amp = Amp + roots[ii,1]/np.max(roots[:,1])/((XX-roots[ii,0]-Eoff)**2+(.5*width)**2)/math.pi/2*width
- 
+plt.stem(roots[:,0]+Eoff, roots[:,1]/np.max(roots[:,1]), markerfmt = 'none', basefmt='none', linefmt='k') 
 plt.plot(XX, Amp, color = '#009E73')
+         
+         
+
 
 x1pos = 7113.75
 x2pos = 7116.25

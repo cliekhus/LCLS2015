@@ -174,12 +174,12 @@ def lorwoffset(t, sig, t0, a, x0, slope):
 
 
 
-def offsetsine(t,oscamp,period,onset):
+def offsetsine(t,oscamp,period,onset,base):
     import numpy as np
     import math
    
     hs = np.heaviside((t-onset), 0)
-    out = oscamp*np.sin(t*2*math.pi/period)*hs
+    out = oscamp*np.sin((t-onset)*2*math.pi/period)*hs + base
 
     return out
 

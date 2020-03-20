@@ -301,29 +301,62 @@ def fitXESsinethree(TCentersplus, TCentersplus2, TCentersminus, XESDiffplus, XES
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def fitXESsine(TCenters, Residual, ploton):
     
     import matplotlib.pyplot as plt
     from scipy.optimize import curve_fit
     from fittingfunctions import offsetsine
+    import numpy as np
 
 
-    startoscamp = -0.01
-    startonset = 500
+    startoscamp = 0.01
+    startonset = 150
     startperiod = 300
+    startbase = 0
     
     if ploton:
 
         plt.figure()
         plt.plot(TCenters, Residual, 'o')
-        plt.plot(TCenters, offsetsine(TCenters, startoscamp, startperiod, startonset))
+        plt.plot(TCenters, offsetsine(TCenters, startoscamp, startperiod, startonset, startbase))
         plt.title('start parameters')
         plt.xlabel('time (fs)')
     
 
-    params,cov = curve_fit(offsetsine, TCenters, Residual, p0 = [startoscamp, startperiod, startonset])
+    params,cov = curve_fit(offsetsine, TCenters, Residual, p0 = [startoscamp, startperiod, startonset, startbase])
+    cov = np.sqrt(np.diag(cov))
     
-    Fit = offsetsine(TCenters, params[0], params[1], params[2])
+    time = np.linspace(min(TCenters), max(TCenters), 1000)
+    
+    Fit = offsetsine(time, params[0], params[1], params[2], params[3])
     
     if ploton:
             
@@ -333,7 +366,7 @@ def fitXESsine(TCenters, Residual, ploton):
         plt.title('end parameters')
         plt.xlabel('time (fs)')
 
-    return Fit, params, cov
+    return Fit, time, params, cov
 
 
 

@@ -10,11 +10,12 @@ Created on Wed Oct 23 14:21:20 2019
 def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, StaticEr, TCentersP, TCentersP2, TCentersM, peaksProDataP, peaksProDataP2, peaksProDataM, minTime, maxTime, numzeros, ploton, MakePlots):
         
     import matplotlib.pyplot as plt 
-    from fitXES import fitXESGlobal
+    from fitXES import fitXESGlobal, fitXESsine
     import numpy as np
     from fittingfunctions import globalconvolved
     from mpl_toolkits.axes_grid1.inset_locator import inset_axes
     import matplotlib.gridspec as gridspec
+    import math
         
     
     pluscolor = '#009E73'
@@ -53,16 +54,16 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         plt.errorbar(TCentersP, peaksProDataP.XESDiff*100+1, peaksProDataP.XESDiffE*100, marker = 'o', color = pluscolor, markersize = 3, linestyle = 'none')
      
         plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[2], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9], 0))*100 + 1, linestyle = ':', color = pluscolor)
-        plt.plot(tt, np.array(globalconvolved(tt, params[0]+cov[0], params[1]+cov[1], params[2]+cov[2], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0]+cov[0], params[1]+cov[1], params[6]+cov[6], params[9]+cov[9], 0))*100 + 1, linestyle = ':', color = pluscolor)
-        plt.plot(tt, np.array(globalconvolved(tt, params[0]-cov[0], params[1]-cov[1], params[2]-cov[2], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0]-cov[0], params[1]-cov[1], params[6]-cov[6], params[9]-cov[9], 0))*100 + 1, linestyle = ':', color = pluscolor)
+        plt.fill_between(tt, np.array(globalconvolved(tt, params[0], params[1], params[2], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9]+cov[9], 0))*100 + 1, \
+                         np.array(globalconvolved(tt, params[0], params[1], params[2], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9]-cov[9], 0))*100 + 1, color = pluscolor, alpha = 0.3)
         
-        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100,  linestyle = '--', color = minuscolor)
-        plt.plot(tt, np.array(globalconvolved(tt, params[0]+cov[0], params[1]+cov[1], params[3]+cov[3], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0]+cov[0], params[1]+cov[1], params[7]+cov[7], params[9]+cov[9], 0))*100,  linestyle = '--', color = minuscolor)
-        plt.plot(tt, np.array(globalconvolved(tt, params[0]-cov[0], params[1]-cov[1], params[3]-cov[3], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0]-cov[0], params[1]-cov[1], params[7]-cov[7], params[9]-cov[9], 0))*100,  linestyle = '--', color = minuscolor)
+        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100, linestyle = '--', color = minuscolor)
+        plt.fill_between(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9]+cov[9], 0))*100, \
+                         np.array(globalconvolved(tt, params[0], params[1], params[3], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9]-cov[9], 0))*100, color = minuscolor, alpha = 0.3)
         
         plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[4], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9], 0))*100 + 0.5, color = pluscolor2)
-        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1]+cov[1], params[4], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9], 0))*100 + 0.5, color = pluscolor2)
-        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1]-cov[1], params[4], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9], 0))*100 + 0.5, color = pluscolor2)
+        plt.fill_between(tt, np.array(globalconvolved(tt, params[0], params[1], params[4], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9]+cov[9], 0))*100 + 0.5, \
+                         np.array(globalconvolved(tt, params[0], params[1], params[4], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9]-cov[9], 0))*100 + 0.5, color = pluscolor2, alpha = 0.3)
 
         plt.plot([-1000, -1000], [0.02, 0.02], 'o', color = pluscolor, markerfacecolor = pluscolor, markeredgecolor = pluscolor, linestyle = ':', markersize = 3, label = str(peaksProDataP.EnergyLabel) +' eV')
         plt.plot([-1000, -1000], [0.02, 0.02], '^', color = pluscolor2, markerfacecolor = pluscolor2, markeredgecolor = pluscolor2, linestyle = 'solid', markersize = 3, label = str(peaksProDataP2.EnergyLabel) +' eV')
@@ -73,7 +74,7 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         leg.get_frame().set_linewidth(0.8)
 
         plt.xlim([-250, 1400])
-        plt.ylim([-2.3, 3.1])
+        plt.ylim([-2.5, 3.5])
         plt.xlabel('time delay (fs)')
         plt.tight_layout()
         
@@ -88,7 +89,8 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         #axins.plot([0, 0],[0,0], linewidth = 0.85, color = 'k', linestyle = '--', label = 'DS')
         axins.set_xlim([xlimL, xlimH])
         axins.set_xticks(np.arange(xlimL, xlimH, 4))
-        #axins.set_xticklabels([])
+        axins.set_yticklabels([])
+        axins.set_yticks([])
         axins.set_ylabel('emission')
         axins.set_xlabel('energy (eV)')
         axins.annotate('', xy=(peaksProDataP.EnergyLabel,0.9), xytext=(peaksProDataP.EnergyLabel,0.1), arrowprops={'arrowstyle': '->', 'ls': 'dotted', 'ec': pluscolor, 'lw': 2})
@@ -100,22 +102,9 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         leg.get_frame().set_edgecolor('k')
         leg.get_frame().set_linewidth(0.8)
 
-        """
-        axins2 = inset_axes(ax, width=1.75, height=.8, bbox_to_anchor=(1, .27), bbox_transform=ax.transAxes)
-        axins2.errorbar(StaticEnergy, StaticS, StaticEr, color = 'k', linewidth = 0.85, linestyle = '--', label = 'DS')
-        axins2.annotate('', xy=(peaksProDataP.EnergyLabel,0.1*10), xytext=(peaksProDataP.EnergyLabel,-0.19*10), arrowprops={'arrowstyle': '->', 'ls': 'dotted', 'ec': pluscolor, 'lw': 2})
-        axins2.annotate('', xy=(peaksProDataM.EnergyLabel,-0.08*10), xytext=(peaksProDataM.EnergyLabel,0.21*10), arrowprops={'arrowstyle': '->', 'ls': 'dashed', 'ec': minuscolor, 'lw': 2})
-        axins2.annotate('', xy=(peaksProDataP2.EnergyLabel,0.1*10), xytext=(peaksProDataP2.EnergyLabel,-0.19*10), arrowprops={'arrowstyle': '->', 'ec': pluscolor2, 'lw': 2})
-        axins2.set_xlim([xlimL, xlimH])
-        axins2.set_ylim([-2, 3])
-        axins2.set_xticks(np.arange(xlimL, xlimH, 4))
-        axins2.set_xlabel('energy (eV)')
-        """
+
     
-        
-        
-    
-    mt = 300
+    mt = params[1]*2*math.sqrt(2*math.log(2))
     
     
     bartlettWindowp = np.bartlett(len(Residualp[TCentersP>mt]))
@@ -152,28 +141,62 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
     
     
     if MakePlots:
-
-        fig = plt.figure(figsize = (3.33,5))
-
-        ax1 = fig.add_subplot(2,1,1)
         
-        amp = max([max(abs(FTp)), max(abs(FTm)), max(abs(FTp2))])
+        fig = plt.figure(figsize = (3.3,4))
+        plt.plot(TCentersM, Residualm, marker = 's', color = minuscolor, markersize = 3, linestyle = '--', label = str(peaksProDataM.EnergyLabel) +' eV')
+        plt.fill_between(TCentersM, Residualm-peaksProDataM.XESDiffE*100, Residualm+peaksProDataM.XESDiffE*100, alpha = 0.3)#, label = 'uncertainty')
         
-        ax1.plot(Freqp, abs(FTp)/amp, color = pluscolor, linewidth = 2, label = '> ' + str(mt) + ' fs', linestyle = ':')
-        ax1.set_ylim(0, 1.05)
-        ax1.set_xlim(0,400)
-        ax1.set_ylabel('oscillatior strength')
-        ax1.set_title(str(peaksProDataP.EnergyLabel) +' eV')
+        
+        Fit, time, params, cov = fitXESsine(TCentersM, Residualm, ploton)
+        plt.plot(time, Fit, color = '#c70039', label = 'sine fit')
+        plt.xlim([-250, 1400])
+        #plt.ylim([-.3,.4])
+        plt.ylabel('%$\Delta$ emission')
+        plt.xlabel('time delay (fs)')
+        
+        leg = plt.legend(loc = 4)
         leg.get_frame().set_edgecolor('k')
         leg.get_frame().set_linewidth(0.8)
+        plt.tight_layout()
         
-        ax2 = fig.add_subplot(2,1,2)
-        ax2.plot(Freqm, abs(FTm)/amp, color = minuscolor, linewidth = 2, label = '> ' + str(mt) + ' fs', linestyle = '--')
+        print('determined period ' + str(int(params[1])) + ' +- ' + str(cov[1]) + ' fs')
+        print('determined frequency ' + str(int(333.564*100/params[1])) + ' +- ' + str(int(333.564*100/(params[1]-cov[1])-333.564*100/(params[1]+cov[1]))) + ' cm-1')
+        
+        fig = plt.figure(figsize = (7,3))
+
+        amp = max([max(abs(FTp)), max(abs(FTm)), max(abs(FTp2))])
+        
+        ax1 = fig.add_subplot(1,3,2)
+        ax1.plot(Freqp, abs(FTp)/amp, color = pluscolor, linewidth = 2, label = '> ' + str(mt) + ' fs', linestyle = ':')
+        ax1.set_ylabel('oscillatior strength')
+        ax1.set_xlabel('cm$^{-1}$')
+        ax1.set_xticks([0,100,200,300,400])
+        ax1.set_title(str(peaksProDataP.EnergyLabel) +' eV')
+        ax1.set_ylim(0, 1.05)
+        ax1.set_xlim(0, 400)
+        
+        
+        ax2 = fig.add_subplot(1,3,1)
+        ax2.plot(Freqp2, abs(FTp2)/amp, color = pluscolor2, linewidth = 2, label = '> ' + str(mt) + ' fs', linestyle = '-')
         ax2.set_xlabel('cm$^{-1}$')
-        ax2.set_ylabel('oscillatior strength')
-        ax2.set_title(str(peaksProDataM.EnergyLabel) +' eV')
-        ax2.set_xlim(0,400)
-        ax2.set_ylim(0,.29)
+        ax2.set_xticks([0,100,200,300,400])
+        ax2.set_title(str(peaksProDataP2.EnergyLabel) +' eV')
+        ax2.set_ylim(0, 0.55)
+        ax2.set_xlim(0, 400)
+        
+        
+        ax3 = fig.add_subplot(1,3,3)
+        ax3.plot(Freqm, abs(FTm)/amp, color = minuscolor, linewidth = 2, label = '> ' + str(mt) + ' fs', linestyle = '--')
+        ax3.set_xlabel('cm$^{-1}$')
+        ax3.set_xticks([0,100,200,300,400])
+        ax3.set_title(str(peaksProDataM.EnergyLabel) +' eV')
+        ax3.set_ylim(0, 0.32)
+        ax3.set_xlim(0, 400)
+        
+        plt.tight_layout()
+
+        
+        
         print(len(Freqm))
     
     
@@ -212,7 +235,7 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
     
     
     
-    if MakePlots:
+    if False:
         
         
         ax1.fill_between(Freqp, abs(FTp)/amp, color = pluscolor, label = '< ' + str(mt) + ' fs', alpha = 0.2)
@@ -226,68 +249,6 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         plt.tight_layout()
         print(len(Freqm))
         
-        
-        """
-        ax1 = plt.subplot2grid((10,1), (5,0), colspan = 1, rowspan = 5)
-        amp = max([max(abs(FTp)), max(abs(FTm)), max(abs(FTp2))])
-        
-        lens1 = ax1.plot(Freqp, abs(FTp)/amp, color = pluscolor, linewidth = 2, label = str(peaksProDataP.EnergyLabel) +' eV', linestyle = ':')
-        ax1.tick_params(axis='y', labelcolor = pluscolor)
-        #ax1.set_xlabel('cm$^{-1}$')
-        #ax1.set_ylabel('oscillation magnitude', color = pluscolor)
-        #ax1.legend()
-        ax1.set_ylim(0, 1.01)
-        ax2 = ax1.twinx()
-        #ax2.set_ylabel('oscillation magnitude', color = minuscolor)
-        lens2 = ax2.plot(Freqm, abs(FTm)/amp, color = minuscolor, linewidth = 2, label = str(peaksProDataM.EnergyLabel) +' eV', linestyle = '--')
-        ax2.tick_params(axis='y', labelcolor = minuscolor)
-        lens = lens1+lens2
-        labs = [l.get_label() for l in lens]
-        #leg = ax2.legend(lens, labs, loc = 0)
-        ax2.set_ylim(0, .2525)
-        #plt.title('> ' + str(mt) + ' fs')
-        plt.tight_layout()
-        #leg.get_frame().set_edgecolor('k')
-        #leg.get_frame().set_linewidth(0.8)
-        
-    
-
-
-        
-        fig = plt.figure(figsize = (4,5))
-        ax1 = fig.add_subplot(2,1,1)
-        ax1.plot(Freqp, abs(FTp), color = pluscolor, linewidth = 2, label = str(peaksProDataP.EnergyLabel) +' eV', linestyle = ':')
-        ax1.plot(Freqp2, abs(FTm), color = minuscolor, linewidth = 2, label = str(peaksProDataM.EnergyLabel) + ' eV', linestyle = '--')
-        ax1.plot(Freqm, abs(FTp2), color = pluscolor2, linewidth = 2, label = str(peaksProDataP2.EnergyLabel) +' eV')
-        leg = ax1.legend()
-        
-        
-        
-        ax1.set_ylabel('fourier amplitude')
-        ax1.set_xlabel('cm$^{-1}$')
-        ax1.set_xlim([0,500])
-        ax1.set_ylim([0,0.015])
-        ax1.set_title('> ' + str(mt) + ' fs')
-        leg.get_frame().set_edgecolor('k')
-        leg.get_frame().set_linewidth(0.8)
-        
-
-        ax2 = fig.add_subplot(2,1,2)
-        ax2.plot(Freqp, abs(FTp), color = pluscolor, linewidth = 2, label = str(peaksProDataP.EnergyLabel) +' eV', linestyle = ':')
-        ax2.plot(Freqm, abs(FTm), color = pluscolor2, linewidth = 2, label = str(peaksProDataP2.EnergyLabel) +' eV', linestyle = '--')
-        ax2.plot(Freqp2, abs(FTp2), color = minuscolor, linewidth = 2, label = str(peaksProDataM.EnergyLabel) + ' eV')
-
-
-        ax2.set_ylabel('fourier amplitude')
-        ax2.set_xlabel('cm$^{-1}$')
-        ax2.set_xlim([0,500])
-        ax2.set_ylim([0,0.015])
-        ax2.set_title('< ' + str(mt) + ' fs')
-        plt.tight_layout()
-
-
-        """
-    
     
     
 
