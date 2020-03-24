@@ -10,9 +10,9 @@ Created on Wed Oct 23 14:21:20 2019
 def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, StaticEr, TCentersP, TCentersP2, TCentersM, peaksProDataP, peaksProDataP2, peaksProDataM, minTime, maxTime, numzeros, ploton, MakePlots):
         
     import matplotlib.pyplot as plt 
-    from fitXES import fitXESGlobal, fitXESsine
+    from fitXES import fitXESGlobal, fitXESsine, fitXESsine2
     import numpy as np
-    from fittingfunctions import globalconvolved
+    from fittingfunctions import globalconvolved, offsetsine
     from mpl_toolkits.axes_grid1.inset_locator import inset_axes
     import matplotlib.gridspec as gridspec
     import math
@@ -143,12 +143,32 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
     if MakePlots:
         
         fig = plt.figure(figsize = (3.3,4))
-        plt.plot(TCentersM, Residualm, marker = 's', color = minuscolor, markersize = 3, linestyle = '--', label = str(peaksProDataM.EnergyLabel) +' eV')
-        plt.fill_between(TCentersM, Residualm-peaksProDataM.XESDiffE*100, Residualm+peaksProDataM.XESDiffE*100, alpha = 0.3)#, label = 'uncertainty')
+        peaksProDataM.XESDiff*100
+        #plt.plot(TCentersM, Residualm, marker = 's', color = minuscolor, markersize = 3, linestyle = '--', label = str(peaksProDataM.EnergyLabel) +' eV')
+        #plt.fill_between(TCentersM, Residualm-peaksProDataM.XESDiffE*100, Residualm+peaksProDataM.XESDiffE*100, alpha = 0.3)#, label = 'uncertainty')
+        plt.plot(TCentersM, peaksProDataM.XESDiff*100, marker = 's', color = minuscolor, markersize = 3, linestyle = 'none', label = str(peaksProDataM.EnergyLabel) +' eV')
+        plt.fill_between(TCentersM, peaksProDataM.XESDiff*100-peaksProDataM.XESDiffE*100, peaksProDataM.XESDiff*100+peaksProDataM.XESDiffE*100, alpha = 0.3)#, label = 'uncertainty')
         
         
-        Fit, time, params, cov = fitXESsine(TCentersM, Residualm, ploton)
-        plt.plot(time, Fit, color = '#c70039', label = 'sine fit')
+        #Fit, time, paramsR, cov, RR = fitXESsine(TCentersM, Residualm, ploton)
+        Fit, time, paramsR, covR, RR = fitXESsine2(TCentersM, Residualm, ploton)
+        #plt.plot(time, Fit, color = '#c70039', label = 'sine fit')
+        Fit = Fit[time>paramsR[3]]
+        glft = np.array(globalconvolved(tt, params[0], params[1], params[3], params[5], 0))*100 + \
+                 np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100
+        plt.plot(time, glft, color = minuscolor)
+        glft = glft[time>paramsR[3]]
+        time = time[time>paramsR[3]]
+        
+        plt.plot(time, Fit+ glft, color = '#c70039', label = 'sine fit')
+
+        SE = np.sqrt(np.mean(RR**2))
+        
+        plt.fill_between(time, Fit+glft+SE, Fit+glft-SE, color='#c70039', alpha = 0.3)
+
+        #time = np.linspace(min(TCentersM), max(TCentersM), 1000)
+        #Fit = offsetsine(time, params[0], params[1]+cov[1], params[2], params[3])
+        #plt.plot(time, Fit, color = 'g', label = 'sine fit')
         plt.xlim([-250, 1400])
         #plt.ylim([-.3,.4])
         plt.ylabel('%$\Delta$ emission')
@@ -159,8 +179,10 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         leg.get_frame().set_linewidth(0.8)
         plt.tight_layout()
         
-        print('determined period ' + str(int(params[1])) + ' +- ' + str(cov[1]) + ' fs')
-        print('determined frequency ' + str(int(333.564*100/params[1])) + ' +- ' + str(int(333.564*100/(params[1]-cov[1])-333.564*100/(params[1]+cov[1]))) + ' cm-1')
+        print('determined period1 ' + str(int(paramsR[2])) + ' +- ' + str(covR[2]) + ' fs')
+        print('determined frequency1 ' + str(int(333.564*100/paramsR[2])) + ' +- ' + str(int(333.564*100/(paramsR[2]-covR[2])-333.564*100/(paramsR[2]+covR[2]))) + ' cm-1')
+        print('determined period2 ' + str(int(paramsR[3])) + ' +- ' + str(covR[3]) + ' fs')
+        print('determined frequency2 ' + str(int(333.564*100/paramsR[3])) + ' +- ' + str(int(333.564*100/(paramsR[3]-covR[3])-333.564*100/(paramsR[3]+covR[3]))) + ' cm-1')
         
         fig = plt.figure(figsize = (7,3))
 

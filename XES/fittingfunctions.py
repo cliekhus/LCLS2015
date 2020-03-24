@@ -184,6 +184,16 @@ def offsetsine(t,oscamp,period,onset,base):
     return out
 
 
+def offsetsine2(t,oscamp1,oscamp2,period1,period2,onset,base):
+    import numpy as np
+    import math
+   
+    hs = np.heaviside((t-onset), 0)
+    out = oscamp1*np.sin((t-onset)*2*math.pi/period1)*hs + oscamp2*np.sin((t-onset)*2*math.pi/period2)*hs + base
+
+    return out
+
+
 
 
 

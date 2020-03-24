@@ -63,7 +63,9 @@ def makeABpeak(Eoff, calc, roots, ploton, cc, lc, ls, ii, ax2):
     for root,amp in zip(Croots,Camp):
         Cshape = Cshape + amp*np.exp(-(x-(root+Eoff))**2/sig**2)
     
-    Cpeak = x[np.argmax(Cshape)]
+    #Cpeak = x[np.argmax(Cshape)]
+    Cpeak = np.min(Croots)+Eoff
+    #Cpeak = Croots[np.argmax(Camp)]+Eoff
     
     if ii == 0:
         ax2.plot(x, Bshape+Aamp*np.exp(-(x-(Apeak))**2/sig**2)+Cshape, color = 'k')
@@ -89,6 +91,7 @@ def makeABpeak(Eoff, calc, roots, ploton, cc, lc, ls, ii, ax2):
 
 Apeaks = []
 Bpeaks = []
+Cpeaks = []
 
 for ii in range(len(holedensity)):
     
@@ -104,6 +107,7 @@ for ii in range(len(holedensity)):
     
     Apeaks += [Apeak]
     Bpeaks += [Bpeak]
+    Cpeaks += [Cpeak]
     
 
 
@@ -222,7 +226,7 @@ shift = FitOuts['Ax0']-XXA
 
 
 
-#plt.plot(XX+shift, (Amp-Amp0)*150, color = pluscolor,  label = 'calculation', linewidth = 2)
+plt.plot(XX+shift, (Amp-Amp0)*150, color = pluscolor,  label = 'calculation', linewidth = 2)
 leg = plt.legend()
 leg.get_frame().set_edgecolor('k')
 leg.get_frame().set_linewidth(0.8)
@@ -301,6 +305,9 @@ leg.get_frame().set_alpha(1)
 
 
 
+plt.figure()
+BC = [x-y for x,y in zip(Cpeaks, Bpeaks)]
+plt.plot(BC, holedensity, 'o', color = '#009E73', marker = 's', label = 'calc.')
 
 
 
@@ -352,7 +359,8 @@ for ii in range(7):
     ax=plt.subplot(4,2,ii+1)
     plt.stem(roots[:,0]+Eoff, roots[:,1]/np.max(roots[:,1]), markerfmt = 'none', basefmt='none', linefmt='k')
     
-    XX = np.linspace(min(xasProData_one.EnergyPlot), max(xasProData_one.EnergyPlot), 1000)
+    #XX = np.linspace(min(xasProData_one.EnergyPlot), max(xasProData_one.EnergyPlot), 1000)
+    XX = np.linspace(min(xasProData_one.EnergyPlot), 7125, 1000)
     Amp = np.zeros(np.shape(XX))
     
     
@@ -390,8 +398,10 @@ for ii in range(7):
 
     
     
-    plt.xlim([7110.5,7118.5])
-    plt.ylim([0,4])
+    #plt.xlim([7110.5,7118.5])
+    plt.xlim([7110.5,7125])
+    plt.ylim([0,6.1])
+    #plt.ylim([0,4])
     
     plt.xlabel('X-ray energy (eV)')
     plt.ylabel('absorption')
