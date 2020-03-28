@@ -54,16 +54,16 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         plt.errorbar(TCentersP, peaksProDataP.XESDiff*100+1, peaksProDataP.XESDiffE*100, marker = 'o', color = pluscolor, markersize = 3, linestyle = 'none')
      
         plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[2], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9], 0))*100 + 1, linestyle = ':', color = pluscolor)
-        plt.fill_between(tt, np.array(globalconvolved(tt, params[0], params[1], params[2], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9]+cov[9], 0))*100 + 1, \
-                         np.array(globalconvolved(tt, params[0], params[1], params[2], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9]-cov[9], 0))*100 + 1, color = pluscolor, alpha = 0.3)
+        #plt.fill_between(tt, np.array(globalconvolved(tt, params[0], params[1], params[2], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9]+cov[9], 0))*100 + 1, \
+        #                 np.array(globalconvolved(tt, params[0], params[1], params[2], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9]-cov[9], 0))*100 + 1, color = pluscolor, alpha = 0.3)
         
         plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100, linestyle = '--', color = minuscolor)
-        plt.fill_between(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9]+cov[9], 0))*100, \
-                         np.array(globalconvolved(tt, params[0], params[1], params[3], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9]-cov[9], 0))*100, color = minuscolor, alpha = 0.3)
+        #plt.fill_between(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9]+cov[9], 0))*100, \
+        #                 np.array(globalconvolved(tt, params[0], params[1], params[3], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9]-cov[9], 0))*100, color = minuscolor, alpha = 0.3)
         
         plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[4], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9], 0))*100 + 0.5, color = pluscolor2)
-        plt.fill_between(tt, np.array(globalconvolved(tt, params[0], params[1], params[4], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9]+cov[9], 0))*100 + 0.5, \
-                         np.array(globalconvolved(tt, params[0], params[1], params[4], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9]-cov[9], 0))*100 + 0.5, color = pluscolor2, alpha = 0.3)
+        #plt.fill_between(tt, np.array(globalconvolved(tt, params[0], params[1], params[4], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9]+cov[9], 0))*100 + 0.5, \
+        #                 np.array(globalconvolved(tt, params[0], params[1], params[4], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9]-cov[9], 0))*100 + 0.5, color = pluscolor2, alpha = 0.3)
 
         plt.plot([-1000, -1000], [0.02, 0.02], 'o', color = pluscolor, markerfacecolor = pluscolor, markeredgecolor = pluscolor, linestyle = ':', markersize = 3, label = str(peaksProDataP.EnergyLabel) +' eV')
         plt.plot([-1000, -1000], [0.02, 0.02], '^', color = pluscolor2, markerfacecolor = pluscolor2, markeredgecolor = pluscolor2, linestyle = 'solid', markersize = 3, label = str(peaksProDataP2.EnergyLabel) +' eV')
@@ -101,6 +101,55 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         leg.get_frame().set_alpha(1)
         leg.get_frame().set_edgecolor('k')
         leg.get_frame().set_linewidth(0.8)
+        
+        
+        
+        
+        
+        
+        fig, ax = plt.subplots(figsize = (3.3,5))
+
+                
+        plt.plot(TCentersM, peaksProDataM.XESDiff*100, marker = 's', color = minuscolor, markersize = 3, linestyle = 'none')
+        plt.plot(TCentersP2, peaksProDataP2.XESDiff*100+.5, marker = '^', color = pluscolor2, markersize = 3, linestyle = 'none')
+        plt.plot(TCentersP, peaksProDataP.XESDiff*100+1, marker = 'o', color = pluscolor, markersize = 3, linestyle = 'none')
+
+        plt.errorbar(TCentersM, peaksProDataM.XESDiff*100, peaksProDataM.XESDiffE*100, marker = 's', color = minuscolor, markersize = 3, linestyle = 'none')
+        plt.errorbar(TCentersP2, peaksProDataP2.XESDiff*100+.5, peaksProDataP2.XESDiffE*100, marker = '^', color = pluscolor2, markersize = 3, linestyle = 'none')
+        plt.errorbar(TCentersP, peaksProDataP.XESDiff*100+1, peaksProDataP.XESDiffE*100, marker = 'o', color = pluscolor, markersize = 3, linestyle = 'none')
+     
+        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[2], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9], 0))*100 + 1, linestyle = ':', color = pluscolor)
+        plt.fill_between(tt, np.array(globalconvolved(tt, params[0], params[1], params[2], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9], 0))*100 + 1, \
+                         np.array(globalconvolved(tt, params[0], params[1], params[2], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9], 0))*100 + 1, color = pluscolor, alpha = 0.3)
+        
+        
+        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100, linestyle = '--', color = minuscolor)
+        plt.fill_between(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100, \
+                         np.array(globalconvolved(tt, params[0], params[1], params[3], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100, color = minuscolor, alpha = 0.3)
+        
+        for ii in range(5):
+            plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], ii*10, 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100, linestyle = '--', color = minuscolor, alpha = 0.3)
+        
+        #for ii in range(3):
+        #    plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], ii*10+80, 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100, linestyle = '--', color = minuscolor, alpha = 0.3)
+        
+        
+        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[4], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9], 0))*100 + 0.5, color = pluscolor2)
+        plt.fill_between(tt, np.array(globalconvolved(tt, params[0], params[1], params[4], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9], 0))*100 + 0.5, \
+                         np.array(globalconvolved(tt, params[0], params[1], params[4], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9], 0))*100 + 0.5, color = pluscolor2, alpha = 0.3)
+
+        plt.plot([-1000, -1000], [0.02, 0.02], 'o', color = pluscolor, markerfacecolor = pluscolor, markeredgecolor = pluscolor, linestyle = ':', markersize = 3, label = str(peaksProDataP.EnergyLabel) +' eV')
+        plt.plot([-1000, -1000], [0.02, 0.02], '^', color = pluscolor2, markerfacecolor = pluscolor2, markeredgecolor = pluscolor2, linestyle = 'solid', markersize = 3, label = str(peaksProDataP2.EnergyLabel) +' eV')
+        plt.plot([-1000, -1000], [0.02, 0.02], 's', color = minuscolor, fillstyle = 'none', markerfacecolor = minuscolor, markeredgecolor = minuscolor, linestyle = '--', markersize = 3, label = str(peaksProDataM.EnergyLabel) +' eV')
+        plt.ylabel('%$\Delta$ emission')
+        leg = plt.legend()
+        leg.get_frame().set_edgecolor('k')
+        leg.get_frame().set_linewidth(0.8)
+
+        plt.xlim([-250, 1400])
+        plt.ylim([-2.5, 3.5])
+        plt.xlabel('time delay (fs)')
+        plt.tight_layout()
 
 
     
@@ -146,8 +195,8 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         peaksProDataM.XESDiff*100
         #plt.plot(TCentersM, Residualm, marker = 's', color = minuscolor, markersize = 3, linestyle = '--', label = str(peaksProDataM.EnergyLabel) +' eV')
         #plt.fill_between(TCentersM, Residualm-peaksProDataM.XESDiffE*100, Residualm+peaksProDataM.XESDiffE*100, alpha = 0.3)#, label = 'uncertainty')
-        plt.plot(TCentersM, peaksProDataM.XESDiff*100, marker = 's', color = minuscolor, markersize = 3, linestyle = 'none', label = str(peaksProDataM.EnergyLabel) +' eV')
-        plt.fill_between(TCentersM, peaksProDataM.XESDiff*100-peaksProDataM.XESDiffE*100, peaksProDataM.XESDiff*100+peaksProDataM.XESDiffE*100, alpha = 0.3)#, label = 'uncertainty')
+        plt.plot(TCentersM, peaksProDataM.XESDiff*100, marker = 's', color = minuscolor, markersize = 3, linestyle = 'none', label = str(peaksProDataM.EnergyLabel) +' eV', zorder = 0)
+        plt.fill_between(TCentersM, peaksProDataM.XESDiff*100-peaksProDataM.XESDiffE*100, peaksProDataM.XESDiff*100+peaksProDataM.XESDiffE*100, alpha = 0.3, zorder = 1)
         
         
         #Fit, time, paramsR, cov, RR = fitXESsine(TCentersM, Residualm, ploton)
@@ -156,15 +205,15 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         Fit = Fit[time>paramsR[3]]
         glft = np.array(globalconvolved(tt, params[0], params[1], params[3], params[5], 0))*100 + \
                  np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100
-        plt.plot(time, glft, color = minuscolor)
+        plt.plot(time, glft, color = minuscolor, linestyle = '--', label = 'decay fit', zorder = 2)
         glft = glft[time>paramsR[3]]
         time = time[time>paramsR[3]]
         
-        plt.plot(time, Fit+ glft, color = '#c70039', label = 'sine fit')
+        plt.plot(time, Fit+ glft, color = '#c70039', label = 'sine fit', zorder = 100)
 
         SE = np.sqrt(np.mean(RR**2))
         
-        plt.fill_between(time, Fit+glft+SE, Fit+glft-SE, color='#c70039', alpha = 0.3)
+        #plt.fill_between(time, Fit+glft+SE, Fit+glft-SE, color='#c70039', alpha = 0.3)
 
         #time = np.linspace(min(TCentersM), max(TCentersM), 1000)
         #Fit = offsetsine(time, params[0], params[1]+cov[1], params[2], params[3])
@@ -173,6 +222,7 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         #plt.ylim([-.3,.4])
         plt.ylabel('%$\Delta$ emission')
         plt.xlabel('time delay (fs)')
+        
         
         leg = plt.legend(loc = 4)
         leg.get_frame().set_edgecolor('k')

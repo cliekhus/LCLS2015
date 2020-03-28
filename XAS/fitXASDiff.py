@@ -28,16 +28,20 @@ def fitXASPiecewiseGauss(XEnergy, XASDiff, XASOff, XASOn, ploton):
     x0BS = 7113
     x0BpS = 7114.18
     sigCS = 2
-    CS = 1012
+    sigCpS = 2.5
+    CS = 358
     x0CS = 7115.6
+    x0CpS = 7118.2
     erfslopeS = 3
     offsetS = 1342
     erfampS = 849
     peakS = 7117.4
     offAS = 179181
     offBS = 331401
+    offCS = 0.03
     slopeSA = -25.2
     slopeSB = -46.6
+    slopeSC = -0.05
     
     if ploton:
             
@@ -54,7 +58,7 @@ def fitXASPiecewiseGauss(XEnergy, XASDiff, XASOff, XASOn, ploton):
     params,cov = curve_fit(xasoff, XEnergy, XASOff, p0 = [sigBS,BS,x0BS, sigCS,CS,x0CS, offsetS,erfampS,erfslopeS,peakS])
     
     
-    Fit = xasoff(XEnergy, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9])
+    Fit = xasoff(XEnergy, *params)
     
     if ploton:
             
@@ -74,8 +78,11 @@ def fitXASPiecewiseGauss(XEnergy, XASDiff, XASOff, XASOn, ploton):
     xenergyAH = 7113.5
     xenergyBL = 7112.5
     xenergyBH = 7115.5
+    xenergyCL = 7115.5
+    xenergyCH = 7120
     Achoice = np.logical_and(XEnergy<xenergyAH, XEnergy >xenergyAL)
     Bchoice = np.logical_and(XEnergy > xenergyBL, XEnergy < xenergyBH)   
+    Cchoice = np.logical_and(XEnergy > xenergyCL, XEnergy < xenergyCH)
     
     
     
@@ -86,6 +93,7 @@ def fitXASPiecewiseGauss(XEnergy, XASDiff, XASOff, XASOn, ploton):
         plt.plot(XEnergy, XASDiff, 'o')
         plt.plot(XEnergy[Achoice], gauswslope(XEnergy[Achoice], sigAS,x0ApS,AS,offAS,slopeSA))
         plt.plot(XEnergy[Bchoice], gauswslope(XEnergy[Bchoice], sigBpS,x0BpS,BS,offBS,slopeSB))
+        plt.plot(XEnergy[Cchoice], gauswslope(XEnergy[Cchoice], sigCpS,x0CpS,CS,offCS,slopeSC))
         plt.title('start parameters')
         plt.xlabel('energy (eV)')
         
@@ -93,11 +101,15 @@ def fitXASPiecewiseGauss(XEnergy, XASDiff, XASOff, XASOn, ploton):
 
     paramsa,cova = curve_fit(gauswslope, XEnergy[Achoice], XASDiff[Achoice], p0 = [sigAS,x0ApS,AS,offAS,slopeSA])
     
-    FitA = gauswslope(XEnergy, paramsa[0], paramsa[1], paramsa[2], paramsa[3], paramsa[4])
+    FitA = gauswslope(XEnergy, *paramsa)
 
     paramsb,covb = curve_fit(gauswslope, XEnergy[Bchoice], XASDiff[Bchoice], p0 = [sigBpS,x0BpS,BS,offBS,slopeSB])
 
-    FitB = gauswslope(XEnergy, paramsb[0], paramsb[1], paramsb[2], paramsb[3], paramsb[4])
+    FitB = gauswslope(XEnergy, *paramsb)
+    
+    paramsc,covc = curve_fit(gauswslope, XEnergy[Cchoice], XASDiff[Cchoice], p0 = [sigCpS,x0CpS,CS,offCS,slopeSC])
+    
+    FitC = gauswslope(XEnergy, *paramsc)
     
 
     if ploton:
@@ -106,11 +118,12 @@ def fitXASPiecewiseGauss(XEnergy, XASDiff, XASOff, XASOn, ploton):
         plt.plot(XEnergy, XASDiff, 'o')
         plt.plot(XEnergy, FitA)
         plt.plot(XEnergy, FitB)
+        plt.plot(XEnergy, FitC)
         plt.title('end parameters')
         plt.xlabel('energy (eV)')
     
 
-    return Fit, params, paramsa, paramsb, cova, covb
+    return Fit, params, paramsa, paramsb, paramsc, cova, covb, covc
 
 
 
