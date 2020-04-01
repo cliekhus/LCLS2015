@@ -155,7 +155,7 @@ with open(folder + "FitOuts.pkl", "rb") as f:
 pluscolor = '#009E73'
 minuscolor = '#0072b2'
 pluscolor2 = '#e69f00'
-red = '#009E73'
+red = '#c70039'
 
 plt.figure(figsize = (3.3,6))
 
@@ -176,7 +176,7 @@ xC = np.linspace(7115.5, 7120, 1000)
 ax = plt.subplot2grid((10,1), (2,0), colspan = 1, rowspan = 8)
 plt.fill_between(xA, FitOuts['Aoff']-xA*FitOuts['Aslope'], gauswslope(xA,FitOuts['Asig'],FitOuts['Ax0'],FitOuts['Aa'],FitOuts['Aoff'],FitOuts['Aslope']), label = 'A peak fit, ' + str(round(FitOuts['Ax0'],1)) + ' eV', linewidth = 5, color = pluscolor2,zorder=1)
 plt.fill_between(xB, FitOuts['Boff']-xB*FitOuts['Bslope'], gauswslope(xB,FitOuts['Bsig'],FitOuts['Bx0'],FitOuts['Ba'],FitOuts['Boff'],FitOuts['Bslope']), label = 'B peak fit, ' + str(round(FitOuts['Bx0'],1)) + ' eV', linewidth = 5, color = minuscolor,zorder=2)
-plt.fill_between(xC, FitOuts['Coff']-xC*FitOuts['Cslope'], gauswslope(xC,FitOuts['Csig'],FitOuts['Cx0'],FitOuts['Ca'],FitOuts['Coff'],FitOuts['Cslope']), label = 'C peak fit, ' + str(round(FitOuts['Cx0'],1)) + ' eV', linewidth = 5, color = red,zorder=3)
+plt.fill_between(xC, FitOuts['Coff']-xC*FitOuts['Cslope'], gauswslope(xC,FitOuts['Csig'],FitOuts['Cx0'],FitOuts['Ca'],FitOuts['Coff'],FitOuts['Cslope']), label = 'C peak fit, ' + str(round(FitOuts['Cx0'],1)) + ' eV', linewidth = 5, color = pluscolor,zorder=3)
 plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(XASDiffBootF,-4), np.delete(XASDiffBootE,-4), \
              marker='.', label = str(MinTime) + ' to ' + str(MaxTime) + ' fs delay', color = 'k',zorder=10)
 plt.xlabel('x-ray energy (eV)')
@@ -229,7 +229,7 @@ shift = FitOuts['Ax0']-XXA
 
 
 
-plt.plot(XX+shift, (Amp-Amp0)*150, color = pluscolor,  label = 'calculation', linewidth = 2)
+plt.plot(XX+shift, (Amp-Amp0)*150, color = red,  label = 'calculation', linewidth = 2, zorder = 100)
 leg = plt.legend()
 leg.get_frame().set_edgecolor('k')
 leg.get_frame().set_linewidth(0.8)
@@ -288,6 +288,7 @@ ax.annotate('', xy=(1.5, .25), xytext=(0.4,0.1), arrowprops={'arrowstyle': '<-',
 
 AB = [x-y for x,y in zip(Bpeaks, Apeaks)]
 plt.plot(AB, holedensity, 'o', color = red, marker = 's', label = 'calc.')
+plt.plot([0.20, 0.40, 0.67, 1.23, 1.65, 2.27, 2.61, 2.66], [0.13,0.21,0.27,0.39,0.50,0.68,0.79,0.81], marker = '*', linestyle = 'none')
 patch = pat.Ellipse((FitOuts['BmA'],linefit(FitOuts['BmA'])), FitOuts['BmAunc'], linefit(FitOuts['BmA']+FitOuts['BmAunc'])-linefit(FitOuts['BmA']-FitOuts['BmAunc']), color='#c70039')
 plt.plot(-10,-10, color = '#c70039', marker = 'o', label = 'exp.', linestyle = 'none')
 plt.tight_layout()

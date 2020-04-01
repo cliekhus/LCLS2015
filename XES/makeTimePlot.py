@@ -231,8 +231,14 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         
         print('determined period1 ' + str(int(paramsR[2])) + ' +- ' + str(covR[2]) + ' fs')
         print('determined frequency1 ' + str(int(333.564*100/paramsR[2])) + ' +- ' + str(int(333.564*100/(paramsR[2]-covR[2])-333.564*100/(paramsR[2]+covR[2]))) + ' cm-1')
+        print('determined amplitide1 ' + str(paramsR[0]) + ' +- ' + str(covR[0]) + '%')
+        
         print('determined period2 ' + str(int(paramsR[3])) + ' +- ' + str(covR[3]) + ' fs')
         print('determined frequency2 ' + str(int(333.564*100/paramsR[3])) + ' +- ' + str(int(333.564*100/(paramsR[3]-covR[3])-333.564*100/(paramsR[3]+covR[3]))) + ' cm-1')
+        print('determined amplitide2 ' + str(paramsR[1]) + ' +- ' + str(covR[1]) + '%')
+        
+        print('determined offset time ' + str(paramsR[4]) + ' +- ' + str(covR[4]) + ' fs')
+        print('determined base ' + str(paramsR[5]) + ' +- ' + str(covR[5]) + '%')
         
         fig = plt.figure(figsize = (7,3))
 

@@ -12,7 +12,12 @@ import matplotlib.image as mpimg
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import numpy as np
 
-rerunTD = True
+rerunTD = False
+
+pluscolor = '#009E73'
+minuscolor = '#0072b2'
+pluscolor2 = '#e69f00'
+red = '#c70039'
 
 if rerunTD:
     import subprocess
@@ -23,7 +28,7 @@ if rerunTD:
     except:
         print('file already gone')
     subprocess.Popen('cmd /c "cd C://Program Files (x86)/University of Illinois/VMD & vmd -e C://Users/chels/OneDrive/Documents/UW/Mixed-Valence-Complexes/LCLS2015/UVVIS/UVTD.tcl"')
-    time.sleep(15)
+    time.sleep(25)
     os.system("taskkill /f /im vmd.exe")
 
 UVVIS = loadtxt('UVVIS.txt')
@@ -39,7 +44,7 @@ plt.plot(UVVIS[:,0], UVVIS[:,1], color = 'k')
 plt.ylabel('absorption')
 plt.xlabel('wavelength (nm)')
 plt.xlim([200, 2500])
-patch = pat.Rectangle(xy=(800-25,0), width = 50, height = 0.2, alpha = 0.5, color = '#c70039')
+patch = pat.Rectangle(xy=(800-25,0), width = 50, height = 0.2, alpha = 0.5, color = pluscolor)
 ax.add_patch(patch)
 
 
@@ -57,12 +62,12 @@ shift = measmax-calcmax
 
 ax=plt.subplot(2,1,1)
 plt.plot(1240/broadened[1240/broadened[:,0]>0,0]+shift, broadened[1240/broadened[:,0]>0,1]/np.max(broadened[:,1]), color = 'k')
-plt.stem(1240/roots[:,0]+shift, roots[:,1]/np.max(roots[:,1])*.9, markerfmt = 'none', basefmt='none', linefmt='#009E73')
+plt.stem(1240/roots[:,0]+shift, roots[:,1]/np.max(roots[:,1])*.9, markerfmt = 'none', basefmt='none', linefmt=red)
 
 anoxpos = 1240/roots[np.argmax(roots[:,1]),0]+shift
 anoypos = roots[np.argmax(roots[:,0]),1]/np.max(roots[:,1])+0.01        
 ax.annotate('', xy=(anoxpos, 1), xytext=(anoxpos,1.2), ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
-patch = pat.Rectangle(xy=(800-25,0), width = 50, height = 1, alpha = 0.5, color = '#c70039')
+patch = pat.Rectangle(xy=(800-25,0), width = 50, height = 1, alpha = 0.5, color = pluscolor)
 ax.add_patch(patch)
 arr_lena = mpimg.imread('UVTD.bmp')
 imagebox = OffsetImage(arr_lena, zoom=0.1)
