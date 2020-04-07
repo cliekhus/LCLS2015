@@ -81,15 +81,15 @@ if Redot0:
     
     with open(folder + "t0.pkl", "wb") as f:
         pickle.dump(t0, f)
+        
+    with open(folder + "xasProData.pkl", "wb") as f:
+        pickle.dump(xasProData, f)
     
 
 
 else:
     with open(folder + "xasProData.pkl", "rb") as f:
         xasProData = pickle.load(f)
-       
-    with open(folder + "xasProData_one.pkl", "rb") as f:
-        xasProData_one = pickle.load(f)
         
     with open(folder + "t0.pkl", "rb") as f:
         t0 = pickle.load(f)

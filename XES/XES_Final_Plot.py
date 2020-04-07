@@ -17,50 +17,53 @@ from scipy.signal import savgol_filter
 
 
 
-APSName = h5py.File('C:\LCLS_Data\APS\APS_Aug_2015_Fesamples.mat')
+APSName = h5py.File('D:\LCLS_Data\APS\APS_Aug_2015_Fesamples.mat')
 
 indexlow = 400
 indexhigh = 500
 
 
+folder1 = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
+folder2 = "D://LCLS_Data/LCLS_python_data/XES_conversion_info/"
+folder3 = "D://LCLS_Data/LCLS_python_data/XES_Spectra/"
 
-with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataPF.pkl", "rb") as f:
+with open(folder1 + "peaksProDataPF.pkl", "rb") as f:
     peaksProDataP = pickle.load(f)
     
-with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataP2F.pkl", "rb") as f:
+with open(folder1 + "peaksProDataP2F.pkl", "rb") as f:
     peaksProDataP2 = pickle.load(f)
 
-with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataMF.pkl", "rb") as f:
+with open(folder1 + "peaksProDataMF.pkl", "rb") as f:
     peaksProDataM = pickle.load(f)
     
-with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataPF_boot.pkl", "rb") as f:
+with open(folder1 + "peaksProDataPF_boot.pkl", "rb") as f:
     peaksProDataPF_boot = pickle.load(f)
         
-with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataMF_boot.pkl", "rb") as f:
+with open(folder1 + "peaksProDataMF_boot.pkl", "rb") as f:
     peaksProDataMF_boot = pickle.load(f)
     
-with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\peaksProDataP2F_boot.pkl", "rb") as f:
+with open(folder1 + "peaksProDataP2F_boot.pkl", "rb") as f:
     peaksProDataP2F_boot = pickle.load(f)
 
-with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\TCentersPF.pkl", "rb") as f:
+with open(folder1 + "TCentersPF.pkl", "rb") as f:
     TCentersPF = pickle.load(f)
 
-with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\TCentersP2F.pkl", "rb") as f:
+with open(folder1 + "TCentersP2F.pkl", "rb") as f:
     TCentersP2F = pickle.load(f)
 
-with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\TCentersMF.pkl", "rb") as f:
+with open(folder1 + "TCentersMF.pkl", "rb") as f:
     TCentersMF = pickle.load(f)
         
-with open("C://LCLS_Data/LCLS_python_data/XES_conversion_info/x0.pkl", "rb") as f:
+with open(folder2 + "x0.pkl", "rb") as f:
     x0 = pickle.load(f)
 
-with open("C://LCLS_Data/LCLS_python_data/XES_Spectra/xesProData.pkl", "rb") as f:
+with open(folder3 + "xesProData.pkl", "rb") as f:
     static = pickle.load(f)
 
-with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\ParamsF.pkl", "rb") as f:
+with open(folder1 + "ParamsF.pkl", "rb") as f:
     ParamsF = pickle.load(f)
 
-with open("C:\LCLS_Data\LCLS_python_data\XES_TimeResolved\ParamsE.pkl", "rb") as f:
+with open(folder1 + "ParamsE.pkl", "rb") as f:
     ParamsE = pickle.load(f)
 
 pluscolor = '#009E73'

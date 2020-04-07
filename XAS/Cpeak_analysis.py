@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 ii = 5
 
 holedensity = [.10, .21, .36, .50, .60, .75, .84]
+colorchoice = ['k', 'c', 'g', 'r', 'm', 'y', 'b']
+linechoice = ['-', ':', '--', '-.']
 
 file = os.getcwd()+'\\simulation\\feru-series-2-'
 
@@ -28,10 +30,13 @@ for ii in range(len(holedensity)):
 
 plt.figure()
 
-for ii in range(20):
-    plt.plot(holedensity, Croots[ii,:], marker = 'o')
+for ii in range(len(colorchoice)*len(linechoice)):
+    plt.plot(holedensity, Croots[ii,:], color = colorchoice[ii%len(colorchoice)], linestyle = linechoice[ii//len(colorchoice)], label = 'root {}'.format(ii))
+    for jj in range(len(holedensity)):
+        plt.scatter(holedensity[jj], Croots[ii,jj], s = Camps[ii,jj]*100000000, color = colorchoice[ii%len(colorchoice)], alpha = 0.5)
     
-    
+plt.legend()
+plt.xlim([0,1])
 #plt.figure()
 
 #for ii in range(95):

@@ -196,7 +196,7 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         #plt.plot(TCentersM, Residualm, marker = 's', color = minuscolor, markersize = 3, linestyle = '--', label = str(peaksProDataM.EnergyLabel) +' eV')
         #plt.fill_between(TCentersM, Residualm-peaksProDataM.XESDiffE*100, Residualm+peaksProDataM.XESDiffE*100, alpha = 0.3)#, label = 'uncertainty')
         plt.plot(TCentersM, peaksProDataM.XESDiff*100, marker = 's', color = minuscolor, markersize = 3, linestyle = 'none', label = str(peaksProDataM.EnergyLabel) +' eV', zorder = 0)
-        plt.fill_between(TCentersM, peaksProDataM.XESDiff*100-peaksProDataM.XESDiffE*100, peaksProDataM.XESDiff*100+peaksProDataM.XESDiffE*100, alpha = 0.3, zorder = 1)
+        plt.errorbar(TCentersM, peaksProDataM.XESDiff*100, peaksProDataM.XESDiffE*100, marker = 's', color = minuscolor, markersize = 3, linestyle = 'none')
         
         
         #Fit, time, paramsR, cov, RR = fitXESsine(TCentersM, Residualm, ploton)
@@ -209,17 +209,22 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         glft = glft[time>paramsR[3]]
         time = time[time>paramsR[3]]
         
+        
+        SE = 1.96*np.sqrt(1/(len(RR)-2)*np.sum(RR**2))
+        
         plt.plot(time, Fit+ glft, color = '#c70039', label = 'sine fit', zorder = 100)
+        plt.fill_between(time, Fit + glft+SE, Fit+glft-SE, color = '#c70039', label = 'pred. int.', alpha = 0.3)#, label = 'uncertainty')
 
-        SE = np.sqrt(np.mean(RR**2))
+        
         
         #plt.fill_between(time, Fit+glft+SE, Fit+glft-SE, color='#c70039', alpha = 0.3)
 
         #time = np.linspace(min(TCentersM), max(TCentersM), 1000)
         #Fit = offsetsine(time, params[0], params[1]+cov[1], params[2], params[3])
         #plt.plot(time, Fit, color = 'g', label = 'sine fit')
-        plt.xlim([-250, 1400])
-        #plt.ylim([-.3,.4])
+        
+        plt.xlim([100, 1400])
+        plt.ylim([-1.25,.25])
         plt.ylabel('%$\Delta$ emission')
         plt.xlabel('time delay (fs)')
         
