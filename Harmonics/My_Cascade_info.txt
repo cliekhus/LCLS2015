@@ -1,0 +1,7 @@
+to run mo and tds type msub dplot.run
+info for which orbital and root are chosen in the dplot.nw file
+vi dplot.nw
+/dtemp/emsls50088/for-chelsea/
+Useful things:
+/DFT Final
+/Root  n
