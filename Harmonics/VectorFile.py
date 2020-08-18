@@ -24,7 +24,7 @@ def VectorFile(number, wavenumber, D3, savename, legend):
     
     #########################################
     #Obviously you'll want to adjust this line
-    folder = "C:/Users/chelsea/OneDrive/Documents/UW/Mixed-Valence-Complexes/LCLS2015/Calculations/FeRu-freq-xyzs/"
+    folder = "C:/Users/chelsea/OneDrive/Documents/UW/Mixed-Valence-Complexes/LCLS2015/Harmonics/FeRu-freq-xyzs/"
     
     f = open(folder+'freq.m-' + str(int(number)).zfill(3) + '.xyz', 'r')
     
@@ -71,7 +71,7 @@ def VectorFile(number, wavenumber, D3, savename, legend):
             framesp[ii,jj,2] = frames[ii,jj,:].dot(PA2)
     
     
-    fig = plt.figure(figsize = (1.5,1.5))
+    fig = plt.figure(figsize = (3,3))
     if D3:
         ax = fig.add_subplot(111, projection='3d')
     else:

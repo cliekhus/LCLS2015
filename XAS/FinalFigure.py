@@ -54,10 +54,10 @@ def makeABpeak(Eoff, calc, roots, ploton, cc, lc, ls):
     x = np.array(calc[:,0])+Eoff
     Broots = np.array(roots[:,0])
     Bamp = np.array(roots[:,1])
-    Bamp = Bamp[Broots+Eoff<7114]
+    Bamp = Bamp[Broots+Eoff<7116]
     Bamp = np.delete(Bamp, [0])
     
-    Broots = Broots[Broots+Eoff<7114]
+    Broots = Broots[Broots+Eoff<7115]
     Broots = np.delete(Broots, [0])
     Bshape = np.zeros(np.shape(x))
     for root,amp in zip(Broots,Bamp):
@@ -67,8 +67,8 @@ def makeABpeak(Eoff, calc, roots, ploton, cc, lc, ls):
 
     Croots = np.array(roots[:,0])
     Camp = np.array(roots[:,1])
-    Camp = Camp[Croots+Eoff>=7114]
-    Croots = Croots[Croots+Eoff>=7114]
+    Camp = Camp[Croots+Eoff>=7115]
+    Croots = Croots[Croots+Eoff>=7115]
     Cshape = np.zeros(np.shape(x))
     for root,amp in zip(Croots,Camp):
         Cshape = Cshape + amp*np.exp(-(x-(root+Eoff))**2/sig**2)
@@ -107,6 +107,9 @@ for ii in range(len(holedensity)):
 
 Cpeaks2 = Cpeaks30[0:2]+Cpeaks20[2:]
 Cpeaks3 = Cpeaks20[0:2]+Cpeaks30[2:]
+
+#Cpeaks2 = Cpeaks20
+#Cpeaks3 = Cpeaks30
 
 AB2 = loadtxt(os.getcwd()+'\\simulation\\ediff-series-3.dat')
 
@@ -154,11 +157,20 @@ with open(folder + "xasProData_one.pkl", "rb") as f:
 with open(folder + "FitOuts.pkl", "rb") as f:
     FitOuts = pickle.load(f)
     
+with open(folder + "APS_HERFD_II.pkl", "rb") as f:
+    HERFD_II = pickle.load(f)
+
+with open(folder + "APS_HERFD_III.pkl", "rb") as f:
+    HERFD_III = pickle.load(f)
+
+with open(folder + "APS_incident.pkl", "rb") as f:
+    incident_axis = pickle.load(f)
+
     
     
     
-    
-    
+
+
     
     
 
@@ -166,28 +178,36 @@ with open(folder + "FitOuts.pkl", "rb") as f:
 plt.figure(figsize = (3.5,5))
 
 
+Cmax = np.max(xasProData_one.XASOff_Norm[xasProData_one.EnergyPlot < 7118.5])
+HERFDmax = np.max(HERFD_II[incident_axis < 7118.5])
+
 ax = plt.subplot2grid((10,1), (0,0), colspan = 1, rowspan = 2)
 plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(xasProData_one.XASOff_Norm,-4), np.delete(xasProData_one.Error_Off,-4), color = 'k')
-plt.text(7112.8, 1250, 'B')
-plt.text(7115, 1990, 'C')
+plt.plot(incident_axis, (HERFD_II)*Cmax/HERFDmax, linewidth = 2, color = red, linestyle = ':')
+plt.plot(incident_axis, (HERFD_III)*Cmax/HERFDmax, linewidth = 2, color = red, linestyle = '--')
+plt.text(7111, 900, 'A')
+plt.text(7113.8, 1250, 'B')
+plt.text(7115.5, 1985, 'C')
 plt.ylabel('$I_{off}$')
-plt.xlim([7110,7120])
+plt.xlim([7110,7122])
+plt.xticks(np.arange(7110, 7123, 2.0))
+plt.ylim([0,2500])
 ax.set_xticklabels([])
 plt.tight_layout()
 
-xA = np.linspace(7110.5, 7113, 1000)
-xB = np.linspace(7112.5, 7115, 1000)
-xC = np.linspace(7115.5, 7120, 1000)
+xA = np.linspace(7112, 7114, 1000)
+xB = np.linspace(7114, 7117.5, 1000)
 
 ax = plt.subplot2grid((10,1), (2,0), colspan = 1, rowspan = 8)
-plt.fill_between(xA, FitOuts['Aoff']-xA*FitOuts['Aslope'], gauswslope(xA,FitOuts['Asig'],FitOuts['Ax0'],FitOuts['Aa'],FitOuts['Aoff'],FitOuts['Aslope']), label = 'A peak fit, ' + str(round(FitOuts['Ax0'],1)) + ' eV', linewidth = 5, color = pluscolor2,zorder=1)
-plt.fill_between(xB, FitOuts['Boff']-xB*FitOuts['Bslope'], gauswslope(xB,FitOuts['Bsig'],FitOuts['Bx0'],FitOuts['Ba'],FitOuts['Boff'],FitOuts['Bslope']), label = 'B peak fit, ' + str(round(FitOuts['Bx0'],1)) + ' eV', linewidth = 5, color = pluscolor,zorder=2)
+plt.fill_between(xA, FitOuts['Aoff']-xA*FitOuts['Aslope'], gauswslope(xA,FitOuts['Asig'],FitOuts['Ax0'],FitOuts['Aa'],FitOuts['Aoff'],FitOuts['Aslope']), label = 'A peak: ' + str(round(FitOuts['Ax0'],1)) + ' eV', linewidth = 5, color = pluscolor2,zorder=1)
+plt.fill_between(xB, FitOuts['Boff']-xB*FitOuts['Bslope'], gauswslope(xB,FitOuts['Bsig'],FitOuts['Bx0'],FitOuts['Ba'],FitOuts['Boff'],FitOuts['Bslope']), label = 'B peak: ' + str(round(FitOuts['Bx0'],1)) + ' eV', linewidth = 5, color = pluscolor,zorder=2)
 plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(XASDiffBootF,-4), np.delete(XASDiffBootE,-4), \
-             marker='.', label = str(MinTime) + ' to ' + str(MaxTime) + ' fs delay', color = 'k',zorder=10)
+             marker='.', label = str(MinTime) + ' to ' + str(MaxTime) + ' fs delay', color = 'k',zorder=10, linestyle = ':')
 plt.xlabel('x-ray energy (eV)')
 plt.ylabel('$I_{on}-I_{off}$')
 plt.ylim([-250,175])
-plt.xlim([7110,7120])
+plt.xlim([7110,7122])
+plt.xticks(np.arange(7110, 7123, 2.0))
 
 
 
@@ -208,6 +228,7 @@ for ii in range(len(roots[:,1])):
     Amp0 = Amp0 + roots[ii,1]/np.max(roots[:,1])/((XX-roots[ii,0])**2+(.5*width)**2)/math.pi/2*width
 
 choice = 0.68
+#choice = 36
 roots = loadtxt(file+'3-'+str(choice)+'.roots')
 roots[:,0] = roots[:,0] + Eoff
 
@@ -224,12 +245,26 @@ XXp = XX[XX<7111.4]
 IMax = np.argmax(Ampp)
 XXA = XX[IMax]
 
-shift = FitOuts['Ax0']-XXA
+Bmpp = Amp0[XX<7115]
+BXXp = XX[XX<7115]
+IMax = np.argmax(Bmpp)
+XXB = XX[IMax]
+
+Fit,Params,ParamsA,ParamsB,Paramsc,cova,covb,covc = \
+        fitXASPiecewiseGauss(np.delete(xasProData_one.EnergyPlot,-4), np.delete(XASDiffBootF,-4), np.delete(xasProData_one.XASOff_Norm,-4), np.delete(xasProData_one.XASOn_Norm,-4), False)
+
+
+#shift = FitOuts['Ax0']-XXA
+#shift = FitOuts['Bx0']-XXB
+#shift = 0
+shift = Params[2]-Bpeaks[0]
 
 
 
 
-plt.plot(XX+shift, (Amp-Amp0)*200, color = red, label = 'calculation', linewidth = 2, zorder = 100)
+
+plt.plot(incident_axis, (HERFD_III-HERFD_II)*Cmax/HERFDmax*.2, label = 'model complexes', linewidth = 2, color = red)
+
 leg = plt.legend()
 leg.get_frame().set_edgecolor('k')
 leg.get_frame().set_linewidth(0.8)
@@ -254,8 +289,8 @@ plt.plot(XX+shift, Amp, color = red)
          
 
 
-x1pos = 7113.75
-x2pos = 7116.25
+x1pos = 7112.5
+x2pos = 7116
 bally = 3.4
          
 plt.plot([x1pos,x2pos], [bally,bally], lw=2, color='k')
@@ -273,8 +308,8 @@ ax.text(x2pos,bally, 'Ru', horizontalalignment='center', verticalalignment='cent
 ax.text(x1pos,2.65, str(round(choice,2))+' hd', horizontalalignment='center', verticalalignment='center', color='k')
 ax.text(x2pos,2.65, str(round(1-choice,2))+' hd', horizontalalignment='center', verticalalignment='center', color='k')
 
-
-plt.xlim([7110,7120])
+plt.xticks(np.arange(7110, 7123, 2.0))
+plt.xlim([7110,7122])
 plt.ylim([0,4])
 
 plt.xlabel('X-ray energy (eV)')
@@ -287,7 +322,7 @@ ax=plt.subplot(2,1,2)
 
 
 
-
+"""
 if rerunTD:
     import subprocess
     import time
@@ -314,12 +349,12 @@ ab = AnnotationBbox(imagebox, (0.9, 0.76), frameon=False)
 ax.add_artist(ab)
 ax.annotate('', xy=(0.4,0.48), xytext=(0.19,0.18), arrowprops={'arrowstyle': '<-', 'ls': 'solid', 'ec': 'k', 'lw': 2})
 
-
 arr_lena = mpimg.imread('pt68_1_TD.bmp')
 imagebox = OffsetImage(arr_lena, zoom=0.1)
 ab = AnnotationBbox(imagebox, (2.12, 0.23), frameon=False)
 ax.add_artist(ab)
 ax.annotate('', xy=(2.28, 0.50), xytext=(2.3,0.64), arrowprops={'arrowstyle': '<-', 'ls': 'solid', 'ec': 'k', 'lw': 2})
+"""
 
 AB = [x-y for x,y in zip(Bpeaks, Apeaks)]
 plt.plot(AB2[:,1], AB2[:,0], color = red, marker = 'o', linestyle = 'none', markerfacecolor = 'none', markeredgewidth = 1.5, label = 'traj. 1', zorder = 400)
@@ -327,8 +362,8 @@ plt.plot(AB, holedensity, color = darkred, marker = 's', linestyle = 'none', mar
 plt.plot(AB, linefit(AB), color = 'k', zorder = 1)
 patch = pat.Ellipse((FitOuts['BmA'],linefit(FitOuts['BmA'])), FitOuts['BmAunc'], linefit(FitOuts['BmA']+FitOuts['BmAunc'])-linefit(FitOuts['BmA']-FitOuts['BmAunc']), color=pluscolor, zorder = 200)
 #plt.plot(-10,-10, color = pluscolor, marker = 'o', label = 'exp.', linestyle = 'none')
-ax.annotate('exp.', xy=(2.2,0.7), xytext=(1.9,0.85), arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
-plt.tight_layout()
+ax.annotate('exp.', xy=(2.23,0.75), xytext=(1.93,0.9), arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
+#plt.tight_layout()
 ax.add_patch(patch)
 plt.plot(AB, linefit(AB), color = 'k', zorder = 100)
 plt.xlabel('A - B peak energy difference (eV)')
@@ -337,7 +372,8 @@ plt.xlim([.12,2.9])
 plt.ylim([0,1])
 plt.tight_layout()
 
-leg = ax.legend(bbox_to_anchor=(0.8, 1.15), loc='upper left', borderaxespad=0., facecolor = 'white', handlelength = 1.2)
+#leg = ax.legend(bbox_to_anchor=(0.8, 1.15), loc='upper left', borderaxespad=0., facecolor = 'white', handlelength = 1.2)
+leg = ax.legend()
 leg.get_frame().set_edgecolor('k')
 leg.get_frame().set_linewidth(0.8)
 leg.get_frame().set_alpha(1)
@@ -369,36 +405,41 @@ plt.figure(figsize = (3.5,5))
 
 ax = plt.subplot2grid((10,1), (0,0), colspan = 1, rowspan = 2)
 plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(xasProData_one.XASOff_Norm,-4), np.delete(xasProData_one.Error_Off,-4), color = 'k')
-plt.text(7112.8, 1250, 'B')
-plt.text(7115, 1990, 'C')
+#plt.plot(XX+shift, Amp0*1000, linewidth = 2, color = red, linestyle = ':')
+#plt.plot(XX+shift, Amp*1000, linewidth = 2, color = red, linestyle = '--')
+plt.text(7111, 900, 'A')
+plt.text(7113.8, 1250, 'B')
+plt.text(7115.5, 1985, 'C')
 plt.ylabel('$I_{off}$')
-plt.xlim([7110,7120])
+plt.xticks(np.arange(7110, 7123, 2.0))
+plt.xlim([7110,7122])
+plt.ylim([0,2500])
 ax.set_xticklabels([])
 plt.tight_layout()
 
-xA = np.linspace(7110.5, 7113, 1000)
-xB = np.linspace(7112.5, 7115, 1000)
-xC = np.linspace(7115.5, 7120, 1000)
+xB = np.linspace(7114, 7117, 1000)
+xC = np.linspace(7117, 7122, 1000)
 
 ax = plt.subplot2grid((10,1), (2,0), colspan = 1, rowspan = 8)
-plt.fill_between(xB, FitOuts['Boff']-xB*FitOuts['Bslope'], gauswslope(xB,FitOuts['Bsig'],FitOuts['Bx0'],FitOuts['Ba'],FitOuts['Boff'],FitOuts['Bslope']), label = 'B peak fit, ' + str(round(FitOuts['Bx0'],1)) + ' eV', linewidth = 5, color = pluscolor,zorder=2)
-plt.fill_between(xC, FitOuts['Coff']-xC*FitOuts['Cslope'], gauswslope(xC,FitOuts['Csig'],FitOuts['Cx0'],FitOuts['Ca'],FitOuts['Coff'],FitOuts['Cslope']), label = 'C peak fit, ' + str(round(FitOuts['Cx0'],1)) + ' eV', linewidth = 5, color = minuscolor,zorder=3)
+plt.fill_between(xB, FitOuts['Boff']-xB*FitOuts['Bslope'], gauswslope(xB,FitOuts['Bsig'],FitOuts['Bx0'],FitOuts['Ba'],FitOuts['Boff'],FitOuts['Bslope']), label = 'B peak: ' + str(round(FitOuts['Bx0'],1)) + ' eV', linewidth = 5, color = pluscolor,zorder=2)
+plt.fill_between(xC, FitOuts['Coff']-xC*FitOuts['Cslope'], gauswslope(xC,FitOuts['Csig'],FitOuts['Cx0'],FitOuts['Ca'],FitOuts['Coff'],FitOuts['Cslope']), label = 'C peak: ' + str(round(FitOuts['Cx0'],1)) + ' eV', linewidth = 5, color = minuscolor,zorder=3)
 plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(XASDiffBootF,-4), np.delete(XASDiffBootE,-4), \
-             marker='.', label = str(MinTime) + ' to ' + str(MaxTime) + ' fs delay', color = 'k',zorder=10)
+             marker='.', label = str(MinTime) + ' to ' + str(MaxTime) + ' fs delay', color = 'k',zorder=10, linestyle = ':')
 plt.xlabel('x-ray energy (eV)')
 plt.ylabel('$I_{on}-I_{off}$')
 plt.ylim([-250,175])
-plt.xlim([7110,7120])
+plt.xticks(np.arange(7110, 7123, 2.0))
+plt.xlim([7110,7122])
 
 
+#calc_diff = Amp-Amp0)*200
 
+#plt.plot(XX+shift, (Amp-Amp0)*200, color = red, label = 'calculation', linewidth = 2, zorder = 100)
 
-leg = plt.legend()
+leg = plt.legend(loc = 'upper left')
 leg.get_frame().set_edgecolor('k')
 leg.get_frame().set_linewidth(0.8)
 plt.tight_layout()
-
-
 
 
 
@@ -416,8 +457,6 @@ Amp0 = np.zeros(np.shape(XX))
 for ii in range(len(roots[:,1])):
     Amp0 = Amp0 + roots[ii,1]/np.max(roots[:,1])/((XX-roots[ii,0])**2+(.5*width)**2)/math.pi/2*width
 
-Fit,Params,ParamsA,ParamsB,Paramsc,cova,covb,covc = \
-        fitXASPiecewiseGauss(np.delete(xasProData_one.EnergyPlot,-4), np.delete(XASDiffBootF,-4), np.delete(xasProData_one.XASOff_Norm,-4), np.delete(xasProData_one.XASOn_Norm,-4), False)
 
 plt.figure(figsize=(3.5,5))
 ax=plt.subplot(2,1,1)
@@ -427,8 +466,8 @@ plt.plot(XX+shift, Amp, color = red)
          
 
 
-x1pos = 7113.75
-x2pos = 7116.25
+x1pos = 7112.5
+x2pos = 7116
 bally = 3.4
          
 plt.plot([x1pos,x2pos], [bally,bally], lw=2, color='k')
@@ -441,9 +480,9 @@ ax.annotate(' ', xy=(roots[6,0]+shift,roots[6,1]/np.max(roots[:,1])+.1), xytext=
 ax.text(roots[6,0]+shift,1.5, 'C1', horizontalalignment='right')
 ax.annotate('C2', xy=(roots[8,0]+shift,roots[8,1]/np.max(roots[:,1])+.1), xytext=(roots[8,0]+shift,1.8), \
             ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
-ax.annotate(' ', xy=(roots[10,0]+shift,roots[10,1]/np.max(roots[:,1])+.1), xytext=(roots[10,0]+shift,1.5), \
+ax.annotate(' ', xy=(roots[10,0]+shift,roots[10,1]/np.max(roots[:,1])+.1), xytext=(roots[10,0]+shift,.95), \
             ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
-ax.text(roots[10,0]+shift,1.5, 'C3', horizontalalignment='left')
+ax.text(roots[10,0]+shift,.95, 'C3', horizontalalignment='left')
 ax.annotate('B', xy=(roots[4,0]+shift,roots[4,1]/np.max(roots[:,1])+.1), xytext=(roots[4,0]+shift,1.8), \
             ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
 
@@ -453,7 +492,8 @@ ax.text(x1pos,2.65, str(round(choice,2))+' hd', horizontalalignment='center', ve
 ax.text(x2pos,2.65, str(round(1-choice,2))+' hd', horizontalalignment='center', verticalalignment='center', color='k')
 
 
-plt.xlim([7110,7120])
+plt.xticks(np.arange(7110, 7123, 2.0))
+plt.xlim([7110,7122])
 plt.ylim([0,4])
 
 plt.xlabel('X-ray energy (eV)')
@@ -461,15 +501,22 @@ plt.xlabel('X-ray energy (eV)')
 plt.ylabel('calculated $I_{off}$')
 #ax.set_xticklabels([])
 
+#shift1 = (Cpeaks1[0]-Bpeaks[0])-(Params[5]-Params[2])
+#shift2 = (Cpeaks2[0]-Bpeaks[0])-(Params[5]-Params[2])
+#shift3 = (Cpeaks3[0]-Bpeaks[0])-(Params[5]-Params[2])
+
 shift1 = Cpeaks1[0]-Params[5]
 shift2 = Cpeaks2[0]-Params[5]
 shift3 = Cpeaks3[0]-Params[5]
 
+print(Cpeaks1[0])
+print()
+
 ax=plt.subplot(2,1,2)
 
-BC1 = [x-y-shift1 for x,y in zip(Cpeaks1, Bpeaks)]
-BC2 = [x-y-shift2 for x,y in zip(Cpeaks2, Bpeaks)]
-BC3 = [x-y-shift3 for x,y in zip(Cpeaks3, Bpeaks)]
+BC1 = [x-y-shift1-shift for x,y in zip(Cpeaks1, Bpeaks)]
+BC2 = [x-y-shift2-shift for x,y in zip(Cpeaks2, Bpeaks)]
+BC3 = [x-y-shift3-shift for x,y in zip(Cpeaks3, Bpeaks)]
 
 plt.plot(BC1, holedensity, color = red, marker = '^', linestyle = 'none', markerfacecolor = 'none', markeredgewidth = 1.5, label = 'C1-B', zorder = 3)
 plt.plot(BC2, holedensity, color = darkred, marker = 'v', linestyle = 'none', markerfacecolor = 'none', markeredgewidth = 1.5, label = 'C2-B', zorder = 3)
@@ -486,11 +533,12 @@ plt.plot(BC3, holedensity, color = darkerred, marker = '*', linestyle = 'none', 
 #plt.scatter([roots[6,0]-roots[4,0]-shift1, roots[8,0]-roots[4,0]-shift2, roots[10,0]-roots[4,0]-shift3],[0.68, 0.68, 0.68])
 
 Cline = np.polyfit(BC1+BC2+BC3, holedensity+holedensity+holedensity, 1)
+#Cline = np.polyfit(BC2+BC3, holedensity+holedensity, 1)
 Clinefit = np.poly1d(Cline)
 plt.plot(BC1, Clinefit(BC1), color = 'k', zorder = 0)
 patch = pat.Ellipse((FitOuts['CmB'],Clinefit(FitOuts['CmB'])), FitOuts['CmBunc'], Clinefit(FitOuts['CmB']+FitOuts['CmBunc'])-Clinefit(FitOuts['CmB']-FitOuts['CmBunc']), color=pluscolor)
 #plt.plot(-10,-10, color = pluscolor, marker = 'o', label = 'exp.', linestyle = 'none')
-ax.annotate('exp.', xy=(3.94,0.69), xytext=(3.54,0.83), arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
+ax.annotate('exp.', xy=(3.98,0.66), xytext=(3.58,0.8), arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
 plt.tight_layout()
 ax.add_patch(patch)
 plt.xlabel('B - C peak energy difference (eV)')
@@ -512,6 +560,7 @@ leg.get_frame().set_alpha(1)
 
 
 ############################ Make C TDs #######################################
+"""
 plt.figure(figsize = (7,1.5))
 ax=plt.subplot(1,1,1)
 
@@ -548,9 +597,14 @@ plt.axis('off')
 frame1 = plt.gca()
 frame1.axes.get_xaxis().set_visible(False)
 frame1.axes.get_yaxis().set_visible(False)
+"""
+
+
+################# Print out info ##############################################
 
 print('Hole density: ' + str(Clinefit(FitOuts['CmB'])) + ' pm ' + str(Clinefit(FitOuts['CmB']+FitOuts['CmBunc'])-Clinefit(FitOuts['CmB']-FitOuts['CmBunc'])))
-
+print(FitOuts['CmB'])
+print(FitOuts['CmBunc'])
 
 print('C1 shift: ' + str(shift1))
 print('C2 shift: ' + str(shift2))

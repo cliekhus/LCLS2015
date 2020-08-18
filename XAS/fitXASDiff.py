@@ -21,27 +21,27 @@ def fitXASPiecewiseGauss(XEnergy, XASDiff, XASOff, XASOn, ploton):
 
     sigAS = .3
     AS = 65.3
-    x0ApS = 7111.9
+    x0ApS = 7113.4
     sigBS = .1
     sigBpS = .558
     BS = 125.4
-    x0BS = 7113
-    x0BpS = 7114.18
+    x0BS = 7114.5
+    x0BpS = 7115.68
     sigCS = 2
-    sigCpS = 2.5
-    CS = 358
-    x0CS = 7115.6
-    x0CpS = 7118.2
+    sigCpS = 1.5
+    CS = 300
+    x0CS = 7117.1
+    x0CpS = 7119.7
     erfslopeS = 3
     offsetS = 1342
     erfampS = 849
     peakS = 7117.4
-    offAS = 179181
-    offBS = 331401
-    offCS = 0.03
+    offAS = 179223
+    offBS = 331477
+    offCS = -234
     slopeSA = -25.2
     slopeSB = -46.6
-    slopeSC = -0.05
+    slopeSC = 0
     
     if ploton:
             
@@ -74,12 +74,12 @@ def fitXASPiecewiseGauss(XEnergy, XASDiff, XASOff, XASOn, ploton):
         
         
         
-    xenergyAL = 7108
-    xenergyAH = 7113.5
-    xenergyBL = 7112.5
-    xenergyBH = 7115.5
-    xenergyCL = 7115.5
-    xenergyCH = 7120
+    xenergyAL = 7109.5
+    xenergyAH = 7115
+    xenergyBL = 7114
+    xenergyBH = 7117
+    xenergyCL = 7116.5
+    xenergyCH = 7122
     Achoice = np.logical_and(XEnergy<xenergyAH, XEnergy >xenergyAL)
     Bchoice = np.logical_and(XEnergy > xenergyBL, XEnergy < xenergyBH)   
     Cchoice = np.logical_and(XEnergy > xenergyCL, XEnergy < xenergyCH)
@@ -415,7 +415,7 @@ def fitXASPiecewiseDiff(XEnergy, XASDiff, XASOff, XASOn, ploton):
         erfslopeS = 3
         offsetS = 1342
         erfampS = 849
-        peakS = 7117.4
+        peakS = 7118.9
         offAS = 0
         offBS = -37
     
@@ -533,46 +533,46 @@ def fitXASPiecewiseLor(XEnergy, XASDiff, XASOff, XASOn, ploton):
     if False:
         sigAS = .2
         AS = 0.1
-        x0ApS = 7111.8
+        x0ApS = 7113.3
         sigBS = .1
         sigBpS = .3
         BS = 389
         BpS = 0.1
-        x0BS = 7113
-        x0BpS = 7114
+        x0BS = 7114.5
+        x0BpS = 7115.5
         sigCS = 2
         sigCpS = 2
         CS = 1012
         CpS = 0.1
-        x0CS = 7115.6
-        x0CpS = 7115.7
+        x0CS = 7117.1
+        x0CpS = 7117.2
         erfslopeS = 3
         offsetS = 1342
         erfampS = 849
-        peakS = 7117.4
+        peakS = 7118.9
         offAS = -0.02
         offBS = -0.06
     
     else:
         sigAS = 2
         AS = 50
-        x0ApS = 7111.8
+        x0ApS = 7113.3
         sigBS = .1
         sigBpS = .3
         BS = 389
         BpS = 60
-        x0BS = 7113
-        x0BpS = 7114
+        x0BS = 7114.5
+        x0BpS = 7115.5
         sigCS = 2
         sigCpS = 2
         CS = 1012
         CpS = 1012
-        x0CS = 7115.6
-        x0CpS = 7115.7
+        x0CS = 7117.1
+        x0CpS = 7117.2
         erfslopeS = 3
         offsetS = 1342
         erfampS = 849
-        peakS = 7117.4
+        peakS = 7118.9
         offAS = 177750
         offBS = -60
         slopeS = -25
@@ -608,10 +608,10 @@ def fitXASPiecewiseLor(XEnergy, XASDiff, XASOff, XASOn, ploton):
         
         
         
-    xenergyAL = 7108
-    xenergyAH = 7113.5
-    xenergyBL = 7113
-    xenergyBH = 7115.5
+    xenergyAL = 7109.5
+    xenergyAH = 7115
+    xenergyBL = 7114
+    xenergyBH = 7117
     Achoice = np.logical_and(XEnergy<xenergyAH, XEnergy >xenergyAL)
     Bchoice = np.logical_and(XEnergy > xenergyBL, XEnergy < xenergyBH)   
     if ploton:

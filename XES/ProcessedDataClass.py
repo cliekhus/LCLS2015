@@ -14,7 +14,15 @@ class XESProcessedData:
 
         self.__dict__.update(dict.fromkeys(self._defaults, self._default_value))
         self.__dict__.update(kwargs)
+    
+    def makeLaserXES(self, xesRawData, MaxTime, MinTime, FPlots):
+        from makeStatic import makeLaserXES
         
+        XESOn_Norm, XESOff_Norm, Error_On, Error_Off, UniAngle = makeLaserXES(xesRawData, self, MaxTime, MinTime, FPlots)
+        
+        self.__dict__.update(XESOn_Norm = XESOn_Norm, XESOff_Norm = XESOff_Norm, Error_On = Error_On, Error_Off = Error_Off, UniAngle = UniAngle)
+        
+    
     def changeValue(self, **kwargs):
         self.__dict__.update(kwargs)
         

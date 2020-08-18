@@ -1,6 +1,6 @@
 def gauswslope(x,sig,x0,a,off,slope):
     import numpy as np
-    return abs(a)*np.exp(-((x-abs(x0))/sig)**2)+abs(off)-abs(slope)*x
+    return abs(a)*np.exp(-((x-abs(x0))/sig)**2)+off-abs(slope)*x
 
 
 

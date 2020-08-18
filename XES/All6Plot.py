@@ -12,39 +12,39 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as pat
 
 
-folder = "C://Users/chels/Downloads/numbered_data/"
+folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
 
-with open(folder + "peaksProData123.pkl", "rb") as f:
+with open(folder + "peaksProDataPF.pkl", "rb") as f:
     peaksProData123 = pickle.load(f)
     
-Energy123 = round(convertAngle2Energy(123, True)*1000,1)
+Energy123 = peaksProData123.EnergyLabel
 
-with open(folder + "peaksProData131.pkl", "rb") as f:
+with open(folder + "peaksProData_131.pkl", "rb") as f:
     peaksProData131 = pickle.load(f)
 
-Energy131 = round(convertAngle2Energy(131, True)*1000,1)
+Energy131 = peaksProData131.EnergyLabel
 
-with open(folder + "peaksProData144.pkl", "rb") as f:
+with open(folder + "peaksProData_143.pkl", "rb") as f:
     peaksProData144 = pickle.load(f)
 
-Energy144 = round(convertAngle2Energy(144, True)*1000,1)
+Energy144 = peaksProData144.EnergyLabel
 
-with open(folder + "peaksProData155.pkl", "rb") as f:
+with open(folder + "peaksProDataP2F.pkl", "rb") as f:
     peaksProData155 = pickle.load(f)
 
-Energy155 = round(convertAngle2Energy(155, True)*1000,1)
+Energy155 = peaksProData155.EnergyLabel
 
-with open(folder + "peaksProData165.pkl", "rb") as f:
+with open(folder + "peaksProData_165.pkl", "rb") as f:
     peaksProData165 = pickle.load(f)
     
-Energy165 = round(convertAngle2Energy(165, True)*1000,1)
+Energy165 = peaksProData165.EnergyLabel
     
-with open(folder + "peaksProData180.pkl", "rb") as f:
+with open(folder + "peaksProDataMF.pkl", "rb") as f:
     peaksProData180 = pickle.load(f)
     
-Energy180 = round(convertAngle2Energy(180, True)*1000,1)
+Energy180 = peaksProData180.EnergyLabel
 
-with open("C://Users/chels/Downloads/LCLS_python_data/LCLS_python_data/XES_TimeResolved/TCentersPF.pkl", "rb") as f:
+with open(folder + "TCentersPF.pkl", "rb") as f:
     TCenters = pickle.load(f)
 
 
@@ -105,14 +105,14 @@ plt.ylim([-2.2,.4])
 plt.xlabel('time delay (fs)')
 
 ax = plt.subplot(8,1,8)
-plt.plot([6401.1, 6404.1], [0,0], color = 'k', zorder = 0)
+plt.plot([6401.1, 6404.2], [0,0], color = 'k', zorder = 0)
 plt.scatter(Energy155, Y155[8], color = 'r', zorder = 1)
 plt.scatter(Energy123, Y123[8], color = 'darkorange', zorder = 2)
 plt.scatter(Energy144, Y144[8], color = 'k', zorder = 3)
 plt.scatter(Energy165, Y165[8], color = 'g', zorder = 4)
 plt.scatter(Energy131, Y131[8], color = 'b', zorder = 5)
 plt.scatter(Energy180, Y180[8], color = 'purple', zorder = 6)
-plt.xlim([6401.1, 6404.1])
+plt.xlim([6401.1, 6404.2])
 plt.xlabel('energy (eV)')
 plt.ylabel('peak %$\Delta$')
 ax.set_yticks([-2,2])

@@ -194,7 +194,16 @@ def offsetsine2(t,oscamp1,oscamp2,period1,period2,onset,base):
     return out
 
 
-
+def offsetcos2(t,oscamp1,oscamp2,period1,period2,onset,base,sigma):
+    import numpy as np
+    import math
+    from scipy.ndimage import gaussian_filter
+    
+    hs = np.heaviside((t-onset), 0)
+    out = oscamp1*np.cos((t-onset)*2*math.pi/period1)*hs + oscamp2*np.cos((t-onset)*2*math.pi/period2)*hs + base
+    out = gaussian_filter(out, sigma = sigma/(t[1]-t[0]))
+    
+    return out
 
 
 
@@ -216,6 +225,7 @@ def globalfit(t, t0, sig, a11, a21, a31, rate1, a12, a22, a32, rate2):
     out3 = [x+y for x,y in zip(out31, out32)]
     
     return out1+out2+out3
+
 
 
 

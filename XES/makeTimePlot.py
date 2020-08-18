@@ -10,7 +10,7 @@ Created on Wed Oct 23 14:21:20 2019
 def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, StaticEr, TCentersP, TCentersP2, TCentersM, peaksProDataP, peaksProDataP2, peaksProDataM, minTime, maxTime, numzeros, ploton, MakePlots):
         
     import matplotlib.pyplot as plt 
-    from fitXES import fitXESGlobal, fitXESsine, fitXESsine2
+    from fitXES import fitXESGlobal, fitXESsine, fitXESsine2, fitXESGlobal_setBET, fitXEScos2
     import numpy as np
     from fittingfunctions import globalconvolved, offsetsine
     from mpl_toolkits.axes_grid1.inset_locator import inset_axes
@@ -26,6 +26,13 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
     xlimH = 6407
 
     params, cov, paramshalf, covhalf, paramssimple, covsimple = fitXESGlobal(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, ploton)
+    
+    params1, cov1 = fitXESGlobal_setBET(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, params[5]+cov[5], ploton)
+    params2, cov2 = fitXESGlobal_setBET(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, params[5]-cov[5], ploton)
+    paramsa, cov3 = fitXESGlobal_setBET(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, params[5]+3*cov[5], ploton)
+    paramsb, cov4 = fitXESGlobal_setBET(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, params[5]-3*cov[5], ploton)
+    
+    
     
     Fitp1 = globalconvolved(TCentersP, params[0], params[1], params[2], params[5], 0)
     Fitm1 = globalconvolved(TCentersM, params[0], params[1], params[3], params[5], 0)
@@ -119,25 +126,39 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         plt.errorbar(TCentersP, peaksProDataP.XESDiff*100+1, peaksProDataP.XESDiffE*100, marker = 'o', color = pluscolor, markersize = 3, linestyle = 'none')
      
         plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[2], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9], 0))*100 + 1, linestyle = ':', color = pluscolor)
-        plt.fill_between(tt, np.array(globalconvolved(tt, params[0], params[1], params[2], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9], 0))*100 + 1, \
-                         np.array(globalconvolved(tt, params[0], params[1], params[2], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[6], params[9], 0))*100 + 1, color = pluscolor, alpha = 0.3)
+        plt.fill_between(tt, np.array(globalconvolved(tt, params1[0], params1[1], params1[2], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params1[0], params1[1], params1[5], params1[8], 0))*100 + 1, \
+                         np.array(globalconvolved(tt, params2[0], params2[1], params2[2], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params2[0], params2[1], params2[5], params2[8], 0))*100 + 1, color = pluscolor, alpha = 0.3)
         
         
         plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100, linestyle = '--', color = minuscolor)
-        plt.fill_between(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100, \
-                         np.array(globalconvolved(tt, params[0], params[1], params[3], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100, color = minuscolor, alpha = 0.3)
+        plt.fill_between(tt, np.array(globalconvolved(tt, params1[0], params1[1], params1[3], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params1[0], params1[1], params1[6], params1[8], 0))*100, \
+                         np.array(globalconvolved(tt, params2[0], params2[1], params2[3], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params2[0], params2[1], params2[6], params2[8], 0))*100, color = minuscolor, alpha = 0.3)
+        #plt.plot(tt, np.array(globalconvolved(tt, paramsb[0], paramsb[1], paramsb[3], params[5]-3*cov[5], 0))*100 + np.array(globalconvolved(tt, paramsb[0], paramsb[1], paramsb[6], paramsb[8], 0))*100, linestyle = '--', color = minuscolor, alpha = 0.3) #minuscolor, alpha = 0.3)
+        #plt.plot(tt, np.array(globalconvolved(tt, paramsa[0], paramsa[1], paramsa[3], params[5]+3*cov[5], 0))*100 + np.array(globalconvolved(tt, paramsa[0], paramsa[1], paramsa[6], paramsa[8], 0))*100, linestyle = '--', color = minuscolor, alpha = 0.3)
         
-        for ii in range(5):
-            plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], ii*10, 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100, linestyle = '--', color = minuscolor, alpha = 0.3)
+        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[4], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9], 0))*100 + 0.5, color = pluscolor2)
+        plt.fill_between(tt, np.array(globalconvolved(tt, params1[0], params1[1], params1[4], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params1[0], params1[1], params1[7], params1[8], 0))*100 + 0.5, \
+                         np.array(globalconvolved(tt, params2[0], params2[1], params2[4], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params2[0], params2[1], params2[7], params2[8], 0))*100 + 0.5, color = pluscolor2, alpha = 0.3)
         
+        
+        
+        
+        """
+        for ii in range(10):
+            try:
+                    
+                paramsa, cov = fitXESGlobal_setBET(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, ii*10, False)
+    
+                plt.plot(tt, np.array(globalconvolved(tt, paramsa[0], paramsa[1], paramsa[3], ii*5, 0))*100 + np.array(globalconvolved(tt, paramsa[0], paramsa[1], paramsa[7], paramsa[9], 0))*100, linestyle = '--', color = minuscolor, alpha = 0.3)
+                print(str(ii*5)+ ' BET did work')
+            except:
+                print(str(ii*5) + ' BET didnt work')
+        """
         #for ii in range(3):
         #    plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], ii*10+80, 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100, linestyle = '--', color = minuscolor, alpha = 0.3)
         
         
-        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[4], params[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9], 0))*100 + 0.5, color = pluscolor2)
-        plt.fill_between(tt, np.array(globalconvolved(tt, params[0], params[1], params[4], params[5]+cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9], 0))*100 + 0.5, \
-                         np.array(globalconvolved(tt, params[0], params[1], params[4], params[5]-cov[5], 0))*100 + np.array(globalconvolved(tt, params[0], params[1], params[8], params[9], 0))*100 + 0.5, color = pluscolor2, alpha = 0.3)
-
+        
         plt.plot([-1000, -1000], [0.02, 0.02], 'o', color = pluscolor, markerfacecolor = pluscolor, markeredgecolor = pluscolor, linestyle = ':', markersize = 3, label = str(peaksProDataP.EnergyLabel) +' eV')
         plt.plot([-1000, -1000], [0.02, 0.02], '^', color = pluscolor2, markerfacecolor = pluscolor2, markeredgecolor = pluscolor2, linestyle = 'solid', markersize = 3, label = str(peaksProDataP2.EnergyLabel) +' eV')
         plt.plot([-1000, -1000], [0.02, 0.02], 's', color = minuscolor, fillstyle = 'none', markerfacecolor = minuscolor, markeredgecolor = minuscolor, linestyle = '--', markersize = 3, label = str(peaksProDataM.EnergyLabel) +' eV')
@@ -200,8 +221,9 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         
         
         #Fit, time, paramsR, cov, RR = fitXESsine(TCentersM, Residualm, ploton)
-        Fit, time, paramsR, covR, RR = fitXESsine2(TCentersM, Residualm, ploton)
+        #Fit, time, paramsR, covR, RR = fitXESsine2(TCentersM, Residualm, ploton)
         #plt.plot(time, Fit, color = '#c70039', label = 'sine fit')
+        Fit, time, paramsR, covR, RR = fitXEScos2(TCentersM, Residualm, params[1], ploton)
         Fit = Fit[time>paramsR[3]]
         glft = np.array(globalconvolved(tt, params[0], params[1], params[3], params[5], 0))*100 + \
                  np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100
@@ -212,7 +234,7 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         
         SE = 1.96*np.sqrt(1/(len(RR)-2)*np.sum(RR**2))
         
-        plt.plot(time, Fit+ glft, color = '#c70039', label = 'sine fit', zorder = 100)
+        plt.plot(time, Fit+ glft, color = '#c70039', label = 'cosine fit', zorder = 100)
         plt.fill_between(time, Fit + glft+SE, Fit+glft-SE, color = '#c70039', label = 'pred. int.', alpha = 0.3)#, label = 'uncertainty')
 
         
@@ -375,7 +397,7 @@ def makeTimePlotSubPlot(FeIIIEnergy, FeIIISignal, FeIIEnergy, FeIISignal, TCente
 #    Fitp, Fitm, params, info = fitXESthree(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, ploton)
     #Fitp, Fitm, params, info = fitXESthreeExtra(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, ploton)
     params, cov, paramshalf, covhalf, paramssimple, covsimple = fitXESGlobal(TCentersP, TCentersP2, TCentersM, peaksProDataP.XESDiff, peaksProDataP2.XESDiff, peaksProDataM.XESDiff, 0, ploton)
-    cov= np.sqrt(np.diag(cov))
+    
     
     Fitp1 = globalconvolved(TCentersP, params[0], params[1], params[2], params[5], 0)
     Fitm1 = globalconvolved(TCentersM, params[0], params[1], params[3], params[5], 0)
@@ -392,7 +414,7 @@ def makeTimePlotSubPlot(FeIIIEnergy, FeIIISignal, FeIIEnergy, FeIISignal, TCente
     
     if MakePlots:
             
-        fig, ax = plt.subplots(figsize = (4,6))
+        fig, ax = plt.subplots(figsize = (3.3,5))
         
         
                 
@@ -437,7 +459,8 @@ def makeTimePlotSubPlot(FeIIIEnergy, FeIIISignal, FeIIEnergy, FeIISignal, TCente
         plt.tight_layout()
         
         
-        axins = inset_axes(ax, width=1.75, height=.5, bbox_to_anchor=(1, .39), bbox_transform=ax.transAxes)
+        #axins = inset_axes(ax, width=1.75, height=.5, bbox_to_anchor=(1, .39), bbox_transform=ax.transAxes)
+        axins = inset_axes(ax, width=1.5, height=.4, bbox_to_anchor=(1, .39), bbox_transform=ax.transAxes)
         #axins.plot(range(10), range(10))
 
         #plt.figure(figsize = (4,5))
@@ -452,15 +475,16 @@ def makeTimePlotSubPlot(FeIIIEnergy, FeIIISignal, FeIIEnergy, FeIISignal, TCente
         axins.set_xlim([xlimL, xlimH])
         axins.set_xticks(np.arange(6397, 6412, 4))
         axins.set_xticklabels([])
-        leg = axins.legend(bbox_to_anchor=(0.03, 1.5), loc='upper left', borderaxespad=0., facecolor = 'white', handlelength = 1.2)
-        leg.get_frame().set_alpha(1)
-        leg.get_frame().set_edgecolor('k')
-        leg.get_frame().set_linewidth(0.8)
+        axins.set_title('model complexes', fontsize = 9)
+        #leg = axins.legend(bbox_to_anchor=(0.07, 1.8), loc='upper left', borderaxespad=0., facecolor = 'white', handlelength = 1.2, ncol = 2)
+        #leg.get_frame().set_alpha(1)
+        #leg.get_frame().set_edgecolor('k')
+        #leg.get_frame().set_linewidth(0.8)
         #plt.ylabel('emission')
         #axins.legend()
         #plt.tight_layout()
 
-        axins2 = inset_axes(ax, width=1.75, height=.8, bbox_to_anchor=(1, .27), bbox_transform=ax.transAxes)
+        axins2 = inset_axes(ax, width=1.5, height=.6, bbox_to_anchor=(1, .27), bbox_transform=ax.transAxes)
         #ax = plt.subplot2grid((10,1), (3,0), colspan = 1, rowspan = 7)
         axins2.plot(FeIIIEnergy*1000, (FeIIISignal-FeIISignal)/FeIISignal*100, color = 'k', linewidth = 0.85)
         axins2.annotate('', xy=(peaksProDataP.EnergyLabel,0.2*100), xytext=(peaksProDataP.EnergyLabel,-0.13*100), arrowprops={'arrowstyle': '->', 'ls': 'dotted', 'ec': pluscolor, 'lw': 2})
@@ -469,6 +493,7 @@ def makeTimePlotSubPlot(FeIIIEnergy, FeIIISignal, FeIIEnergy, FeIISignal, TCente
         axins2.set_xlim([xlimL, xlimH])
         axins2.set_xticks(np.arange(6397, 6412, 4))
         axins2.set_xlabel('energy (eV)')
+        #plt.ylim([-15, 30])
         #axins2.set_ylabel('%$\Delta$ emission')
         #plt.ylim([-4, 4])
         #plt.xlim([xlimL, xlimH])
@@ -476,8 +501,67 @@ def makeTimePlotSubPlot(FeIIIEnergy, FeIIISignal, FeIIEnergy, FeIISignal, TCente
         #plt.tight_layout()
         
     
-        
-        
+    modelcomplex = (FeIIISignal-FeIISignal)/FeIISignal*100
+    idxP = (np.abs(FeIIEnergy*1000-peaksProDataP.EnergyLabel)).argmin()
+    idxM = (np.abs(FeIIEnergy*1000-peaksProDataM.EnergyLabel)).argmin()
+    idxP2 = (np.abs(FeIIEnergy*1000-peaksProDataP2.EnergyLabel)).argmin()
+    
+    valueP = modelcomplex[idxP]
+    valueM = modelcomplex[idxM]
+    valueP2 = modelcomplex[idxP2]
+    
+    
+
+    amp1 = params[2]*2/math.exp(params[1]**2/2/params[5]**2)*100
+    amp2 = params[3]*2/math.exp(params[1]**2/2/params[5]**2)*100
+    amp3 = params[4]*2/math.exp(params[1]**2/2/params[5]**2)*100
+    
+    dp1 = (params[2]+cov[2])*2/math.exp((params[1]+cov[1])**2/2/(params[5]+cov[5])**2)*100
+    dp2 = (params[3]+cov[3])*2/math.exp((params[1]+cov[1])**2/2/(params[5]+cov[5])**2)*100
+    dp3 = (params[4]+cov[4])*2/math.exp((params[1]+cov[1])**2/2/(params[5]+cov[5])**2)*100
+    
+    dm1 = (params[2]-cov[2])*2/math.exp((params[1]-cov[1])**2/2/(params[5]-cov[5])**2)*100
+    dm2 = (params[3]-cov[3])*2/math.exp((params[1]-cov[1])**2/2/(params[5]-cov[5])**2)*100
+    dm3 = (params[4]-cov[4])*2/math.exp((params[1]-cov[1])**2/2/(params[5]-cov[5])**2)*100
+    
+    ef1 = (amp1-amp2)/(valueP-valueM)
+    def1 = max((dp1-dm2)/(valueP-valueM)-(amp1-amp2)/(valueP-valueM), (amp1-amp2)/(valueP-valueM)-(dm1-dp2)/(valueP-valueM))
+    
+    ef2 = (amp3-amp2)/(valueP2-valueM)
+    def2 = max((dp3-dm2)/(valueP2-valueM)-(amp3-amp2)/(valueP2-valueM), (amp3-amp2)/(valueP2-valueM)-(dm3-dp2)/(valueP2-valueM))
+    
+    print('excitation fraction')
+    
+    print(peaksProDataP.EnergyLabel)
+    print('ampP = ' + str(amp1) + ' pm ' + str(max(abs(amp1-dp1), abs(amp1-dm1))))
+    print('ampM = ' + str(amp2) + ' pm ' + str(max(abs(amp2-dp2), abs(amp2-dm2))))
+    print('ampP2 = ' + str(amp3) + ' pm ' + str(max(abs(amp3-dp3), abs(amp3-dm3))))
+    
+    print(ef1)
+    print(def1)
+    
+    print(ef2)
+    print(def2)
+    
+    print((ef1+ef2)/2)
+    print(np.sqrt((def1**2+def2**2))/np.sqrt(2))
+    
+    
+    bmp1 = params[6]*2/math.exp(params[1]**2/2/params[5]**2)*100
+    bmp2 = params[7]*2/math.exp(params[1]**2/2/params[5]**2)*100
+    bmp3 = params[8]*2/math.exp(params[1]**2/2/params[5]**2)*100
+    
+    dp1 = (params[6]+cov[6])*2/math.exp((params[1]+cov[1])**2/2/(params[5]+cov[5])**2)*100
+    dp2 = (params[7]+cov[7])*2/math.exp((params[1]+cov[1])**2/2/(params[5]+cov[5])**2)*100
+    dp3 = (params[8]+cov[8])*2/math.exp((params[1]+cov[1])**2/2/(params[5]+cov[5])**2)*100
+    
+    dm1 = (params[6]-cov[6])*2/math.exp((params[1]-cov[1])**2/2/(params[5]-cov[5])**2)*100
+    dm2 = (params[7]-cov[7])*2/math.exp((params[1]-cov[1])**2/2/(params[5]-cov[5])**2)*100
+    dm3 = (params[8]-cov[8])*2/math.exp((params[1]-cov[1])**2/2/(params[5]-cov[5])**2)*100
+    
+    print('bmpP = ' + str(bmp1) + ' pm ' + str(max(abs(bmp1-dp1), abs(bmp1-dm1))))
+    print('bmpM = ' + str(bmp2) + ' pm ' + str(max(abs(bmp2-dp2), abs(bmp2-dm2))))
+    print('bmpP2 = ' + str(bmp3) + ' pm ' + str(max(abs(bmp3-dp3), abs(bmp3-dm3))))
     
     mt = 200
     

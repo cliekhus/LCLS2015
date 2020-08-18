@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 
 
 
-#folder = "D://LCLS_Data/LCLS_python_data/XAS_Spectra/"
-folder = "C:/Users/chels/Downloads/LCLS_python_data/LCLS_python_data/XAS_Spectra/"
+folder = "D://LCLS_Data/LCLS_python_data/XAS_Spectra/"
+#folder = "C:/Users/chels/Downloads/LCLS_python_data/LCLS_python_data/XAS_Spectra/"
 
 with open(folder + "XASDiffBoot.pkl", "rb") as f:
     XASDiffBoot = pickle.load(f)
@@ -91,9 +91,9 @@ for ii in range(numboot-1):
     Ba[ii-errorhit] = abs(ParamsB[2])
     Ca[ii-errorhit] = abs(ParamsC[2])
     
-    Aoff[ii-errorhit] = abs(ParamsA[3])
-    Boff[ii-errorhit] = abs(ParamsB[3])
-    Coff[ii-errorhit] = abs(ParamsC[3])
+    Aoff[ii-errorhit] = ParamsA[3]
+    Boff[ii-errorhit] = ParamsB[3]
+    Coff[ii-errorhit] = ParamsC[3]
     
     Aslope[ii-errorhit] = abs(ParamsA[4])
     Bslope[ii-errorhit] = abs(ParamsB[4])
@@ -119,7 +119,7 @@ Aslope = Aslope[:numboot-errorhit]
 Bslope = Bslope[:numboot-errorhit]
 Cslope = Cslope[:numboot-errorhit]
 
-cond = np.logical_and.reduce((Ax0>7110, Bx0<7115, Ax0<7113, Aa < 500, Ba < 500, Cx0 < 7200, Cx0 > 7000, Ca < 650))
+cond = np.logical_and.reduce((Ax0>7110, Bx0<7116, Ax0<7114, Aa < 500, Ba < 500, Cx0 < 7201, Cx0 > 7000, Ca < 650))
 
 fitout = {'Asig': np.mean(Asig[cond]), 'Bsig': np.mean(Bsig[cond]), 'Csig': np.mean(Csig[cond]),\
           'Ax0': np.mean(Ax0[cond]), 'Bx0': np.mean(Bx0[cond]), 'Cx0': np.mean(Cx0[cond]),\

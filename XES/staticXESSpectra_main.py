@@ -60,7 +60,7 @@ xesProData.makeProXES(xesRawData, MaxTime, MinTime, FPlots)
 xesProData.energyConversion(True)
 
 
-numboot = 100
+numboot = 1000
 startT = time.time()
 
 for ii in range(numboot):

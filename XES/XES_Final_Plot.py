@@ -88,7 +88,7 @@ MaxTimePlots = 1400
 
 FPlots = False
 
-#makeTimePlotSubPlot(FeIIIEnergy, FeIIISignal, FeIIEnergy, FeIISignal, TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, FPlots, True)
+makeTimePlotSubPlot(FeIIIEnergy, FeIIISignal, FeIIEnergy, FeIISignal, TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, True, True)
 
 StaticS = savgol_filter((static.XESOn_Norm - static.XESOff_Norm)/static.XESOff_Norm*100, 5,3)
 StaticEr = np.sqrt(static.Error_On**2+static.Error_On**2)/static.XESOff_Norm*100
@@ -119,7 +119,7 @@ ax.annotate('', xy=(peaksProDataM.EnergyLabel,-0.13*100), xytext=(peaksProDataM.
 ax.annotate('', xy=(peaksProDataP2.EnergyLabel,0.2*100), xytext=(peaksProDataP2.EnergyLabel,-0.13*100), arrowprops={'arrowstyle': '->', 'ec': pluscolor2, 'lw': 3})
 plt.xlabel('energy (eV)')
 plt.ylabel('% $\Delta$ emission')
-#plt.ylim([-4, 4])
+#plt.ylim([-30, 30])
 plt.xlim([xlimL, xlimH])
 plt.xticks(np.arange(6397, 6412, 4))
 plt.tight_layout()

@@ -305,7 +305,52 @@ def fitXESsinethree(TCentersplus, TCentersplus2, TCentersminus, XESDiffplus, XES
 
 
 
+def fitXEScos2(TCenters, Residual, sigma, ploton):
+    
+    import matplotlib.pyplot as plt
+    from scipy.optimize import curve_fit
+    from fittingfunctions import offsetcos2
+    import numpy as np
 
+
+    startoscamp = 0.01
+    startonset = 150
+    startperiod1 = 300
+    startperiod2 = 133
+    startbase = 0
+    
+    if ploton:
+
+        plt.figure()
+        plt.plot(TCenters, Residual, 'o')
+        plt.plot(TCenters, offsetcos2(TCenters, startoscamp, startoscamp, startperiod1, startperiod2, startonset, startbase, sigma))
+        plt.title('start parameters')
+        plt.xlabel('time (fs)')
+    
+
+    params,cov = curve_fit(lambda t,oscamp1,oscamp2,period1,period2,onset,base: \
+                           offsetcos2(t,oscamp1,oscamp2,period1,period2,onset,base,sigma), TCenters, Residual, \
+                           p0 = [startoscamp, startoscamp, startperiod1, startperiod2, startonset, startbase])
+    cov = np.sqrt(np.diag(cov))
+    
+    time = np.linspace(min(TCenters), max(TCenters), 1000)
+    
+    params = np.append(params, sigma)
+    Fit = offsetcos2(TCenters, *params)
+    
+    RR = Residual - Fit
+    
+    Fit = offsetcos2(time, *params)
+    
+    if ploton:
+            
+        plt.figure()
+        plt.plot(TCenters, Residual, 'o')
+        plt.plot(TCenters, Fit)
+        plt.title('end parameters')
+        plt.xlabel('time (fs)')
+
+    return Fit, time, params, cov, RR
 
 
 
@@ -419,6 +464,81 @@ def fitXESsine(TCenters, Residual, ploton):
 
 
 
+def fitXESGlobal_setBET(TCentersplus, TCentersplus2, TCentersminus, XESDiffplus, XESDiffplus2, XESDiffminus, startt0, BET, ploton):
+    
+    import matplotlib.pyplot as plt
+    from scipy.optimize import curve_fit
+    from fittingfunctions import globalconvolved
+    from fittingfunctions import globalfit
+    from fittingfunctions import globalfitsimple
+    from fittingfunctions import halffit
+    import numpy as np
+    import math
+
+    starta = .02
+    startrate = 50
+    startsig = 30
+    startoffsetp = 0
+    startoffsetm = 0
+    ampfactor = 0.5
+    ratefactor = 2
+    
+    if ploton:
+
+        plt.figure()
+        plt.plot(TCentersplus, XESDiffplus, 'o')
+        plt.plot(TCentersplus2, XESDiffplus2, 's')
+        plt.plot(TCentersminus, XESDiffminus, 'x')
+        plt.plot(TCentersplus, globalconvolved(TCentersplus, startt0, startsig, starta, startrate, startoffsetp))
+        plt.plot(TCentersplus, globalconvolved(TCentersplus, startt0, startsig, starta*ampfactor, startrate*ratefactor, startoffsetp))
+        plt.plot(TCentersminus, globalconvolved(TCentersminus, startt0, startsig, -starta, startrate, startoffsetm))
+        plt.plot(TCentersminus, globalconvolved(TCentersminus, startt0, startsig, -starta*ampfactor, startrate*ratefactor, startoffsetm))
+        plt.title('start parameters')
+        plt.xlabel('time (fs)')
+    
+    times = np.concatenate((TCentersplus,TCentersminus,TCentersplus2))
+    ys = np.concatenate((XESDiffplus,XESDiffminus,XESDiffplus2))
+    tt = np.linspace(min(times), max(times), 1000)
+
+
+    params,cov = curve_fit(lambda t, t0, sig, a11, a21, a31, a12, a22, a32, rate2: \
+                           globalfit(t, t0, sig, a11, a21, a31, BET, a12, a22, a32, rate2), times, ys, \
+                           p0 = [startt0, startsig, starta, -starta, starta, starta*ampfactor, -starta*ampfactor, starta*ampfactor, startrate*ratefactor])
+    cov = np.sqrt(np.diag(cov))
+    
+#    Rsquared = 1-(np.sum((ys - globalfit(times, *params))**2) / np.sum((ys - np.mean(globalfit(times, *params)))**2))
+#    print('Rsquared for global with fixed BET ' + str(Rsquared))
+    print('global fit with fixed BET')
+    print('BET = ' + str(BET) + ' fs')
+    print('IRF = ' + str(int(params[1]*2*math.sqrt(2*math.log(2)))) + ' $\pm$ ' + str(int(cov[1]*2*math.sqrt(2*math.log(2)))) + ' fs')
+    print('LD = ' + str(int(params[8])) + ' $\pm$ ' + str(int(cov[8])) + ' fs')
+    print('Ap1 = ' + str(params[2]) + ' $\pm$ ' + str(cov[2]) + ' fs')
+    print('Ap2 = ' + str(params[3]) + ' $\pm$ ' + str(cov[3]) + ' fs')
+    print('Ap3 = ' + str(params[4]) + ' $\pm$ ' + str(cov[4]) + ' fs')
+    print('Bp1 = ' + str(params[5]) + ' $\pm$ ' + str(cov[5]) + ' fs')
+    print('Bp2 = ' + str(params[6]) + ' $\pm$ ' + str(cov[6]) + ' fs')
+    print('Bp3 = ' + str(params[7]) + ' $\pm$ ' + str(cov[7]) + ' fs')
+    
+    if ploton:
+        plt.figure()
+        plt.plot(TCentersplus, XESDiffplus, 'o')
+        plt.plot(TCentersplus2, XESDiffplus2, 's')
+        plt.plot(TCentersminus, XESDiffminus, 'x')
+        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[2], BET, 0)) + np.array(globalconvolved(tt, params[0], params[1], params[5], params[8], 0)), label = '2')
+        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[3], BET, 0)) + np.array(globalconvolved(tt, params[0], params[1], params[6], params[8], 0)), label = '3')
+        plt.plot(tt, np.array(globalconvolved(tt, params[0], params[1], params[4], BET, 0)) + np.array(globalconvolved(tt, params[0], params[1], params[7], params[8], 0)), label = '4')
+        plt.title('two exponentials')
+        plt.legend()
+
+
+
+    return params, cov
+
+
+
+
+
+
 
 
 def fitXESGlobal(TCentersplus, TCentersplus2, TCentersminus, XESDiffplus, XESDiffplus2, XESDiffminus, startt0, ploton):
@@ -461,6 +581,7 @@ def fitXESGlobal(TCentersplus, TCentersplus2, TCentersminus, XESDiffplus, XESDif
     params,cov = curve_fit(globalfit, times, ys, \
                            p0 = [startt0, startsig, starta, -starta, starta, startrate, starta*ampfactor, -starta*ampfactor, starta*ampfactor, startrate*ratefactor])
     cov = np.sqrt(np.diag(cov))
+    
     
     Rsquared = 1-(np.sum((ys - globalfit(times, *params))**2) / np.sum((ys - np.mean(globalfit(times, *params)))**2))
     print('Rsquared for global ' + str(Rsquared))

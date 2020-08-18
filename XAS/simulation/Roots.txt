@@ -1,0 +1,16 @@
+Root 1 426 b -0.93
+
+Root 5 436 b 0.45
+Root 5 437 b 0.30
+Root 5 440 b 0.40
+Root 5 441 b 0.39
+Root 5 442 b 0.30
+
+Root 7 427 a 0.99
+
+Root 9 429 a 0.71
+Root 9 428 a 0.48
+Root 9 429 b 0.31
+
+Root 11 428 a 0.83
+Root 11 429 a 0.50

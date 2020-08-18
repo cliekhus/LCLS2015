@@ -76,7 +76,75 @@ def makeStaticXES(xesRawData, xesProData, MaxTime, MinTime, ploton):
     
     
     
+def makeLaserXES(xesRawData, xesProData, MaxTime, MinTime, ploton):
     
+    
+    
+    from makeMedianFilter import makeMedFilter
+    from makeTimeFilter import makeTimeFilter
+    from scipy.stats import sem
+    from makeIntensityFilter import makeLineFilter
+    import numpy as np
+
+
+    numAngle = len(xesProData.UniAngle)
+    SpectraOn = np.empty(numAngle)
+    SpectraOff = np.empty(numAngle)
+    ErrorOn = np.empty(numAngle)
+    ErrorOff = np.empty(numAngle)
+        
+    TTFilter = makeTimeFilter(xesRawData, ploton)
+    TimeFilter = np.logical_and.reduce((xesProData.TTDelay<MaxTime, xesProData.TTDelay>MinTime, TTFilter))
+    
+    indices2delete = []
+    
+    for ii in range(numAngle):
+
+        selectAngle = xesRawData.Angle == xesProData.UniAngle[ii]
+        filteron = np.logical_and.reduce((TimeFilter, selectAngle, xesRawData.LOn, xesRawData.XOn))
+        filteroff = np.logical_and.reduce((selectAngle, np.logical_not(xesRawData.LOn), xesRawData.XOn))
+        MedianFilterOn = makeMedFilter(xesRawData, filteron, ploton)
+        MedianFilterOff = makeMedFilter(xesRawData, filteroff, ploton)
+        SlopeFilterOn, ROffsetOn = makeLineFilter(xesRawData.RowlandY, xesRawData.Diode2, filteron, ploton)
+        SlopeFilterOff, ROffsetOff = makeLineFilter(xesRawData.RowlandY, xesRawData.Diode2, filteroff, ploton)
+        FilterOn = np.logical_and(SlopeFilterOn, MedianFilterOn, filteron)
+        FilterOff = np.logical_and(SlopeFilterOff, MedianFilterOff, filteroff)
+
+
+        if np.sum(FilterOn.astype('int')) > 0 and np.sum(FilterOff.astype('int')) > 0:
+    
+            
+            SpectraOn[ii] = np.nansum(xesProData.RowWOffset[FilterOn])/np.nansum(xesRawData.Diode2[FilterOn])
+            SpectraOff[ii] = np.nansum(xesProData.RowWOffset[FilterOff])/np.nansum(xesRawData.Diode2[FilterOff])
+            ErrorOn[ii] = sem(xesProData.RowWOffset[FilterOn]/xesRawData.Diode2[FilterOn])
+            ErrorOff[ii] = sem(xesProData.RowWOffset[FilterOff]/xesRawData.Diode2[FilterOff])
+            """
+            SpectraOn[ii] = np.nansum(xesRawData.Diode2[FilterOn])/np.nansum(xesRawData.Ipm2Sum[FilterOn])
+            SpectraOff[ii] = np.nansum(xesRawData.Diode2[FilterOff])/np.nansum(xesRawData.Ipm2Sum[FilterOff])
+            ErrorOn[ii] = sem(xesRawData.Diode2[FilterOn]/xesRawData.Ipm2Sum[FilterOn])
+            ErrorOff[ii] = sem(xesRawData.Diode2[FilterOff]/xesRawData.Ipm2Sum[FilterOff])
+            """
+            """
+            SpectraOn[ii] = np.nansum(xesRawData.CspadSum[FilterOn])/np.nansum(xesRawData.Diode2[FilterOn])
+            SpectraOff[ii] = np.nansum(xesRawData.CspadSum[FilterOff])/np.nansum(xesRawData.Diode2[FilterOff])
+            ErrorOn[ii] = sem(xesRawData.CspadSum[FilterOn]/xesRawData.Ipm2Sum[FilterOn])
+            ErrorOff[ii] = sem(xesRawData.CspadSum[FilterOff]/xesRawData.Ipm2Sum[FilterOff])
+            """
+            
+
+        else:
+            
+            indices2delete = indices2delete + [ii]
+
+    
+    SpectraOn = np.delete(SpectraOn, indices2delete)
+    SpectraOff = np.delete(SpectraOff, indices2delete)
+    ErrorOn = np.delete(ErrorOn, indices2delete)
+    ErrorOff = np.delete(ErrorOff, indices2delete)
+    UniAngle = np.delete(xesProData.UniAngle, indices2delete)
+    
+            
+    return SpectraOn, SpectraOff, ErrorOn, ErrorOff, UniAngle
     
     
     

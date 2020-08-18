@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import math
 from VectorFile import VectorFile
 
-folder = "C:/Users/chelsea/OneDrive/Documents/UW/Mixed-Valence-Complexes/LCLS2015/Calculations/FeRu-freq-xyzs/"
+folder = "C:/Users/chelsea/OneDrive/Documents/UW/Mixed-Valence-Complexes/LCLS2015/Harmonics/FeRu-freq-xyzs/"
 
 f = open(folder+'run.out', 'r')
 

@@ -16,21 +16,19 @@ from makeTimePlot import makeTimePlotThree
 from makeTimePlot import makeTimePlotThreeError
 from makeTimePlot import makeOneBootFT
 import numpy as np
-import math
 from MakeRawBoot import MakeRawBoot
 import time
 import datetime
 from fitXES import fitXESGlobal
 
 
-#folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
-folder = "C://Users/chels/Downloads/LCLS_python_data/LCLS_python_data/XES_TimeResolved/"
-ReEnterData = False
+folder = "D://LCLS_Data/LCLS_python_data/XES_TimeResolved/"
+ReEnterData = True
 FPlots = False
-ReLoadData = True
-SaveData = True
-Boot = True
-numBoot = 10
+ReLoadData = False
+SaveData = False
+Boot = False
+numBoot = 1000
 
 NumTTSteps = 100
 NumTTStepsPlots = 50
@@ -41,19 +39,13 @@ MaxTime = 0
 MinTimePlots = -250
 MaxTimePlots = 1400
 
-removenum = 9
 
 #plus data
 
 if ReEnterData:
 
-    #FileNumsP = list(range(144, 154+1))
-    #FileNumsP = list(range(131, 140+1))
-    #FileNumsP = list(range(165, 178+1))
     FileNumsP = list(range(123, 130+1))
-    #FileNumsP = list(range(155,164+1))
-    #FileNumsP = [103,105,115,121]
-    #FileNumsP.remove(FileNumsP[removenum])
+    #FileNumsP = list(range(131, 140+1))
     peaksRawDataP = loadData(FileNumsP, "Peaks", 1)
     
 if ReLoadData:
@@ -74,11 +66,8 @@ peaksProDataP.makeProPeaks(peaksRawDataP, NumTTSteps, MinTime, MaxTime, FPlots)
 
 if ReEnterData:
 
-    #FileNumsP2 = list(range(123, 130+1))
-    #FileNumsP2 = [105,103]
-    FileNumsP2 = list(range(155,164+1))
-    #FileNumsP2 = list(range(144, 154+1))
-    #FileNumsP2.remove(FileNumsP2[removenum])
+    FileNumsP2 = list(range(155, 164+1))
+    #FileNumsP2 = list(range(143, 154+1))
     peaksRawDataP2 = loadData(FileNumsP2, "Peaks", 1)
     
 if ReLoadData:
@@ -100,8 +89,7 @@ peaksProDataP2.makeProPeaks(peaksRawDataP2, NumTTSteps, MinTime, MaxTime, FPlots
 if ReEnterData:
 
     FileNumsM = list(range(180,188+1))
-    #FileNumsM = list(range(131, 140+1))
-    #FileNumsM.remove(FileNumsM[removenum])
+    #FileNumsM = list(range(165, 178+1))
     peaksRawDataM = loadData(FileNumsM, "Peaks", 1)
     
 if ReLoadData:
@@ -127,8 +115,8 @@ Fit1, Fit2, params, info = fitXESthree(TCentersP, TCentersM, TCentersP2, peaksPr
 
 t0 = params[3]
 
-#folder_con = "D://LCLS_Data/LCLS_python_data/XES_conversion_info/"
-folder_con = "C://Users/chels/Downloads/LCLS_python_data/LCLS_python_data/XES_conversion_info/"
+folder_con = "D://LCLS_Data/LCLS_python_data/XES_conversion_info/"
+#folder_con = "C://Users/chels/Downloads/LCLS_python_data/LCLS_python_data/XES_conversion_info/"
 
 with open(folder_con + "t0.pkl", "wb") as f:
         pickle.dump(t0, f)
