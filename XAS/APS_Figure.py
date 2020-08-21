@@ -73,6 +73,8 @@ with open("D:\LCLS_Data\LCLS_python_data\XAS_Spectra\APS_HERFD_II.pkl", "wb") as
     pickle.dump(HERFD_II, f)
 with open("D:\LCLS_Data\LCLS_python_data\XAS_Spectra\APS_HERFD_III.pkl", "wb") as f:
     pickle.dump(HERFD_III, f)
+with open("D:\LCLS_Data\LCLS_python_data\XAS_Spectra\APS_FeRu.pkl", "wb") as f:
+    pickle.dump(HERFD_FeRu, f)
 with open("D:\LCLS_Data\LCLS_python_data\XAS_Spectra\APS_incident.pkl", "wb") as f:
     pickle.dump(incident_axis, f)
         

@@ -12,7 +12,7 @@ import numpy as np
 import pickle
 import matplotlib.gridspec as gridspec
 from fitXASDiff import fitXASPiecewiseGauss
-from fittingfunctions import gauswslope
+from fittingfunctions import gauswslope, xasoff, xason, diffxas
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import matplotlib.image as mpimg
 from matplotlib.offsetbox import TextArea, DrawingArea, OffsetImage, AnnotationBbox
@@ -166,13 +166,24 @@ with open(folder + "APS_HERFD_III.pkl", "rb") as f:
 with open(folder + "APS_incident.pkl", "rb") as f:
     incident_axis = pickle.load(f)
 
-    
-    
-    
+with open(folder + "Fe_fits.pkl", "rb") as f:
+    Fe_Fits = pickle.load(f)
+
+with open(folder + "APS_FeRu.pkl", "rb") as f:
+    HERFD_FeRu = pickle.load(f)
 
 
     
-    
+
+
+
+#Fe_Fits = {"params_II": params_II, "params_III": params_III, "params_XAS": params_XAS, "params_FeRu": params_FeRu, "cov_FeRu": np.sqrt(np.diag(cov_FeRu))}
+
+FitOuts['BmA'] = Fe_Fits['params_FeRu'][1]-Fe_Fits['params_FeRu'][0]
+FitOuts['BmAunc'] = np.sqrt((Fe_Fits['cov_FeRu'][1])**2+(Fe_Fits['cov_FeRu'][0])**2)
+FitOuts['CmB'] = Fe_Fits['params_FeRu'][2]-Fe_Fits['params_FeRu'][1]
+FitOuts['CmBunc'] = np.sqrt((Fe_Fits['cov_FeRu'][2])**2+(Fe_Fits['cov_FeRu'][1])**2)
+
 
 ####################### MAKE AB XANES DIFF PLOT #############################
 plt.figure(figsize = (3.5,5))
@@ -183,8 +194,9 @@ HERFDmax = np.max(HERFD_II[incident_axis < 7118.5])
 
 ax = plt.subplot2grid((10,1), (0,0), colspan = 1, rowspan = 2)
 plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(xasProData_one.XASOff_Norm,-4), np.delete(xasProData_one.Error_Off,-4), color = 'k')
-plt.plot(incident_axis, (HERFD_II)*Cmax/HERFDmax, linewidth = 2, color = red, linestyle = ':')
-plt.plot(incident_axis, (HERFD_III)*Cmax/HERFDmax, linewidth = 2, color = red, linestyle = '--')
+plt.plot(incident_axis, HERFD_FeRu*Cmax/HERFDmax, linewidth = 2, color = pluscolor2, linestyle = '-.')
+plt.plot(incident_axis, (HERFD_II)*Cmax/HERFDmax, linewidth = 2, color = minuscolor, linestyle = ':')
+plt.plot(incident_axis, (HERFD_III)*Cmax/HERFDmax, linewidth = 2, color = minuscolor, linestyle = '--')
 plt.text(7111, 900, 'A')
 plt.text(7113.8, 1250, 'B')
 plt.text(7115.5, 1985, 'C')
@@ -198,9 +210,15 @@ plt.tight_layout()
 xA = np.linspace(7112, 7114, 1000)
 xB = np.linspace(7114, 7117.5, 1000)
 
+xall = np.linspace(7110, 7122, 1000)
+
 ax = plt.subplot2grid((10,1), (2,0), colspan = 1, rowspan = 8)
-plt.fill_between(xA, FitOuts['Aoff']-xA*FitOuts['Aslope'], gauswslope(xA,FitOuts['Asig'],FitOuts['Ax0'],FitOuts['Aa'],FitOuts['Aoff'],FitOuts['Aslope']), label = 'A peak: ' + str(round(FitOuts['Ax0'],1)) + ' eV', linewidth = 5, color = pluscolor2,zorder=1)
-plt.fill_between(xB, FitOuts['Boff']-xB*FitOuts['Bslope'], gauswslope(xB,FitOuts['Bsig'],FitOuts['Bx0'],FitOuts['Ba'],FitOuts['Boff'],FitOuts['Bslope']), label = 'B peak: ' + str(round(FitOuts['Bx0'],1)) + ' eV', linewidth = 5, color = pluscolor,zorder=2)
+
+params_FeRu = Fe_Fits["params_FeRu"]
+
+plt.plot(xall, diffxas(xall, *params_FeRu)*Cmax/HERFDmax*.2, label = 'reconstruction', linewidth = 3, color = pluscolor2, zorder=2)
+#plt.fill_between(xA, FitOuts['Aoff']-xA*FitOuts['Aslope'], gauswslope(xA,FitOuts['Asig'],FitOuts['Ax0'],FitOuts['Aa'],FitOuts['Aoff'],FitOuts['Aslope']), label = 'A peak: ' + str(round(FitOuts['Ax0'],1)) + ' eV', linewidth = 5, color = pluscolor2,zorder=1)
+#plt.fill_between(xB, FitOuts['Boff']-xB*FitOuts['Bslope'], gauswslope(xB,FitOuts['Bsig'],FitOuts['Bx0'],FitOuts['Ba'],FitOuts['Boff'],FitOuts['Bslope']), label = 'B peak: ' + str(round(FitOuts['Bx0'],1)) + ' eV', linewidth = 5, color = pluscolor,zorder=2)
 plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(XASDiffBootF,-4), np.delete(XASDiffBootE,-4), \
              marker='.', label = str(MinTime) + ' to ' + str(MaxTime) + ' fs delay', color = 'k',zorder=10, linestyle = ':')
 plt.xlabel('x-ray energy (eV)')
@@ -263,7 +281,7 @@ shift = Params[2]-Bpeaks[0]
 
 
 
-plt.plot(incident_axis, (HERFD_III-HERFD_II)*Cmax/HERFDmax*.2, label = 'model complexes', linewidth = 2, color = red)
+plt.plot(incident_axis, (HERFD_III-HERFD_II)*Cmax/HERFDmax*.2, label = 'model complexes', linewidth = 2, color = minuscolor, zorder=1)
 
 leg = plt.legend()
 leg.get_frame().set_edgecolor('k')
@@ -271,7 +289,9 @@ leg.get_frame().set_linewidth(0.8)
 plt.tight_layout()
 
 
-
+print('scale factor')
+print(Cmax/HERFDmax*.2)
+print(Cmax/HERFDmax)
 
 
 

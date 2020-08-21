@@ -13,6 +13,36 @@ def xasoff(x, sigB,aB,x0B, sigC,aC,x0C, offset, erfamp, erfslope, peak):
 
 
 
+def xason(x, sigA,aA,x0A, sigB,aB,x0B, sigC,aC,x0C, offset, erfamp, erfslope, peak):
+    import numpy as np
+    import math
+    
+    return np.array([aA*math.exp(-(xx-x0A)**2/sigA) + aB*math.exp(-(xx-x0B)**2/sigB) + aC*math.exp(-(xx-x0C)**2/sigC) for xx in x]) + offset + erfamp*np.array([math.erf((xx-peak)/erfslope) for xx in x])
+
+
+
+def diffxas(x, x0A, x0B, x0C, peak):
+    import numpy as np
+    import pickle
+    
+    folder = "D://LCLS_Data/LCLS_python_data/XAS_Spectra/"
+    
+    with open(folder + "Fe_fits.pkl", "rb") as f:
+        Fe_fits = pickle.load(f)
+    
+    
+    
+    params_II = Fe_fits["params_II"]
+    params_III = Fe_fits["params_III"]
+    params_XAS = Fe_fits["params_XAS"]
+    
+    out = xason(x, params_III[0],params_III[1],x0A, params_III[3],params_III[4],x0B, \
+            params_III[6],params_III[7],x0C, params_XAS[6],params_XAS[7],params_XAS[8],peak) \
+            - xasoff(x,  params_II[0],params_II[1],params_II[2], params_II[3],params_II[4],params_II[5],\
+                     params_XAS[6],params_XAS[7],params_XAS[8],params_XAS[9])
+    
+    return out
+
 
 def lor(x,sig,x0,a):
     

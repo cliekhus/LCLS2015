@@ -5,6 +5,7 @@ $ cat .gitignore
 *.gif
 *.docx
 *.bmp
+*.pyc
 /__pycache__
 /Figures
 /Starting_Code
