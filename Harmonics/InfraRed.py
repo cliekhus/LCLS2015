@@ -47,10 +47,13 @@ plt.figure()
 ax = plt.subplot(111)
 ax.stem(wavenumbers, intensities, markerfmt = 'none', basefmt='none', linefmt='b')
 ax.plot(wn, amp, 'k')
-ax.set_xlim([0,400])
-ax.set_ylim([0,.08])
+#ax.set_xlim([0,400])
+ax.set_xlim([2000,2350])
+#ax.set_ylim([0,.08])
 
-maxfreq = 400
+#maxfreq = 400
+
+maxfreq = 2350
 
 intensities = intensities[wavenumbers <= maxfreq]
 wavenumbers = wavenumbers[wavenumbers <= maxfreq]

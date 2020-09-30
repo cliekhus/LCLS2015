@@ -216,8 +216,8 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         peaksProDataM.XESDiff*100
         #plt.plot(TCentersM, Residualm, marker = 's', color = minuscolor, markersize = 3, linestyle = '--', label = str(peaksProDataM.EnergyLabel) +' eV')
         #plt.fill_between(TCentersM, Residualm-peaksProDataM.XESDiffE*100, Residualm+peaksProDataM.XESDiffE*100, alpha = 0.3)#, label = 'uncertainty')
-        plt.plot(TCentersM, peaksProDataM.XESDiff*100, marker = 's', color = minuscolor, markersize = 3, linestyle = 'none', label = str(peaksProDataM.EnergyLabel) +' eV', zorder = 0)
-        plt.errorbar(TCentersM, peaksProDataM.XESDiff*100, peaksProDataM.XESDiffE*100, marker = 's', color = minuscolor, markersize = 3, linestyle = 'none')
+        #plt.plot(TCentersM, peaksProDataM.XESDiff*100, marker = 's', color = minuscolor, markersize = 3, linestyle = 'none', label = str(peaksProDataM.EnergyLabel) +' eV', zorder = 0)
+        plt.errorbar(TCentersM, peaksProDataM.XESDiff*100, peaksProDataM.XESDiffE*100, marker = 's', color = minuscolor, markersize = 3, linestyle = 'none', label = str(peaksProDataM.EnergyLabel) +' eV', zorder = 0)
         
         
         #Fit, time, paramsR, cov, RR = fitXESsine(TCentersM, Residualm, ploton)
@@ -227,15 +227,15 @@ def makeTimePlotSubPlot_LCLS(FeIIEnergy, FeIISignal, StaticEnergy, StaticS, Stat
         Fit = Fit[time>paramsR[3]]
         glft = np.array(globalconvolved(tt, params[0], params[1], params[3], params[5], 0))*100 + \
                  np.array(globalconvolved(tt, params[0], params[1], params[7], params[9], 0))*100
-        plt.plot(time, glft, color = minuscolor, linestyle = '--', label = 'decay fit', zorder = 2)
+        plt.plot(time, glft, color = pluscolor2, linestyle = '--', linewidth = 2, label = 'decay fit', zorder = -100)
         glft = glft[time>paramsR[3]]
         time = time[time>paramsR[3]]
         
         
         SE = 1.96*np.sqrt(1/(len(RR)-2)*np.sum(RR**2))
         
-        plt.plot(time, Fit+ glft, color = '#c70039', label = 'cosine fit', zorder = 100)
-        plt.fill_between(time, Fit + glft+SE, Fit+glft-SE, color = '#c70039', label = 'pred. int.', alpha = 0.3)#, label = 'uncertainty')
+        plt.plot(time, Fit+ glft, color = '#c70039', label = 'cosine fit', linewidth = 2, zorder = 100)
+        #plt.fill_between(time, Fit + glft+SE, Fit+glft-SE, color = '#c70039', label = 'pred. int.', alpha = 0.3)#, label = 'uncertainty')
 
         
         

@@ -28,15 +28,17 @@ for ii in range(len(holedensity)):
     Croots[:,ii] = roots[5:, 0]
     Camps[:,ii] = roots[5:, 1]
 
-plt.figure()
+plt.figure(figsize = (7.5,8))
 
 for ii in range(len(colorchoice)*len(linechoice)):
     plt.plot(holedensity, Croots[ii,:], color = colorchoice[ii%len(colorchoice)], linestyle = linechoice[ii//len(colorchoice)], label = 'root {}'.format(ii))
     for jj in range(len(holedensity)):
-        plt.scatter(holedensity[jj], Croots[ii,jj], s = Camps[ii,jj]*100000000, color = colorchoice[ii%len(colorchoice)], alpha = 0.5)
+        plt.scatter(holedensity[jj], Croots[ii,jj], s = Camps[ii,jj]*100000000, color = colorchoice[ii%len(colorchoice)], alpha = 0.3)
     
 plt.legend()
-plt.xlim([0,1])
+plt.xlim([0,1.2])
+plt.xlabel('iron hole density')
+plt.ylabel('unshifted C peak energy (eV)')
 #plt.figure()
 
 #for ii in range(95):

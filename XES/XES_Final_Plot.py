@@ -88,7 +88,7 @@ MaxTimePlots = 1400
 
 FPlots = False
 
-makeTimePlotSubPlot(FeIIIEnergy, FeIIISignal, FeIIEnergy, FeIISignal, TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, True, True)
+makeTimePlotSubPlot(FeIIIEnergy, FeIIISignal, FeIIEnergy, FeIISignal, TCentersPF, TCentersP2F, TCentersMF, peaksProDataPF_boot, peaksProDataP2F_boot, peaksProDataMF_boot, MinTimePlots, MaxTimePlots, 0, FPlots, True)
 
 StaticS = savgol_filter((static.XESOn_Norm - static.XESOff_Norm)/static.XESOff_Norm*100, 5,3)
 StaticEr = np.sqrt(static.Error_On**2+static.Error_On**2)/static.XESOff_Norm*100
