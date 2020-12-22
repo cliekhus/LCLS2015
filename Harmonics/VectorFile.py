@@ -5,7 +5,7 @@ Created on Thu Mar  5 13:10:17 2020
 @author: chels
 """
 
-def VectorFile(number, wavenumber, D3, savename, legend):
+def VectorFile(number, wavenumber, D3, savename, legend, file):
         
     import numpy as np
     import matplotlib.pyplot as plt
@@ -27,7 +27,7 @@ def VectorFile(number, wavenumber, D3, savename, legend):
     folder = "C:/Users/chelsea/OneDrive/Documents/UW/Mixed-Valence-Complexes/LCLS2015/Harmonics/FeRu-freq-xyzs/"
     
     f = open(folder+'freq.m-' + str(int(number)).zfill(3) + '.xyz', 'r')
-    
+
     contents = f.read()
     
     data = contents.split('    34\n geometry\n')
@@ -46,12 +46,12 @@ def VectorFile(number, wavenumber, D3, savename, legend):
             if ii == 0:
                 atoms = atoms + [pos[0]]
     
-    
     ###########################################
     #Pick which atoms you want to form basis vectors out of.
     Fepos = atoms.index('Fe')
     Rupos = atoms.index('Ru')
     Cpos = atoms[4:].index('C')
+
     
     PA = frames[0,Rupos,:]-frames[0,Fepos,:]
     PA = PA/(PA.dot(PA))**.5
@@ -71,11 +71,12 @@ def VectorFile(number, wavenumber, D3, savename, legend):
             framesp[ii,jj,2] = frames[ii,jj,:].dot(PA2)
     
     
-    fig = plt.figure(figsize = (3,3))
+    fig = plt.figure(figsize = (1.5,1.5))
     if D3:
         ax = fig.add_subplot(111, projection='3d')
     else:
         ax = fig.add_subplot(111)
+    
     
     ###################################
     #Put in your color choices here
@@ -287,7 +288,119 @@ def VectorFile(number, wavenumber, D3, savename, legend):
 
         
 
+    ######################################
+    #mult controls the relative vector size
+    mult = 100
+
+    for jj in range(len(frame)-1):
         
+        D21 = framesp[frameNum,jj,:].dot(x1)
+        D22 = framesp[frameNum,jj,:].dot(x2)
+        D23 = framesp[frameNum,jj,:].dot(x3)
+        
+        
+        D21p = framesp[frameNum+5,jj,:].dot(x1)
+        D22p = framesp[frameNum+5,jj,:].dot(x2)
+        D23p = framesp[frameNum+5,jj,:].dot(x3)
+        
+        if atoms[jj] == 'Fe':
+            Fe_pos = np.array([D21, D22, D23])
+            Fe_pos_p = np.array([D21p, D22p, D23p])
+            
+        if atoms[jj] == 'Ru':
+            Ru_pos = np.array([D21, D22, D23])
+            Ru_pos_p = np.array([D21p, D22p, D23p])
+            
+        if jj == Cpos+0:
+            C0_pos = np.array([D21, D22, D23])
+            C0_pos_p = np.array([D21p, D22p, D23p])
+        
+        if jj == Cpos+2:
+            C1_pos = np.array([D21, D22, D23])
+            C1_pos_p = np.array([D21p, D22p, D23p])
+        
+        if jj == Cpos+4:
+            C2_pos = np.array([D21, D22, D23])
+            C2_pos_p = np.array([D21p, D22p, D23p])
+            
+        if jj == Cpos+6:
+            C3_pos = np.array([D21, D22, D23])
+            C3_pos_p = np.array([D21p, D22p, D23p])
+            
+        if jj == Cpos+8:
+            C4_pos = np.array([D21, D22, D23])
+            C4_pos_p = np.array([D21p, D22p, D23p])
+            
+        if jj == Cpos+10:
+            C5_pos = np.array([D21, D22, D23])
+            C5_pos_p = np.array([D21p, D22p, D23p])
+            
+        #print(atoms[jj])
+        #print(jj)
+        
+        distance = np.sqrt((D21p-D21)**2 + (D22p-D22)**2 + (D23p-D23)**2)
+        
+        #print(distance)
+        
+    FeRu_dist = np.sqrt(np.sum((Fe_pos-Ru_pos)**2))
+    FeRu_p_dist = np.sqrt(np.sum((Fe_pos_p-Ru_pos_p)**2))
+    delta_FeRu = np.sqrt(np.sum((Fe_pos-Ru_pos-Fe_pos_p+Ru_pos_p)**2))
+    
+    FeC0_dist = np.sqrt(np.sum((Fe_pos-C0_pos)**2))
+    FeC0_p_dist = np.sqrt(np.sum((Fe_pos_p-C0_pos_p)**2))
+    delta_FeC0 = np.sqrt(np.sum((Fe_pos-C0_pos-Fe_pos_p+C0_pos_p)**2))
+    
+    FeC1_dist = np.sqrt(np.sum((Fe_pos-C1_pos)**2))
+    FeC1_p_dist = np.sqrt(np.sum((Fe_pos_p-C1_pos_p)**2))
+    delta_FeC1 = np.sqrt(np.sum((Fe_pos-C1_pos-Fe_pos_p+C1_pos_p)**2))
+    
+    FeC2_dist = np.sqrt(np.sum((Fe_pos-C2_pos)**2))
+    FeC2_p_dist = np.sqrt(np.sum((Fe_pos_p-C2_pos_p)**2))
+    delta_FeC2 = np.sqrt(np.sum((Fe_pos-C2_pos-Fe_pos_p+C2_pos_p)**2))
+    
+    FeC3_dist = np.sqrt(np.sum((Fe_pos-C3_pos)**2))
+    FeC3_p_dist = np.sqrt(np.sum((Fe_pos_p-C3_pos_p)**2))
+    delta_FeC3 = np.sqrt(np.sum((Fe_pos-C3_pos-Fe_pos_p+C3_pos_p)**2))
+    
+    FeC4_dist = np.sqrt(np.sum((Fe_pos-C4_pos)**2))
+    FeC4_p_dist = np.sqrt(np.sum((Fe_pos_p-C4_pos_p)**2))
+    delta_FeC4 = np.sqrt(np.sum((Fe_pos-C4_pos-Fe_pos_p+C4_pos_p)**2))
+    
+    FeC5_dist = np.sqrt(np.sum((Fe_pos-C5_pos)**2))
+    FeC5_p_dist = np.sqrt(np.sum((Fe_pos_p-C5_pos_p)**2))
+    delta_FeC5 = np.sqrt(np.sum((Fe_pos-C5_pos-Fe_pos_p+C5_pos_p)**2))
+    
+    
+    file.write(savename + " \n") 
+    
+    file.write('FeRudelta' + " \n")
+    file.write(str(abs(FeRu_dist-FeRu_p_dist)) + " \n")
+    file.write(str(delta_FeRu) + " \n")
+    
+    file.write('FeC0delta' + " \n")
+    file.write(str(abs(FeC0_dist-FeC0_p_dist)) + " \n")
+    file.write(str(delta_FeC0) + " \n")
+    
+    file.write('FeC1delta' + " \n")
+    file.write(str(abs(FeC1_dist-FeC1_p_dist)) + " \n")
+    file.write(str(delta_FeC1) + " \n")
+    
+    file.write('FeC2delta' + " \n")
+    file.write(str(abs(FeC2_dist-FeC2_p_dist)) + " \n")
+    file.write(str(delta_FeC2) + " \n")
+    
+    file.write('FeC3delta' + " \n")
+    file.write(str(abs(FeC3_dist-FeC3_p_dist)) + " \n")
+    file.write(str(delta_FeC3) + " \n")
+    
+    file.write('FeC4delta' + " \n")
+    file.write(str(abs(FeC4_dist-FeC4_p_dist)) + " \n")
+    file.write(str(delta_FeC4) + " \n")
+    
+    file.write('FeC5delta' + " \n")
+    file.write(str(abs(FeC5_dist-FeC5_p_dist)) + " \n")
+    file.write(str(delta_FeC5) + " \n\n")
+    
 
 
 

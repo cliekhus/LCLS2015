@@ -37,7 +37,7 @@ for ii in range(len(colorchoice)*len(linechoice)):
     
 plt.legend()
 plt.xlim([0,1.2])
-plt.xlabel('iron hole density')
+plt.xlabel('Fe hole charge')
 plt.ylabel('unshifted C peak energy (eV)')
 #plt.figure()
 

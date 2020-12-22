@@ -10,6 +10,8 @@ import h5py
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
+from matplotlib.cbook import get_sample_data
+from matplotlib.offsetbox import (TextArea, DrawingArea, OffsetImage, AnnotationBbox)
 
 
 pluscolor = '#009E73'
@@ -34,17 +36,65 @@ FeRu = np.array(APSName['/FeRu_RIXS'])
 
 incident_axis = 1000*np.array(APSName['/Fe_RIXS_incident_axis'])
 emitted_axis = 1000*np.array(APSName['/Fe_RIXS_emitted_axis'])
-xp,yp = np.meshgrid(emitted_axis,incident_axis)
+xp,yp = np.meshgrid(incident_axis,emitted_axis)
 
 incident_axis = incident_axis[:,0]
 
+
+kalpha_index = np.argmax(np.sum(FeIII, axis=0))
 plt.figure()
-plt.pcolor(xp, yp, FeIII)
+ax=plt.subplot(2,2,1)
+plt.pcolor(xp, yp, np.log(np.transpose(FeIII)))
+plt.arrow(7110, emitted_axis[:,kalpha_index][0], 14, 0, head_width = 3, head_length=1, color = 'w')
+plt.text(7107.5, 6403, r'k$\alpha_1$', color = 'w')
+plt.text(7107.5, 6390, r'k$\alpha_2$', color = 'w')
+plt.xlim([7107,7125])
+plt.ylim([6380,6415])
+plt.xlabel('incident x-ray energy (eV)')
+plt.ylabel('emitted energy (eV)')
+
+ax=plt.subplot(2,2,3)
+FeIII_XANES = np.sum(FeIII, axis = 1)
+plt.plot(incident_axis, (FeIII_XANES-min(FeIII_XANES))/np.sum(FeIII_XANES)*100)
+plt.xlim([7107,7125])
+plt.xlabel('incident x-ray energy (eV)')
+plt.ylabel('XANES')
+
+ax=plt.subplot(2,2,2)
+HERFD_III = FeIII[:,kalpha_index]/np.sum(FeIII)*100
+plt.plot(incident_axis, HERFD_III)
+plt.xlim([7107,7125])
+plt.xlabel('incident x-ray energy (eV)')
+plt.ylabel('HERFD-XANES')
+# =============================================================================
+# 
+# ax=plt.subplot(2,2,4)
+# with get_sample_data("C:/Users/chelsea/OneDrive/Documents/UW/Mixed-Valence-Complexes/LCLS2015/Figures/FeMOs.pdf") as file:
+#     arr_img = plt.imread(file, format='pdf')
+# 
+# imagebox = OffsetImage(arr_img, zoom=.25)
+# imagebox.image.axes = ax
+# 
+# ab = AnnotationBbox(imagebox, [0.5,0.5],
+#                     xybox=(0, 0),
+#                     xycoords='data',
+#                     boxcoords="offset points",
+#                     pad=0.5,
+#                     arrowprops=dict(
+#                         arrowstyle="->",
+#                         connectionstyle="angle,angleA=0,angleB=90,rad=3")
+#                     )
+# 
+# ax.add_artist(ab)
+# =============================================================================
+
+plt.tight_layout()
+
 
 plt.figure()
 plt.plot(emitted_axis[0], np.sum(FeIII, axis=0), marker='.')
 
-plt.xlabel('emitted energy (keV)')
+plt.xlabel('emitted energy (eV)')
 plt.ylabel('emittance')
 
 APSXASNorm = np.sum(FeRu, axis = 1)
@@ -68,7 +118,7 @@ ax=plt.subplot(2,1,1)
 plt.plot(incident_axis, APSXASNorm, marker='', label='experiment', color = minuscolor, linewidth = 2, linestyle = '--')
 plt.xlim([7107,7125])
 plt.ylim([0,1])
-plt.xlabel('incident x-ray energy (keV)')
+plt.xlabel('incident x-ray energy (eV)')
 plt.ylabel('XANES (arb. units)')
 plt.legend()
 
@@ -77,7 +127,7 @@ plt.plot(calc[:,0]+Eoff+shift, calc[:,1]*scale, color = red, label = 'calculated
 plt.stem(roots[:,0]+Eoff+shift, roots[:,1]*scale/30, markerfmt = 'none', basefmt='none', linefmt=red)
 plt.xlim([round(7107),round(7125)])
 plt.ylim([0,1])
-plt.xlabel('incident x-ray energy (keV)')
+plt.xlabel('incident x-ray energy (eV)')
 plt.ylabel('XANES (arb. units)')
 plt.legend()
 
@@ -93,9 +143,28 @@ plt.plot(incident_axis, HERFD_FeRu, marker = '', label = r'FeRu', color = plusco
 plt.plot(calc[:,0]+Eoff+shift, calc[:,1]*scale, color = red, label = 'calculated', zorder = -100)
 plt.stem(roots[:,0]+Eoff+shift, roots[:,1]*scale/30, markerfmt = 'none', basefmt='none', linefmt=red)
 plt.xlim([7107,7125])
-plt.xlabel('incident x-ray energy (keV)')
+plt.xlabel('incident x-ray energy (eV)')
 plt.ylabel('HERFD-XANES (arb. units)')
 plt.legend()
+plt.tight_layout()
+
+plt.rcParams.update({'font.size': 14})
+fig, ax = plt.subplots(figsize = (6.5,4))
+plt.subplot(1,2,1)
+plt.plot(incident_axis[incident_axis < 7124], HERFD_II[incident_axis < 7124], marker = '', color = pluscolor, linestyle = '-', linewidth = 2)
+plt.xlim([7107,7124])
+plt.xticks(np.arange(7107, 7124, 5))
+plt.ylabel('HERFD-XANES (arb. units)')
+plt.title(r'$[$Fe$^{\mathrm{II}}$(CN)$_6]^{4-}$')
+plt.subplot(1,2,2)
+plt.plot(incident_axis, HERFD_III, marker = '', color = minuscolor, linewidth = 2, linestyle = '-')
+plt.title(r'$[$Fe$^{\mathrm{III}}$(CN)$_6]^{3-}$')
+plt.xlim([7107, 7124])
+plt.xticks(np.arange(7107, 7124, 5))
+fig.add_subplot(111, frameon=False)
+# hide tick and tick label of the big axis
+plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+plt.xlabel('incident x-ray energy (eV)')
 plt.tight_layout()
 
 

@@ -72,7 +72,14 @@ plt.ylim([0,100])
 plt.xlim([0,500])
 
 
+Filter = np.array(Freq) < 250
+FTFiltered = FT*Filter
+Reconstructed = np.fft.irfft(FTFiltered)
 
+print((np.max(Reconstructed)-np.min(Reconstructed))/2)
+
+plt.figure()
+plt.plot()
 
 
 
@@ -88,6 +95,7 @@ makeSpectralPlot(calc[:,5], calc[:,0], 50, 500, True)
 plt.figure()
 plt.subplot(211)
 plt.plot(calc[:,0], np.array(calc[:,5])-np.mean(calc[:,5]))
+#plt.plot(calc[:,0], Reconstructed)
 plt.ylabel('$\Delta$ 2p-1s (eV)')
 plt.xlabel('time (fs)')
 
@@ -96,8 +104,10 @@ plt.xlabel('time (fs)')
 #ax = plt.subplot2grid((10,1), (0,0), colspan = 1, rowspan = 7)
 plt.subplot(212)
 plt.plot(Freq, abs(FT), color='k')
-plt.ylim([0,60])
+#plt.plot(Freq, abs(FTFiltered))
+#plt.ylim([0,60])
 plt.xlim([0,500])
+#plt.xlim([0,3000])
 plt.xlabel('frequency (cm$^{-1}$)')
 plt.ylabel('oscillation strength')
 plt.tight_layout()
@@ -148,7 +158,36 @@ plt.legend()
 
 
 
+###################### For slides #############################################
 
+
+pluscolor = '#009E73'
+minuscolor = '#0072b2'
+pluscolor2 = '#e69f00'
+red = '#c70039'
+darkred = '#8c0028'
+darkerred = '#64001c'
+
+plt.rcParams.update({'font.size': 14})
+plt.figure(figsize = (10,5))
+plt.subplot(211)
+plt.plot(calc[:,0], np.array(calc[:,5])-np.mean(calc[:,5]), color = 'k')
+plt.plot(calc[:,0], Reconstructed, color = red, linewidth = 3)
+plt.ylabel('$\Delta$ 2p-1s (eV)')
+plt.xlabel('time (fs)')
+
+#gridspec.GridSpec(10,1)
+
+#ax = plt.subplot2grid((10,1), (0,0), colspan = 1, rowspan = 7)
+plt.subplot(212)
+plt.plot(Freq, abs(FT), color='k')
+plt.plot(Freq, abs(FTFiltered), color = red, linewidth = 3)
+#plt.ylim([0,60])
+#plt.xlim([0,500])
+plt.xlim([0,3000])
+plt.xlabel('frequency (cm$^{-1}$)')
+plt.ylabel('oscillation strength')
+plt.tight_layout()
 
 
 

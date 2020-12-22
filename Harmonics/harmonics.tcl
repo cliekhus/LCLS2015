@@ -2,7 +2,7 @@
 #mol addfile C://Users/chels/OneDrive/Documents/UW/Mixed-Valence-Complexes/LCLS2015/UVVIS/feru-uvvis-5.cube
 display resize 1000 800
 #display height 1.1
-display height 2.3
+display height 3.3
 display cuemode Exp2
 display cuedensity 0.2
 color Display Background white
@@ -23,23 +23,18 @@ color change rgb orange3 1 0.89 0
 color change rgb violet2 0.42 0 0.93
 color change rgb green2 0.21 0.86 0.15
 mol modcolor 0 top Element
-mol modstyle 0 top Licorice {0.1 100 100}
+#mol modstyle 0 top Licorice {0.1 100 100}
+mol modstyle 0 top CPK {0.7 0.4 100 100}
 mol modmaterial 0 top Edgy
 mol addrep top
-mol modstyle 1 top Isosurface {2e8 0 0 0}
-mol modcolor 1 top ColorID 26
+mol modstyle 1 top DynamicBonds {2.2 0.1 100}
+mol modcolor 1 top Element
 mol modmaterial 1 top Edgy
-mol addrep top
-mol modstyle 2 top Isosurface {-2e8 0 0 0}
-mol modcolor 2 top ColorID 19
-mol modmaterial 2 top Edgy
-mol addrep top
-mol modstyle 3 top DynamicBonds {2.2 0.1 100}
-mol modcolor 3 top Element
-mol modmaterial 3 top Edgy
-mol modselect 3 top "not name H"
-#rotate z by 5
-#rotate x by 5
+mol modselect 1 top "not name H"
+rotate z by -10
+rotate x by 5
+rotate y by 40
+translate to .15 0 0
 light 0 on
 light 1 on
 light 2 on

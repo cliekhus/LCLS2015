@@ -29,7 +29,7 @@ MaxTime = 30
 if ReEnterData:
 
     FileNums = [106]
-    xesRawData = loadData(FileNums, "XES", 2)
+    xesRawData = loadData(FileNums, "XES", 1)
 
 if ReLoadData:
 

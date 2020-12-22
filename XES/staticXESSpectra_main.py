@@ -19,7 +19,7 @@ folder = "D://LCLS_Data/LCLS_python_data/XES_Spectra/"
 ReEnterData = True
 FPlots = False
 ReLoadData = False
-SaveData = True
+SaveData = False
 
 MinTime = -100
 MaxTime = 100
