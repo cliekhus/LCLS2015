@@ -23,7 +23,7 @@ darkerred = '#64001c'
 
 Eoff = 143.6
 shift = 1.14
-file = 'C:/Users/chelsea/OneDrive/Documents/UW/Mixed-Valence-Complexes/LCLS2015/XAS/simulation/feru-series-2-10'
+file = 'simulation/feru-series-2-10'
 
 calc = np.loadtxt(file+'.dat')
 roots = np.loadtxt(file+'.roots')

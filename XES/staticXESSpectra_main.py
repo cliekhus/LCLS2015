@@ -16,9 +16,9 @@ import time
 import datetime
 
 folder = "D://LCLS_Data/LCLS_python_data/XES_Spectra/"
-ReEnterData = True
+ReEnterData = False
 FPlots = False
-ReLoadData = False
+ReLoadData = True
 SaveData = False
 
 MinTime = -100

@@ -23,8 +23,8 @@ def VectorFile(number, wavenumber, D3, savename, legend, file):
     x3 = np.array([-sin(theta), sin(phi)*cos(theta), cos(phi)*cos(theta)])
     
     #########################################
-    #Obviously you'll want to adjust this line
-    folder = "C:/Users/chelsea/OneDrive/Documents/UW/Mixed-Valence-Complexes/LCLS2015/Harmonics/FeRu-freq-xyzs/"
+    
+    folder = "FeRu-freq-xyzs/"
     
     f = open(folder+'freq.m-' + str(int(number)).zfill(3) + '.xyz', 'r')
 
@@ -72,6 +72,7 @@ def VectorFile(number, wavenumber, D3, savename, legend, file):
     
     
     fig = plt.figure(figsize = (1.5,1.5))
+    #fig = plt.figure(figsize = (4,4))
     if D3:
         ax = fig.add_subplot(111, projection='3d')
     else:
