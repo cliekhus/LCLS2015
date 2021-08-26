@@ -192,11 +192,14 @@ FitOuts['CmBunc'] = np.sqrt((Fe_Fits['cov_FeRu'][2])**2+(Fe_Fits['cov_FeRu'][1])
 plt.figure(figsize = (7,5))
 
 
+energy_shift = Fe_Fits['energy_shift']
+energies = np.delete(xasProData_one.EnergyPlot,-4) - energy_shift
+
 Cmax = np.max(xasProData_one.XASOff_Norm[xasProData_one.EnergyPlot < 7118.5])-np.mean(xasProData_one.XASOff_Norm[xasProData_one.EnergyPlot < 7112.8])
 HERFDmax = np.max(HERFD_FeRu[incident_axis < 7118.5])
 
 ax = plt.subplot2grid((10,2), (0,0), colspan = 1, rowspan = 2)
-plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(xasProData_one.XASOff_Norm,-4), np.delete(xasProData_one.Error_Off,-4), color = 'k', label = 'FeRu')
+plt.errorbar(energies, np.delete(xasProData_one.XASOff_Norm,-4), np.delete(xasProData_one.Error_Off,-4), color = 'k', label = 'FeRu')
 plt.plot(incident_axis, (HERFD_II)*Cmax/HERFDmax, linewidth = 2, color = pluscolor2, linestyle = ':', label = 'FeII')
 plt.plot(incident_axis, (HERFD_III)*Cmax/HERFDmax, linewidth = 2, color = pluscolor2, linestyle = '--', label = 'FeIII')
 plt.text(7111, 900, 'A')
@@ -221,7 +224,7 @@ params_FeRu = Fe_Fits["params_FeRu"]
 #plt.plot([-100, -1000], [1,1], color = 'k', label = 'FeRu GS, LCLS')
 #plt.plot([-100, -1000], [1,1], linewidth = 2, color = minuscolor, linestyle = ':', label = r'Fe$^{\mathrm{II}}$(CN)$_6$ GS, APS')
 #plt.plot([-100, -1000], [1,1], linewidth = 2, color = minuscolor, linestyle = '--', label = r'Fe$^{\mathrm{III}}$(CN)$_6$ GS, APS')
-plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(XASDiffBootF,-4), np.delete(XASDiffBootE,-4), \
+plt.errorbar(energies, np.delete(XASDiffBootF,-4), np.delete(XASDiffBootE,-4), \
              marker='.', label = str(MinTime) + ' to ' + str(MaxTime) + ' fs delay', color = 'k',zorder=10, linestyle = ':')
 
 plt.xlabel('x-ray energy (eV)')
@@ -272,7 +275,7 @@ IMax = np.argmax(Bmpp)
 XXB = XX[IMax]
 
 Fit,Params,ParamsA,ParamsB,Paramsc,cova,covb,covc = \
-        fitXASPiecewiseGauss(np.delete(xasProData_one.EnergyPlot,-4), np.delete(XASDiffBootF,-4), np.delete(xasProData_one.XASOff_Norm,-4), np.delete(xasProData_one.XASOn_Norm,-4), False)
+        fitXASPiecewiseGauss(energies, np.delete(XASDiffBootF,-4), np.delete(xasProData_one.XASOff_Norm,-4), np.delete(xasProData_one.XASOn_Norm,-4), False)
 
 
 #shift = FitOuts['Ax0']-XXA
@@ -297,7 +300,7 @@ plt.tight_layout()
 
 
 ax = plt.subplot2grid((10,2), (0,1), colspan = 1, rowspan = 2)
-plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(xasProData_one.XASOff_Norm,-4), np.delete(xasProData_one.Error_Off,-4), color = 'k')
+plt.errorbar(energies, np.delete(xasProData_one.XASOff_Norm,-4), np.delete(xasProData_one.Error_Off,-4), color = 'k')
 plt.plot(incident_axis, HERFD_FeRu*Cmax/HERFDmax, linewidth = 2, color = minuscolor, linestyle = '-.')
 plt.text(7111, 900, 'A')
 plt.text(7113.8, 1250, 'B')
@@ -323,7 +326,7 @@ params_FeRu = Fe_Fits["params_FeRu"]
 plt.plot(xall, diffxas(xall, *params_FeRu)*Cmax/HERFDmax*.2, label = 'reconstruction', linewidth = 3, color = pluscolor, zorder = -1000)
 #plt.fill_between(xA, FitOuts['Aoff']-xA*FitOuts['Aslope'], gauswslope(xA,FitOuts['Asig'],FitOuts['Ax0'],FitOuts['Aa'],FitOuts['Aoff'],FitOuts['Aslope']), label = 'A peak: ' + str(round(FitOuts['Ax0'],1)) + ' eV', linewidth = 5, color = pluscolor2,zorder=1)
 #plt.fill_between(xB, FitOuts['Boff']-xB*FitOuts['Bslope'], gauswslope(xB,FitOuts['Bsig'],FitOuts['Bx0'],FitOuts['Ba'],FitOuts['Boff'],FitOuts['Bslope']), label = 'B peak: ' + str(round(FitOuts['Bx0'],1)) + ' eV', linewidth = 5, color = pluscolor,zorder=2)
-plt.errorbar(np.delete(xasProData_one.EnergyPlot,-4), np.delete(XASDiffBootF,-4), np.delete(XASDiffBootE,-4), \
+plt.errorbar(energies, np.delete(XASDiffBootF,-4), np.delete(XASDiffBootE,-4), \
              marker='.', label = str(MinTime) + ' to ' + str(MaxTime) + ' fs delay', color = 'k', linestyle = ':', zorder = 1000)
 plt.xlabel('x-ray energy (eV)')
 plt.ylabel('$\Delta$ HERFD-XANES (arb. units.)')
@@ -339,14 +342,19 @@ plt.xticks(np.arange(7110, 7123, 2.0))
 
 
 
-
-
-
+yvals = np.delete(XASDiffBootF,-4)
+print('adjusted R2')
+RSS = np.sum((diffxas(energies, *params_FeRu)*Cmax/HERFDmax*.2-yvals)**2)
+TSS = np.sum((yvals - np.mean(yvals))**2)
+adjR2 = 1-(RSS/(len(energies)-len(params_FeRu)-1))/(TSS/(len(energies-1)))
+print(adjR2)
 
 print('scale factor')
 print(Cmax/HERFDmax*.2)
 print(Cmax/HERFDmax)
 
+
+print('approx exc frac')
 
 
 

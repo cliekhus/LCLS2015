@@ -70,6 +70,11 @@ plt.plot(incident_axis, HERFD_FeRu)
 params_II, cov_II = curve_fit(xasoff, incident_axis, HERFD_FeRu, p0 = [sigBS,BS,x0BS, sigCS,CS,x0CS, offsetS,erfampS,erfslopeS,peakS])
 plt.plot(incident_axis, xasoff(incident_axis, *params_II))
 
+plt.figure()
+plt.plot(incident_axis, HERFD_II)
+params_FeII, cov_FeII = curve_fit(xasoff, incident_axis, HERFD_II, p0 = [sigBS,BS,x0BS, sigCS,CS,x0CS, offsetpS,erfamppS,erfslopepS,peakpS])
+plt.plot(incident_axis, xasoff(incident_axis, *params_FeII))
+
 
 plt.figure()
 plt.plot(incident_axis, HERFD_III)
@@ -87,38 +92,37 @@ plt.plot(incident_axis, xasoff(incident_axis, *params_XAS))
 
 
 
-Fe_Fits = {"params_II": params_II, "params_III": params_III, "params_XAS": params_XAS}
+energy_shift = params_XAS[2]-params_II[2]
+#params_XAS[2] = params_XAS[2]-energy_shift
+#params_XAS[5] = params_XAS[5]-energy_shift
+#params_XAS[9] = params_XAS[9]-energy_shift
 
-with open(folder + "Fe_fits.pkl", "wb") as f:
-    pickle.dump(Fe_Fits, f)
-
-
-energy = np.delete(xasProData_one.EnergyPlot,-4)
+energy = np.delete(xasProData_one.EnergyPlot,-4) - energy_shift
 diff = np.delete(XASDiffBootF,-4)
 
 plt.figure()
-plt.plot(energy, diff/11087.2, label = 'data')
+plt.plot(energy, diff/15801, label = 'data')
 #plt.plot(energy, diffxas(energy, x0AdS, x0BdS, x0CdS, peakdS))
 
-params_FeRu, cov_FeRu = curve_fit(diffxas, energy, diff/15801, p0 = [x0AdS, x0BdS, x0CdS, peakdS, 1])
+params_FeRu, cov_FeRu = curve_fit(diffxas, energy, diff/15801, p0 = [x0AdS, x0BdS, x0CdS, 1, 0, 0])
 
 
-Fe_Fits = {"params_II": params_II, "params_III": params_III, "params_XAS": params_XAS, "params_FeRu": params_FeRu, "cov_FeRu": np.sqrt(np.diag(cov_FeRu))}
+Fe_Fits = {"params_II": params_II, "params_III": params_III, "params_XAS": params_XAS, "params_FeRu": params_FeRu, "cov_FeRu": np.sqrt(np.diag(cov_FeRu)), 'energy_shift': energy_shift}
 
 with open(folder + "Fe_fits.pkl", "wb") as f:
     pickle.dump(Fe_Fits, f)
 
 
 plt.plot(incident_axis, diffxas(incident_axis, *params_FeRu), label = 'fit')
-plt.plot(incident_axis, xason(incident_axis, 0,0,0, 0,0,0, 0,0,0, params_XAS[6],params_XAS[7],params_XAS[8],params_FeRu[3])-\
-         xasoff(incident_axis, 0,0,0, 0,0,0, params_XAS[6],params_XAS[7],params_XAS[8],params_XAS[9]), label = 'diff base')
-plt.plot(incident_axis, xason(incident_axis, 0,0,0, 0,0,0, 0,0,0, params_XAS[6],params_XAS[7],params_XAS[8],params_FeRu[3]), label = 'ES base')
-plt.plot(incident_axis, xasoff(incident_axis, 0,0,0, 0,0,0, params_XAS[6],params_XAS[7],params_XAS[8],params_XAS[9]), label = 'GS base')
-plt.plot(incident_axis, xason(incident_axis, params_III[0],params_III[1]*params_FeRu[4],params_FeRu[0], 0,0,0, 0,0,0, 0,0,0,0), label = 'A peak')
-plt.plot(incident_axis, xason(incident_axis, 0,0,0, params_III[3],params_III[4]*params_FeRu[4],params_FeRu[1], 0,0,0, 0,0,0,0), label = 'B peak')
-plt.plot(incident_axis, xason(incident_axis, 0,0,0, 0,0,0, params_III[6],params_III[7]*params_FeRu[4],params_FeRu[2], 0,0,0,0), label = 'C peak')
+plt.plot(incident_axis, xason(incident_axis, params_III[0],params_III[1],params_FeRu[0], 
+                              params_III[3],params_III[4],params_FeRu[1], 
+                              params_III[6],params_III[7],params_FeRu[2], 0,0,0,0)*params_FeRu[4], label = 'excited state')
 plt.xlabel('incident energy (eV)')
 plt.ylabel('difference HERFD')
 plt.legend()
 plt.tight_layout()
 
+
+print('aprox exfrac')
+exfrac = (params_III[7]*params_FeRu[3]*15801)/(params_XAS[4]*79006)
+print(exfrac)
