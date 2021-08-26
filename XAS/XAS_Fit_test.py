@@ -104,7 +104,7 @@ plt.figure()
 plt.plot(energy, diff/15801, label = 'data')
 #plt.plot(energy, diffxas(energy, x0AdS, x0BdS, x0CdS, peakdS))
 
-params_FeRu, cov_FeRu = curve_fit(diffxas, energy, diff/15801, p0 = [x0AdS, x0BdS, x0CdS, 1, 0, 0])
+params_FeRu, cov_FeRu = curve_fit(diffxas, energy, diff/15801, p0 = [x0AdS, x0BdS, x0CdS, 1, 0, 0, 0])
 
 
 Fe_Fits = {"params_II": params_II, "params_III": params_III, "params_XAS": params_XAS, "params_FeRu": params_FeRu, "cov_FeRu": np.sqrt(np.diag(cov_FeRu)), 'energy_shift': energy_shift}
