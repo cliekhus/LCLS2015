@@ -104,7 +104,7 @@ plt.figure()
 plt.plot(energy, diff/15801, label = 'data')
 #plt.plot(energy, diffxas(energy, x0AdS, x0BdS, x0CdS, peakdS))
 
-params_FeRu, cov_FeRu = curve_fit(diffxas, energy, diff/15801, p0 = [x0AdS, x0BdS, x0CdS, 1, 0, 0, 0])
+params_FeRu, cov_FeRu = curve_fit(diffxas, energy, diff/15801, p0 = [x0AdS, x0BdS, x0CdS, 1, 0, 0, 0, .001])
 
 
 Fe_Fits = {"params_II": params_II, "params_III": params_III, "params_XAS": params_XAS, "params_FeRu": params_FeRu, "cov_FeRu": np.sqrt(np.diag(cov_FeRu)), 'energy_shift': energy_shift}
@@ -114,7 +114,7 @@ with open(folder + "Fe_fits.pkl", "wb") as f:
 
 
 plt.plot(incident_axis, diffxas(incident_axis, *params_FeRu), label = 'fit')
-plt.plot(incident_axis, (xason(incident_axis, params_III[0],params_III[1],params_FeRu[0], params_III[3],params_III[4],params_FeRu[1], \
+plt.plot(incident_axis, (xason(incident_axis, params_III[0],params_FeRu[7],params_FeRu[0], params_III[3],params_III[4],params_FeRu[1], \
             params_III[6],params_III[7],params_FeRu[2], 0,0,0,0))*params_FeRu[3], label = 'excited state')
 plt.xlabel('incident energy (eV)')
 plt.ylabel('difference HERFD')
