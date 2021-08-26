@@ -42,7 +42,7 @@ def diffxas(x, x0A, x0B, x0C, amp, y0, a):
     
     out = (xason(x, params_III[0],params_III[1],x0A, params_III[3],params_III[4],x0B, \
             params_III[6],params_III[7],x0C, 0,0,0,0))*amp \
-            - xasoff(x,  params_XAS[0],params_XAS[1],params_XAS[2], params_XAS[3],params_XAS[4],params_XAS[5],\
+            - xasoff(x,  params_II[0],params_II[1],params_II[2], params_II[3],params_II[4],params_II[5],\
                      0,0,0,0) + y0+a*x
     
     return out

@@ -114,9 +114,8 @@ with open(folder + "Fe_fits.pkl", "wb") as f:
 
 
 plt.plot(incident_axis, diffxas(incident_axis, *params_FeRu), label = 'fit')
-plt.plot(incident_axis, xason(incident_axis, params_III[0],params_III[1],params_FeRu[0], 
-                              params_III[3],params_III[4],params_FeRu[1], 
-                              params_III[6],params_III[7],params_FeRu[2], 0,0,0,0)*params_FeRu[4], label = 'excited state')
+plt.plot(incident_axis, (xason(incident_axis, params_III[0],params_III[1],params_FeRu[0], params_III[3],params_III[4],params_FeRu[1], \
+            params_III[6],params_III[7],params_FeRu[2], 0,0,0,0))*params_FeRu[3], label = 'excited state')
 plt.xlabel('incident energy (eV)')
 plt.ylabel('difference HERFD')
 plt.legend()
@@ -124,5 +123,5 @@ plt.tight_layout()
 
 
 print('aprox exfrac')
-exfrac = (params_III[7]*params_FeRu[3]*15801)/(params_XAS[4]*79006)
+exfrac = (params_III[7]*params_FeRu[3]/params_II[4])*.2
 print(exfrac)
