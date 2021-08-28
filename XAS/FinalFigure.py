@@ -182,10 +182,10 @@ with open(folder + "APS_FeRu.pkl", "rb") as f:
 
 #Fe_Fits = {"params_II": params_II, "params_III": params_III, "params_XAS": params_XAS, "params_FeRu": params_FeRu, "cov_FeRu": np.sqrt(np.diag(cov_FeRu))}
 
-FitOuts['BmA'] = Fe_Fits['params_FeRu'][1]-Fe_Fits['params_FeRu'][0]
-FitOuts['BmAunc'] = np.sqrt((Fe_Fits['cov_FeRu'][1])**2+(Fe_Fits['cov_FeRu'][0])**2)
-FitOuts['CmB'] = Fe_Fits['params_FeRu'][2]-Fe_Fits['params_FeRu'][1]
-FitOuts['CmBunc'] = np.sqrt((Fe_Fits['cov_FeRu'][2])**2+(Fe_Fits['cov_FeRu'][1])**2)
+FitOuts['BmA'] = Fe_Fits['params_FeRu'][5]-Fe_Fits['params_FeRu'][2]
+FitOuts['BmAunc'] = np.sqrt((Fe_Fits['cov_FeRu'][5])**2+(Fe_Fits['cov_FeRu'][2])**2)
+FitOuts['CmB'] = Fe_Fits['params_FeRu'][8]-Fe_Fits['params_FeRu'][5]
+FitOuts['CmBunc'] = np.sqrt((Fe_Fits['cov_FeRu'][8])**2+(Fe_Fits['cov_FeRu'][5])**2)
 
 
 ####################### MAKE AB XANES DIFF PLOT #############################
