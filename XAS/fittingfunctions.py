@@ -21,7 +21,7 @@ def xason(x, sigA,aA,x0A, sigB,aB,x0B, sigC,aC,x0C, offset, erfamp, erfslope, pe
 
 
 
-def diffxas(x, sigA,aA,x0A, sigB,aB,x0B, x0C, y0,a):
+def diffxas(x, sigA,aA,x0A, sigB,aB,x0B, sigC,aC,x0C, y0,a, excfr):
     import numpy as np
     import pickle
     
@@ -32,16 +32,14 @@ def diffxas(x, sigA,aA,x0A, sigB,aB,x0B, x0C, y0,a):
     
     
     
-    params_II = Fe_fits["params_II"]
-    params_III = Fe_fits["params_III"]
     params_XAS = Fe_fits["params_XAS"]
     
     params_XAS[2] = params_XAS[2]-Fe_fits["energy_shift"]
     params_XAS[5] = params_XAS[5]-Fe_fits["energy_shift"]
     params_XAS[9] = params_XAS[9]-Fe_fits["energy_shift"]
     
-    out = xason(x, sigA,aA,x0A, sigB,aB,x0B, params_XAS[3],params_XAS[4],x0C, 0,0,0,0) \
-            - xasoff(x,  params_XAS[0],params_XAS[1],params_XAS[2], params_XAS[3],params_XAS[4],params_XAS[5],\
+    out = xason(x, sigA,aA,x0A, sigB,aB,x0B, sigC,aC,x0C, 0,0,0,0) \
+            - excfr*xasoff(x,  params_XAS[0],params_XAS[1],params_XAS[2], params_XAS[3],params_XAS[4],params_XAS[5],\
                      0,0,0,0) + y0+a*x
     
     return out

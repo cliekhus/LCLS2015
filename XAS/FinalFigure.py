@@ -50,6 +50,7 @@ def makeABpeak(Eoff, calc, roots, ploton, cc, lc, ls):
     sig=1.5
     Apeak = np.min(roots[:,0])+Eoff
     Aamp = roots[0,1]
+
     
     x = np.array(calc[:,0])+Eoff
     x = np.linspace(np.min(calc[:,0]), np.max(calc[:,0]), 10000)+Eoff
@@ -67,6 +68,7 @@ def makeABpeak(Eoff, calc, roots, ploton, cc, lc, ls):
     #Bpeak = Broots[np.argmax(Bamp)]+Eoff
     
     Bpeak = x[np.argmax(Bshape)]
+    Bampval = np.max(Bshape)
     
     Croots = np.array(roots[:,0])
     Camp = np.array(roots[:,1])
@@ -81,7 +83,7 @@ def makeABpeak(Eoff, calc, roots, ploton, cc, lc, ls):
     Cpeak3 = Croots[5]+Eoff
 
     
-    return Apeak, Bpeak, Cpeak1, Cpeak2, Cpeak3
+    return Apeak, Bpeak, Cpeak1, Cpeak2, Cpeak3, Aamp, Bampval
 
 
 
@@ -93,19 +95,23 @@ Bpeaks = []
 Cpeaks1 = []
 Cpeaks20 = []
 Cpeaks30 = []
+ABpeakratio = []
+BampVec = []
 
 for ii in range(len(holedensity)):
     
     calc = loadtxt(file+'2-'+str(int(holedensity[ii]*100))+'.dat')
     roots = loadtxt(file+'2-'+str(int(holedensity[ii]*100))+'.roots')
 
-    Apeak, Bpeak, Cpeak1, Cpeak2, Cpeak3 = makeABpeak(Eoff, calc, roots, ii%3==0, colorchoice[ii], str(holedensity[ii]), linestyle[ii])
+    Apeak, Bpeak, Cpeak1, Cpeak2, Cpeak3, Aamp, Bamp = makeABpeak(Eoff, calc, roots, ii%3==0, colorchoice[ii], str(holedensity[ii]), linestyle[ii])
     
     Apeaks += [Apeak]
     Bpeaks += [Bpeak]
     Cpeaks1 += [Cpeak1]
     Cpeaks20 += [Cpeak2]
     Cpeaks30 += [Cpeak3]
+    ABpeakratio += [Aamp/Bamp]
+    BampVec += [Bamp]
     
 
 Cpeaks2 = Cpeaks30[0:2]+Cpeaks20[2:]
@@ -178,6 +184,11 @@ with open(folder + "APS_FeRu.pkl", "rb") as f:
 
     
 
+params_II = Fe_Fits["params_II"]
+params_XAS = Fe_Fits["params_XAS"]
+print('scale factor')
+scale_factor = params_XAS[1]/params_II[1]
+print(scale_factor)
 
 
 #Fe_Fits = {"params_II": params_II, "params_III": params_III, "params_XAS": params_XAS, "params_FeRu": params_FeRu, "cov_FeRu": np.sqrt(np.diag(cov_FeRu))}
@@ -200,8 +211,8 @@ HERFDmax = np.max(HERFD_FeRu[incident_axis < 7118.5])
 
 ax = plt.subplot2grid((10,2), (0,0), colspan = 1, rowspan = 2)
 plt.errorbar(energies, np.delete(xasProData_one.XASOff_Norm,-4), np.delete(xasProData_one.Error_Off,-4), color = 'k', label = 'FeRu')
-plt.plot(incident_axis, (HERFD_II)*Cmax/HERFDmax, linewidth = 2, color = pluscolor2, linestyle = ':', label = 'FeII')
-plt.plot(incident_axis, (HERFD_III)*Cmax/HERFDmax, linewidth = 2, color = pluscolor2, linestyle = '--', label = 'FeIII')
+plt.plot(incident_axis, (HERFD_II)*scale_factor, linewidth = 2, color = pluscolor2, linestyle = ':', label = 'FeII')
+plt.plot(incident_axis, (HERFD_III)*scale_factor, linewidth = 2, color = pluscolor2, linestyle = '--', label = 'FeIII')
 plt.text(7111, 900, 'A')
 plt.text(7113.8, 1250, 'B')
 plt.text(7115.5, 1985, 'C')
@@ -229,7 +240,7 @@ plt.errorbar(energies, np.delete(XASDiffBootF,-4), np.delete(XASDiffBootE,-4), \
 
 plt.xlabel('x-ray energy (eV)')
 plt.ylabel('$\Delta$ HERFD-XANES (arb. units.)')
-plt.ylim([-550,185])
+plt.ylim([-400,185])
 plt.xlim([7110,7122])
 plt.xticks(np.arange(7110, 7123, 2.0))
 
@@ -251,7 +262,7 @@ Amp0 = np.zeros(np.shape(XX))
 for ii in range(len(roots[:,1])):
     Amp0 = Amp0 + roots[ii,1]/np.max(roots[:,1])/((XX-roots[ii,0])**2+(.5*width)**2)/math.pi/2*width
 
-choice = .75
+choice = .60
 #choice = 36
 roots = loadtxt(file+'2-'+str(round(choice*100))+'.roots')
 roots[:,0] = roots[:,0] + Eoff
@@ -284,10 +295,10 @@ Fit,Params,ParamsA,ParamsB,Paramsc,cova,covb,covc = \
 shift = Params[2]-Bpeaks[0]
 
 
+params_FeRu = Fe_Fits["params_FeRu"]
 
 
-
-plt.plot(incident_axis, (HERFD_III-HERFD_II)*Cmax/HERFDmax*.2, label = 'Fe$^{\mathrm{III}}$(CN)$_6$ - Fe$^{\mathrm{II}}$(CN)$_6$', linewidth = 3, color = pluscolor2, zorder=1)
+plt.plot(incident_axis, (HERFD_III-HERFD_II)*scale_factor*params_FeRu[-1], label = 'Fe$^{\mathrm{III}}$(CN)$_6$ - Fe$^{\mathrm{II}}$(CN)$_6$', linewidth = 3, color = pluscolor2, zorder=1)
 
 leg = plt.legend()
 leg.get_frame().set_edgecolor('k')
@@ -301,7 +312,7 @@ plt.tight_layout()
 
 ax = plt.subplot2grid((10,2), (0,1), colspan = 1, rowspan = 2)
 plt.errorbar(energies, np.delete(xasProData_one.XASOff_Norm,-4), np.delete(xasProData_one.Error_Off,-4), color = 'k')
-plt.plot(incident_axis, HERFD_FeRu*Cmax/HERFDmax, linewidth = 2, color = minuscolor, linestyle = '-.')
+plt.plot(incident_axis, HERFD_FeRu*scale_factor, linewidth = 2, color = minuscolor, linestyle = '-.')
 plt.text(7111, 900, 'A')
 plt.text(7113.8, 1250, 'B')
 plt.text(7115.5, 1985, 'C')
@@ -323,7 +334,8 @@ params_FeRu = Fe_Fits["params_FeRu"]
 
 #plt.plot([-100, -1000], [1,1], color = 'k', label = 'FeRu GS, LCLS')
 #plt.plot([-100, -1000], [1,1], linewidth = 2, color = pluscolor, linestyle = '-.', label = 'FeRu GS, APS')
-plt.plot(xall, diffxas(xall, *params_FeRu)*Cmax/HERFDmax*.2, label = 'reconstruction', linewidth = 3, color = pluscolor, zorder = -1000)
+plt.plot(xall, diffxas(xall, *params_FeRu), label = 'reconstruction', linewidth = 3, color = pluscolor, zorder = -1000)
+plt.plot(xall, (params_FeRu[10]*xall + params_FeRu[9]), label = 'linear background', color = red)
 #plt.fill_between(xA, FitOuts['Aoff']-xA*FitOuts['Aslope'], gauswslope(xA,FitOuts['Asig'],FitOuts['Ax0'],FitOuts['Aa'],FitOuts['Aoff'],FitOuts['Aslope']), label = 'A peak: ' + str(round(FitOuts['Ax0'],1)) + ' eV', linewidth = 5, color = pluscolor2,zorder=1)
 #plt.fill_between(xB, FitOuts['Boff']-xB*FitOuts['Bslope'], gauswslope(xB,FitOuts['Bsig'],FitOuts['Bx0'],FitOuts['Ba'],FitOuts['Boff'],FitOuts['Bslope']), label = 'B peak: ' + str(round(FitOuts['Bx0'],1)) + ' eV', linewidth = 5, color = pluscolor,zorder=2)
 plt.errorbar(energies, np.delete(XASDiffBootF,-4), np.delete(XASDiffBootE,-4), \
@@ -349,9 +361,6 @@ TSS = np.sum((yvals - np.mean(yvals))**2)
 adjR2 = 1-(RSS/(len(energies)-len(params_FeRu)-1))/(TSS/(len(energies-1)))
 print(adjR2)
 
-print('scale factor')
-print(Cmax/HERFDmax*.2)
-print(Cmax/HERFDmax)
 
 
 print('approx exc frac')
@@ -368,14 +377,59 @@ ax=plt.subplot(2,1,1)
 print('shift')
 print(shift)
 plt.stem(roots[:,0]+shift, roots[:,1]/np.max(roots[:,1]), markerfmt = 'none', basefmt='none', linefmt='k') 
-plt.plot(XX+shift, Amp, color = red)
          
          
+choice = .75
+#choice = 36
+roots = loadtxt(file+'2-'+str(round(choice*100))+'.roots')
+roots[:,0] = roots[:,0] + Eoff
 
+Amp = np.zeros(np.shape(XX))
+for ii in range(len(roots[:,1])):
+    Amp = Amp + roots[ii,1]/np.max(roots[:,1])/((XX-roots[ii,0])**2+(.5*width)**2)/math.pi/2*width
 
 x1pos = 7112.5
 x2pos = 7116
-bally = 3.4
+bally = 4
+
+plt.plot(XX+shift, Amp, color = darkerred, linewidth = 1)
+
+
+choice = .5
+#choice = 36
+roots = loadtxt(file+'2-'+str(round(choice*100))+'.roots')
+roots[:,0] = roots[:,0] + Eoff
+
+Amp = np.zeros(np.shape(XX))
+for ii in range(len(roots[:,1])):
+    Amp = Amp + roots[ii,1]/np.max(roots[:,1])/((XX-roots[ii,0])**2+(.5*width)**2)/math.pi/2*width
+
+x1pos = 7112.5
+x2pos = 7116
+bally = 4
+
+plt.plot(XX+shift, Amp, color = red, linewidth = 1)
+
+
+
+choice = .6
+#choice = 36
+roots = loadtxt(file+'2-'+str(round(choice*100))+'.roots')
+roots[:,0] = roots[:,0] + Eoff
+
+Amp = np.zeros(np.shape(XX))
+for ii in range(len(roots[:,1])):
+    Amp = Amp + roots[ii,1]/np.max(roots[:,1])/((XX-roots[ii,0])**2+(.5*width)**2)/math.pi/2*width
+
+x1pos = 7112.5
+x2pos = 7116
+bally = 4
+
+plt.plot(XX+shift, Amp, color = 'k', linewidth = 2)
+
+
+
+
          
 plt.plot([x1pos,x2pos], [bally,bally], lw=2, color='k')
 
@@ -386,17 +440,17 @@ ax.annotate('A', xy=(roots[0,0]+shift,roots[0,1]/np.max(roots[:,1])+.1), xytext=
             ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
 #ax.annotate('B', xy=(roots[4,0]+shift,roots[4,1]/np.max(roots[:,1])+.1), xytext=(roots[4,0]+shift,2.1), \
 #            ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
-ax.annotate('B', xy=(Bpeaks[5]+shift,roots[4,1]/np.max(roots[:,1])+.3), xytext=(Bpeaks[5]+shift,2.1), \
+ax.annotate('B', xy=(Bpeaks[4]+shift,roots[4,1]/np.max(roots[:,1])+.3), xytext=(Bpeaks[4]+shift,2.1), \
             ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
 
 ax.text(x1pos,bally, 'Fe', horizontalalignment='center', verticalalignment='center', color='k')
 ax.text(x2pos,bally, 'Ru', horizontalalignment='center', verticalalignment='center', color='w')
-ax.text(x1pos,2.65, str(round(choice,2))+' hc', horizontalalignment='center', verticalalignment='center', color='k')
-ax.text(x2pos,2.65, str(round(1-choice,2))+' hc', horizontalalignment='center', verticalalignment='center', color='k')
+ax.text(x1pos,3.1, str(round(choice,2))+' hc', horizontalalignment='center', verticalalignment='center', color='k')
+ax.text(x2pos,3.1, str(round(1-choice,2))+' hc', horizontalalignment='center', verticalalignment='center', color='k')
 
 plt.xticks(np.arange(7110, 7123, 2.0))
 plt.xlim([7110,7122])
-plt.ylim([0,4])
+plt.ylim([0,5])
 
 plt.xlabel('X-ray energy (eV)')
 
@@ -469,6 +523,23 @@ leg.get_frame().set_alpha(1)
 
 
 
+plt.figure()
+plt.plot(holedensity, ABpeakratio, marker = 's', label = 'calculated')
+plt.xlabel('hole charge')
+plt.ylabel('A, B peak amplitude ratio')
+plt.plot(holedensity[4], ABpeakratio[4], marker = '*', label = '0.6 h.c.', linestyle = 'none')
+plt.plot(linefit(FitOuts['BmA']), params_FeRu[1]/params_FeRu[4], marker = 'o', label='experiment', linestyle = 'none')
+plt.legend()
+
+
+
+
+plt.figure()
+plt.plot(holedensity, [x/BampVec[0] for x in BampVec], marker = 's', label = 'calculated')
+plt.xlabel('hole charge')
+plt.ylabel('relative B peak amplitude')
+plt.plot(linefit(FitOuts['BmA']), params_FeRu[4]/params_XAS[1], marker = 'o', label='experiment', linestyle = 'none')
+plt.legend()
 
 
 
