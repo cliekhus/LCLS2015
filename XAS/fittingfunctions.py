@@ -21,7 +21,7 @@ def xason(x, sigA,aA,x0A, sigB,aB,x0B, sigC,aC,x0C, offset, erfamp, erfslope, pe
 
 
 
-def diffxas(x, sigA,aA,x0A, sigB,aB,x0B, sigC,aC,x0C, y0,a, excfr):
+def diffxas(x, sigA,aA,x0A, sigB,aB,x0B, sigC,aC,x0C, y0,a):
     import numpy as np
     import pickle
     
@@ -39,7 +39,7 @@ def diffxas(x, sigA,aA,x0A, sigB,aB,x0B, sigC,aC,x0C, y0,a, excfr):
     params_XAS[9] = params_XAS[9]-Fe_fits["energy_shift"]
     
     out = xason(x, sigA,aA,x0A, sigB,aB,x0B, sigC,aC,x0C, 0,0,0,0) \
-            - excfr*xasoff(x,  params_XAS[0],params_XAS[1],params_XAS[2], params_XAS[3],params_XAS[4],params_XAS[5],\
+            - .25*xasoff(x,  params_XAS[0],params_XAS[1],params_XAS[2], params_XAS[3],params_XAS[4],params_XAS[5],\
                      0,0,0,0) + y0+a*x
     
     return out

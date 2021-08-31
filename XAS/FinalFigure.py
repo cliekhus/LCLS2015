@@ -240,7 +240,7 @@ plt.errorbar(energies, np.delete(XASDiffBootF,-4), np.delete(XASDiffBootE,-4), \
 
 plt.xlabel('x-ray energy (eV)')
 plt.ylabel('$\Delta$ HERFD-XANES (arb. units.)')
-plt.ylim([-400,185])
+plt.ylim([-600,185])
 plt.xlim([7110,7122])
 plt.xticks(np.arange(7110, 7123, 2.0))
 
@@ -298,7 +298,7 @@ shift = Params[2]-Bpeaks[0]
 params_FeRu = Fe_Fits["params_FeRu"]
 
 
-plt.plot(incident_axis, (HERFD_III-HERFD_II)*scale_factor*params_FeRu[-1], label = 'Fe$^{\mathrm{III}}$(CN)$_6$ - Fe$^{\mathrm{II}}$(CN)$_6$', linewidth = 3, color = pluscolor2, zorder=1)
+plt.plot(incident_axis, (HERFD_III-HERFD_II)*scale_factor*.25, label = 'Fe$^{\mathrm{III}}$(CN)$_6$ - Fe$^{\mathrm{II}}$(CN)$_6$', linewidth = 3, color = pluscolor2, zorder=1)
 
 leg = plt.legend()
 leg.get_frame().set_edgecolor('k')
@@ -379,7 +379,8 @@ print(shift)
 plt.stem(roots[:,0]+shift, roots[:,1]/np.max(roots[:,1]), markerfmt = 'none', basefmt='none', linefmt='k') 
          
          
-choice = .75
+
+choice = .1
 #choice = 36
 roots = loadtxt(file+'2-'+str(round(choice*100))+'.roots')
 roots[:,0] = roots[:,0] + Eoff
@@ -392,24 +393,8 @@ x1pos = 7112.5
 x2pos = 7116
 bally = 4
 
-plt.plot(XX+shift, Amp, color = darkerred, linewidth = 1)
-
-
-choice = .5
-#choice = 36
-roots = loadtxt(file+'2-'+str(round(choice*100))+'.roots')
-roots[:,0] = roots[:,0] + Eoff
-
-Amp = np.zeros(np.shape(XX))
-for ii in range(len(roots[:,1])):
-    Amp = Amp + roots[ii,1]/np.max(roots[:,1])/((XX-roots[ii,0])**2+(.5*width)**2)/math.pi/2*width
-
-x1pos = 7112.5
-x2pos = 7116
-bally = 4
-
-plt.plot(XX+shift, Amp, color = red, linewidth = 1)
-
+plt.plot(XX+shift, Amp, color = red, linewidth = 2)
+Ampforplotting1 = Amp
 
 
 choice = .6
@@ -425,7 +410,11 @@ x1pos = 7112.5
 x2pos = 7116
 bally = 4
 
-plt.plot(XX+shift, Amp, color = 'k', linewidth = 2)
+plt.plot(XX+shift, Amp, color = red, linewidth = 2)
+Ampforplotting = Amp
+
+
+
 
 
 
@@ -503,7 +492,7 @@ plt.plot(AB, holedensity, color = darkred, marker = 's', linestyle = 'none', mar
 plt.plot(AB, linefit(AB), color = 'k', zorder = 1)
 patch = pat.Ellipse((FitOuts['BmA'],linefit(FitOuts['BmA'])), FitOuts['BmAunc'], linefit(FitOuts['BmA']+FitOuts['BmAunc'])-linefit(FitOuts['BmA']-FitOuts['BmAunc']), color=pluscolor, zorder = 200)
 #plt.plot(-10,-10, color = pluscolor, marker = 'o', label = 'exp.', linestyle = 'none')
-ax.annotate('exp.', xy=(2.3,0.82), xytext=(1.55,0.9), arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
+ax.annotate('exp.', xy=(1.6,0.65), xytext=(.75,.65), arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
 #plt.tight_layout()
 ax.add_patch(patch)
 plt.plot(3.2, linefit(3.2), color = pluscolor2, marker = '*', markersize = 10, linestyle = 'none', zorder = 10000)
@@ -559,7 +548,7 @@ print('Hole density: ' + str(linefit(FitOuts['BmA'])) + ' pm ' + str(linefit(Fit
 
 
 
-######################## MAKE BC XANES DIFF PLOT #############################
+####################### MAKE BC XANES DIFF PLOT #############################
 #plt.figure(figsize = (3.5,5))
 #
 #
@@ -717,183 +706,165 @@ print('Hole density: ' + str(linefit(FitOuts['BmA'])) + ' pm ' + str(linefit(Fit
 #
 #
 #
-#
-#
-############################# Make C TDs #######################################
-#"""
-#plt.figure(figsize = (7,1.5))
-#ax=plt.subplot(1,1,1)
-#
-#zoom = 0.11
-#
-#arr_lena = mpimg.imread('pt60_5_TD.bmp')
-#imagebox = OffsetImage(arr_lena, zoom=zoom)
-#ab = AnnotationBbox(imagebox, (-.75, 0))#, frameon=False)
-#ax.add_artist(ab)
-#ax.text(-.75,-.6, 'B', horizontalalignment='center')
-#
-#arr_lena = mpimg.imread('pt60_7_TD.bmp')
-#imagebox = OffsetImage(arr_lena, zoom=zoom)
-#ab = AnnotationBbox(imagebox, (-.25, 0))#, frameon=False)
-#ax.add_artist(ab)
-#ax.text(-.25,-.6, 'C1', horizontalalignment='center')
-#
-#arr_lena = mpimg.imread('pt60_9_TD.bmp')
-#imagebox = OffsetImage(arr_lena, zoom=zoom)
-#ab = AnnotationBbox(imagebox, (.25, 0))#), frameon=False)
-#ax.add_artist(ab)
-#ax.text(.25,-.6, 'C2', horizontalalignment='center')
-#
-#arr_lena = mpimg.imread('pt60_11_TD.bmp')
-#imagebox = OffsetImage(arr_lena, zoom=zoom)
-#ab = AnnotationBbox(imagebox, (.75, 0))#), frameon=False)
-#ax.add_artist(ab)
-#ax.text(.75,-.6, 'C3', horizontalalignment='center')
-#
-#plt.xlim([-.75, .8])
-#plt.ylim([-.5, .5])
-#plt.axis('off')
-#
-#frame1 = plt.gca()
-#frame1.axes.get_xaxis().set_visible(False)
-#frame1.axes.get_yaxis().set_visible(False)
-#"""
-#
-#
-################## Print out info ##############################################
-#
+
+
+############################ Make C TDs #######################################
+"""
+plt.figure(figsize = (7,1.5))
+ax=plt.subplot(1,1,1)
+
+zoom = 0.11
+
+arr_lena = mpimg.imread('pt60_5_TD.bmp')
+imagebox = OffsetImage(arr_lena, zoom=zoom)
+ab = AnnotationBbox(imagebox, (-.75, 0))#, frameon=False)
+ax.add_artist(ab)
+ax.text(-.75,-.6, 'B', horizontalalignment='center')
+
+arr_lena = mpimg.imread('pt60_7_TD.bmp')
+imagebox = OffsetImage(arr_lena, zoom=zoom)
+ab = AnnotationBbox(imagebox, (-.25, 0))#, frameon=False)
+ax.add_artist(ab)
+ax.text(-.25,-.6, 'C1', horizontalalignment='center')
+
+arr_lena = mpimg.imread('pt60_9_TD.bmp')
+imagebox = OffsetImage(arr_lena, zoom=zoom)
+ab = AnnotationBbox(imagebox, (.25, 0))#), frameon=False)
+ax.add_artist(ab)
+ax.text(.25,-.6, 'C2', horizontalalignment='center')
+
+arr_lena = mpimg.imread('pt60_11_TD.bmp')
+imagebox = OffsetImage(arr_lena, zoom=zoom)
+ab = AnnotationBbox(imagebox, (.75, 0))#), frameon=False)
+ax.add_artist(ab)
+ax.text(.75,-.6, 'C3', horizontalalignment='center')
+
+plt.xlim([-.75, .8])
+plt.ylim([-.5, .5])
+plt.axis('off')
+
+frame1 = plt.gca()
+frame1.axes.get_xaxis().set_visible(False)
+frame1.axes.get_yaxis().set_visible(False)
+"""
+
+
+################# Print out info ##############################################
+
 #print('BC: ' + str(FitOuts['CmB']) + ' pm ' + str(FitOuts['CmBunc']))
 #print('Hole density: ' + str(Clinefit(FitOuts['CmB'])) + ' pm ' + str(Clinefit(FitOuts['CmB']+FitOuts['CmBunc'])-Clinefit(FitOuts['CmB']-FitOuts['CmBunc'])))
-#
-#
+
+
 #print('C1 shift: ' + str(shift1))
 #print('C2 shift: ' + str(shift2))
 #print('C3 shift: ' + str(shift3))
-#
-#
-#    
+
+
+    
 #print('number of points used: ' + str(FitOuts['numpoints']))
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-####################### Supplementary Figure #################################
-#
-#
-#
-#plt.figure(figsize=(7.5,10))
-#
-#for ii in range(7):
-#    
-#    roots = loadtxt(file+'2-'+str(int(holedensity[ii]*100))+'.roots')
-#    
-#    ax=plt.subplot(4,2,ii+1)
-#    plt.stem(roots[:,0]+Eoff+shift, roots[:,1]/np.max(roots[:,1]), markerfmt = 'none', basefmt='none', linefmt='k')
-#
-#    Amp = np.zeros(np.shape(XX))
-#    
-#    
-#    
-#    for jj in range(len(roots[:,1])):
-#        Amp = Amp + roots[jj,1]/np.max(roots[:,1])/((XX-roots[jj,0]-Eoff)**2+(.5*width)**2)/math.pi/2*width
-#     
-#    plt.plot(XX+shift, Amp, color = red)
-#    
-#    x1pos = 7113
-#    x2pos = 7116.25
-#    bally = 4.5
-#             
-#    plt.plot([x1pos,x2pos], [bally,bally], lw=2, color='k')
-#    
-#    plt.plot(x1pos,bally,'ko', markersize = 30, fillstyle = 'full', color = str(holedensity[ii]))
-#    plt.plot(x2pos,bally,'ko', markersize = 30, fillstyle = 'full', color = str(1-holedensity[ii]))
-#    
-#    if ii >= 2:
-#            
-#        ax.annotate('A', xy=(Apeaks[ii]+shift,roots[0,1]/np.max(roots[:,1])+.1), xytext=(Apeaks[ii]+shift,2.1), ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
-#        ax.annotate('B', xy=(Bpeaks[ii]+shift,1.2), xytext=(Bpeaks[ii]+shift,2.1), ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
-#        
-#        ax.annotate(' ', xy=(Cpeaks1[ii]+shift,roots[6,1]/np.max(roots[:,1])+.1), xytext=(Cpeaks1[ii]+shift,2.1), \
-#            ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
-#        ax.text(Cpeaks1[ii]+shift,2.1, 'C1', horizontalalignment='right')
-#        ax.annotate('C2', xy=(Cpeaks2[ii]+shift,roots[8,1]/np.max(roots[:,1])+.1), xytext=(Cpeaks2[ii]+shift,2.4), \
-#                    ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
-#        ax.annotate(' ', xy=(Cpeaks3[ii]+shift,roots[10,1]/np.max(roots[:,1])+.1), xytext=(Cpeaks3[ii]+shift,2.1), \
-#                    ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
-#        ax.text(Cpeaks3[ii]+shift,2.1, 'C3', horizontalalignment='left')
-#        
-#    else:
-#        
-#        ax.text(Apeaks[ii]+shift,2.1, 'A', horizontalalignment='right')
-#        ax.text(Bpeaks[ii]+shift,2.1, 'B', horizontalalignment='left')
-#        ax.annotate('', xy=(Apeaks[ii]+shift,roots[0,1]/np.max(roots[:,1])+.1), xytext=(Apeaks[ii]+shift,2.1), ha='right', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
-#        ax.annotate('', xy=(Bpeaks[ii]+shift,1.2), xytext=(Bpeaks[ii]+shift,2.1), ha='left', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
-#        
-#        ax.annotate(' ', xy=(Cpeaks1[ii]+shift,roots[6,1]/np.max(roots[:,1])+.1), xytext=(Cpeaks1[ii]+shift,2.1), \
-#            ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
-#        ax.text(Cpeaks1[ii]+shift,2.1, 'C1', horizontalalignment='right')
-#        ax.annotate('C3', xy=(Cpeaks3[ii]+shift,roots[10,1]/np.max(roots[:,1])+.1), xytext=(Cpeaks3[ii]+shift,2.4), \
-#                    ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
-#        ax.annotate(' ', xy=(Cpeaks2[ii]+shift,roots[8,1]/np.max(roots[:,1])+.1), xytext=(Cpeaks2[ii]+shift,2.1), \
-#                    ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
-#        ax.text(Cpeaks2[ii]+shift,2.1, 'C2', horizontalalignment='left')
-#        
-#    if ii <= 2:
-#            
-#        ax.text(x1pos,bally, 'Fe', horizontalalignment='center', verticalalignment='center', color='w')
-#        ax.text(x2pos,bally, 'Ru', horizontalalignment='center', verticalalignment='center', color='k')
-#        ax.text(x1pos,3.25, str(round(holedensity[ii],2))+' hc', horizontalalignment='center', verticalalignment='center', color='k')
-#        ax.text(x2pos,3.25, str(round(1-holedensity[ii],2))+' hc', horizontalalignment='center', verticalalignment='center', color='k')
-#    
-#    else:
-#    
-#        ax.text(x1pos,bally, 'Fe', horizontalalignment='center', verticalalignment='center', color='k')
-#        ax.text(x2pos,bally, 'Ru', horizontalalignment='center', verticalalignment='center', color='w')
-#        ax.text(x1pos,3.25, str(round(holedensity[ii],2))+' hc', horizontalalignment='center', verticalalignment='center', color='k')
-#        ax.text(x2pos,3.25, str(round(1-holedensity[ii],2))+' hc', horizontalalignment='center', verticalalignment='center', color='k')
-#
-#        
-#        
-#    
-#    #plt.xlim([7110.5,7118.5])
-#    plt.xlim([7110.5,7125])
-#    plt.ylim([0,6.1])
-#    #plt.ylim([0,4])
-#    
-#    plt.xlabel('X-ray energy (eV)')
-#    plt.ylabel('absorption')
-#    
-#    #plt.ylabel('calculated $I_{off}$')
-#
-#ax=plt.subplot(4,2,8)
-#
-#plt.plot(AB, holedensity, color = red, marker = 's', linestyle = 'none', markerfacecolor = 'none', markeredgewidth = 1.5, label = 'AB 1', zorder = 3)
-#plt.plot(AB2[:,1], AB2[:,0], color = darkred, marker = 'o', linestyle = 'none', markerfacecolor = 'none', markeredgewidth = 1.5, label = 'AB 2', zorder = 4)
-#plt.plot(AB, linefit(AB), color = 'k', zorder = 0)
-#plt.plot(BC1, holedensity, color = red, marker = '^', linestyle = 'none', markerfacecolor = 'none', markeredgewidth = 1.5, label = 'BC 1', zorder = 3)
-#plt.plot(BC2, holedensity, color = darkred, marker = 'v', linestyle = 'none', markerfacecolor = 'none', markeredgewidth = 1.5, label = 'BC 2', zorder = 3)
-#plt.plot(BC3, holedensity, color = darkerred, marker = '*', linestyle = 'none', markerfacecolor = 'none', markeredgewidth = 1.5, label = 'BC 3', zorder = 3)
-#plt.plot(BC1, Clinefit(BC1), color = 'k', zorder = 0)
-#plt.xlabel('A - B or B - C peak energy difference (eV)')
-#plt.ylabel('Fe hole charge')
-#leg = ax.legend(bbox_to_anchor=(0.03, 1.15), loc='upper left', borderaxespad=0., facecolor = 'white', handlelength = 1.2)
-#leg.get_frame().set_edgecolor('k')
-#leg.get_frame().set_linewidth(0.8)
-#leg.get_frame().set_alpha(1)
-#
-#plt.tight_layout()
-#
-#
-#
-#
-#
+
+
+
+
+
+
+
+
+
+
+
+###################### Supplementary Figure #################################
+
+
+
+plt.figure(figsize=(7.5,10))
+
+for ii in range(7):
+    
+    roots = loadtxt(file+'2-'+str(int(holedensity[ii]*100))+'.roots')
+    
+    ax=plt.subplot(4,2,ii+1)
+    plt.stem(roots[:,0]+Eoff+shift, roots[:,1]/np.max(roots[:,1]), markerfmt = 'none', basefmt='none', linefmt='k')
+
+    Amp = np.zeros(np.shape(XX))
+    
+    
+    
+    for jj in range(len(roots[:,1])):
+        Amp = Amp + roots[jj,1]/np.max(roots[:,1])/((XX-roots[jj,0]-Eoff)**2+(.5*width)**2)/math.pi/2*width
+     
+    plt.plot(XX+shift, Amp, color = red)
+    
+    x1pos = 7113
+    x2pos = 7116.25
+    bally = 4.5
+             
+    plt.plot([x1pos,x2pos], [bally,bally], lw=2, color='k')
+    
+    plt.plot(x1pos,bally,'ko', markersize = 30, fillstyle = 'full', color = str(holedensity[ii]))
+    plt.plot(x2pos,bally,'ko', markersize = 30, fillstyle = 'full', color = str(1-holedensity[ii]))
+    
+    if ii >= 2:
+            
+        ax.annotate('A', xy=(Apeaks[ii]+shift,roots[0,1]/np.max(roots[:,1])+.1), xytext=(Apeaks[ii]+shift,2.1), ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
+        ax.annotate('B', xy=(Bpeaks[ii]+shift,1.2), xytext=(Bpeaks[ii]+shift,2.1), ha='center', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
+        
+
+        
+    else:
+        
+        ax.text(Apeaks[ii]+shift,2.1, 'A', horizontalalignment='right')
+        ax.text(Bpeaks[ii]+shift,2.1, 'B', horizontalalignment='left')
+        ax.annotate('', xy=(Apeaks[ii]+shift,roots[0,1]/np.max(roots[:,1])+.1), xytext=(Apeaks[ii]+shift,2.1), ha='right', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
+        ax.annotate('', xy=(Bpeaks[ii]+shift,1.2), xytext=(Bpeaks[ii]+shift,2.1), ha='left', arrowprops={'arrowstyle': '->', 'ls': 'solid', 'ec': 'k', 'lw': 2})
+        
+
+        
+    if ii <= 2:
+            
+        ax.text(x1pos,bally, 'Fe', horizontalalignment='center', verticalalignment='center', color='w')
+        ax.text(x2pos,bally, 'Ru', horizontalalignment='center', verticalalignment='center', color='k')
+        ax.text(x1pos,3.25, str(round(holedensity[ii],2))+' hc', horizontalalignment='center', verticalalignment='center', color='k')
+        ax.text(x2pos,3.25, str(round(1-holedensity[ii],2))+' hc', horizontalalignment='center', verticalalignment='center', color='k')
+    
+    else:
+    
+        ax.text(x1pos,bally, 'Fe', horizontalalignment='center', verticalalignment='center', color='k')
+        ax.text(x2pos,bally, 'Ru', horizontalalignment='center', verticalalignment='center', color='w')
+        ax.text(x1pos,3.25, str(round(holedensity[ii],2))+' hc', horizontalalignment='center', verticalalignment='center', color='k')
+        ax.text(x2pos,3.25, str(round(1-holedensity[ii],2))+' hc', horizontalalignment='center', verticalalignment='center', color='k')
+
+        
+        
+    
+    #plt.xlim([7110.5,7118.5])
+    plt.xlim([7110.5,7125])
+    plt.ylim([0,6.1])
+    #plt.ylim([0,4])
+    
+    plt.xlabel('X-ray energy (eV)')
+    plt.ylabel('absorption')
+    
+    #plt.ylabel('calculated $I_{off}$')
+
+ax=plt.subplot(4,2,8)
+
+plt.plot(AB, holedensity, color = red, marker = 's', linestyle = 'none', markerfacecolor = 'none', markeredgewidth = 1.5, label = 'AB 1', zorder = 3)
+plt.plot(AB2[:,1], AB2[:,0], color = darkred, marker = 'o', linestyle = 'none', markerfacecolor = 'none', markeredgewidth = 1.5, label = 'AB 2', zorder = 4)
+plt.plot(AB, linefit(AB), color = 'k', zorder = 0)
+plt.xlabel('A - B peak energy difference (eV)')
+plt.ylabel('Fe hole charge')
+leg = ax.legend(bbox_to_anchor=(0.03, 1.15), loc='upper left', borderaxespad=0., facecolor = 'white', handlelength = 1.2)
+leg.get_frame().set_edgecolor('k')
+leg.get_frame().set_linewidth(0.8)
+leg.get_frame().set_alpha(1)
+
+plt.tight_layout()
+
+
+
+
+
 ####################### Presentation Figure #################################
 #
 #
