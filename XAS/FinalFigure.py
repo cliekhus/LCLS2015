@@ -393,7 +393,7 @@ x1pos = 7112.5
 x2pos = 7116
 bally = 4
 
-plt.plot(XX+shift, Amp, color = red, linewidth = 2)
+
 Ampforplotting1 = Amp
 
 
